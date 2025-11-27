@@ -33,6 +33,20 @@
 
         h1, h2, h3, h4, h5, .nav-link, .btn, .modal-title { font-family: 'Kanit', sans-serif; }
 
+        /* Loading Screen */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        .spinner-logo { width: 80px; animation: spin 2s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* Glass Card */
         .glass-card {
             background: var(--glass-bg);
@@ -58,13 +72,9 @@
         .bg-live { background: #dc3545; color: white; animation: pulse 1.5s infinite; }
         .bg-wait { background: #6c757d; color: white; }
         .bg-done { background: #198754; color: white; }
-        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        .team-header-y { color: #856404; background-color: #fff3cd; border-left: 5px solid #FFD700; padding: 10px; border-radius: 8px; }
-        .team-header-b { color: #084298; background-color: #cfe2ff; border-left: 5px solid #00BFFF; padding: 10px; border-radius: 8px; }
-
-        /* Report Preview Fixes */
+        /* PDF Styles - Fix Layout */
         .report-preview-page {
             background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm 20mm; color: #000; position: relative;
         }
@@ -77,6 +87,12 @@
     </style>
 </head>
 <body>
+
+    <div id="loadingOverlay">
+        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="spinner-logo">
+        <h4 class="text-secondary fw-bold">กำลังโหลดข้อมูล...</h4>
+        <small class="text-muted">กระดุมทองเกมส์ 2568</small>
+    </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
@@ -103,7 +119,7 @@
 
     <div class="container py-4">
         
-        <div id="page-dashboard" class="page-section fade-in">
+        <div id="page-dashboard" class="page-section">
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div class="glass-card p-3 d-flex justify-content-between align-items-center border-warning border-2">
@@ -221,18 +237,18 @@
 
                             <div class="tab-pane fade" id="tab-players">
                                 <div class="mb-3">
-                                    <h6 class="team-header-y small fw-bold d-flex justify-content-between align-items-center">
+                                    <h6 class="text-warning-emphasis small fw-bold d-flex justify-content-between align-items-center border-bottom border-warning pb-2">
                                         นักกีฬาสีเหลือง 
                                         <button class="btn btn-sm btn-warning py-0" onclick="addPlayerInput('Y')"><i class="fas fa-plus"></i> เพิ่ม</button>
                                     </h6>
-                                    <div id="playersY" class="d-flex flex-column gap-2"></div>
+                                    <div id="playersY" class="d-flex flex-column gap-2 mt-2"></div>
                                 </div>
                                 <div class="mb-3">
-                                    <h6 class="team-header-b small fw-bold d-flex justify-content-between align-items-center">
+                                    <h6 class="text-primary-emphasis small fw-bold d-flex justify-content-between align-items-center border-bottom border-info pb-2">
                                         นักกีฬาสีฟ้า 
                                         <button class="btn btn-sm btn-info py-0 text-white" onclick="addPlayerInput('B')"><i class="fas fa-plus"></i> เพิ่ม</button>
                                     </h6>
-                                    <div id="playersB" class="d-flex flex-column gap-2"></div>
+                                    <div id="playersB" class="d-flex flex-column gap-2 mt-2"></div>
                                 </div>
                                 <button class="btn btn-sm btn-dark w-100 mt-2" onclick="printPlayerList()"><i class="fas fa-print me-1"></i> พิมพ์รายชื่อนักกีฬา (PDF)</button>
                             </div>
@@ -311,25 +327,34 @@
     <div class="d-none">
         <div id="playerListContent" class="report-preview-page">
             <div class="text-center mb-4">
-                <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 70px;">
-                <h4 class="fw-bold mt-2">รายชื่อนักกีฬา "กระดุมทองเกมส์ 2568"</h4>
-                <p class="mb-0"><strong>กีฬา:</strong> <span id="plSport"></span> <strong>รุ่น:</strong> <span id="plCat"></span></p>
+                <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 60px;">
+                <h3 class="fw-bold mt-2 mb-0">ใบรายชื่อนักกีฬา</h3>
+                <h5 class="text-primary fw-bold">"กระดุมทองเกมส์ 2568"</h5>
+                <hr>
+                <p class="mb-0 fs-5"><strong>กีฬา:</strong> <span id="plSport"></span> &nbsp;|&nbsp; <strong>รุ่น:</strong> <span id="plCat"></span></p>
             </div>
-            <div class="row">
-                <div class="col-6">
-                    <div class="border border-warning rounded p-3">
-                        <h5 class="text-center fw-bold text-warning-emphasis bg-warning bg-opacity-10 py-2">ทีมสีเหลือง</h5>
-                        <ol id="plListY" class="ps-4"></ol>
-                    </div>
+            
+            <table class="table table-bordered text-center" style="border-color: #000;">
+                <thead>
+                    <tr class="table-light">
+                        <th style="width: 50%; background-color: #fff3cd !important; color: black;">รายชื่อทีมสีเหลือง</th>
+                        <th style="width: 50%; background-color: #cfe2ff !important; color: black;">รายชื่อทีมสีฟ้า</th>
+                    </tr>
+                </thead>
+                <tbody id="plTableBody">
+                    </tbody>
+            </table>
+
+            <div class="row mt-5 pt-5">
+                <div class="col-6 text-center">
+                    <div style="border-bottom: 1px dotted #000; width: 150px; margin: 0 auto 5px;"></div>
+                    <p>ผู้ควบคุมทีมสีเหลือง</p>
                 </div>
-                <div class="col-6">
-                    <div class="border border-info rounded p-3">
-                        <h5 class="text-center fw-bold text-primary-emphasis bg-info bg-opacity-10 py-2">ทีมสีฟ้า</h5>
-                        <ol id="plListB" class="ps-4"></ol>
-                    </div>
+                <div class="col-6 text-center">
+                    <div style="border-bottom: 1px dotted #000; width: 150px; margin: 0 auto 5px;"></div>
+                    <p>ผู้ควบคุมทีมสีฟ้า</p>
                 </div>
             </div>
-            <div class="mt-5 text-center small text-muted">พิมพ์จากระบบบันทึกผลการแข่งขัน โรงเรียนกระดุมทองวิทยา</div>
         </div>
     </div>
 
@@ -383,10 +408,17 @@
 
         // --- DASHBOARD ---
         window.loadMatches = () => {
+            // Show Loader only on first load
+            const loader = document.getElementById('loadingOverlay');
+            
             const filterS = document.getElementById('filterSport').value;
             const filterW = document.getElementById('filterWinner').value;
             
             onValue(ref(db, 'matches'), (snap) => {
+                // Hide Loader when data arrives
+                if(loader) loader.style.opacity = '0'; 
+                setTimeout(() => { if(loader) loader.style.display = 'none'; }, 500);
+
                 const list = document.getElementById('matchList');
                 const filterSportSel = document.getElementById('filterSport');
                 list.innerHTML = '';
@@ -474,7 +506,6 @@
                 refDiv.innerHTML = '';
                 const refCount = (m.sport === 'cheer') ? 3 : 1;
                 let currentRefs = m.referees || [];
-                // Fix: Ensure array has correct length
                 while(currentRefs.length < refCount) currentRefs.push('');
                 
                 currentRefs.forEach((name, i) => {
@@ -485,7 +516,7 @@
 
                 document.getElementById('signerLabel').innerText = (m.sport === 'cheer') ? "ประธานสีผู้รับรอง" : "ตัวแทนนักกีฬาผู้ชนะ";
 
-                // Players (Initialize if undefined)
+                // Players (Force Initialize Empty Arrays if undefined)
                 if(!m.playersY) m.playersY = [];
                 if(!m.playersB) m.playersB = [];
                 renderPlayers(m.playersY, 'Y');
@@ -496,14 +527,16 @@
             }, { onlyOnce: true });
         };
 
-        // --- PLAYERS (FIXED BUG) ---
+        // --- PLAYERS (BUG FIX) ---
         window.renderPlayers = (list, team) => {
             const div = document.getElementById(`players${team}`);
             div.innerHTML = '';
-            if(!list || list.length === 0) {
+            // Handle case where list might be null/undefined initially
+            const safeList = list || []; 
+            if(safeList.length === 0) {
                 div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ</small>';
             } else {
-                list.forEach((p, i) => {
+                safeList.forEach((p, i) => {
                     div.innerHTML += `
                         <div class="input-group input-group-sm mb-1">
                             <input type="text" class="form-control" value="${p}" onchange="updatePlayer('${team}', ${i}, this.value)">
@@ -514,11 +547,11 @@
         };
 
         window.addPlayerInput = (team) => {
-            // Fix: Check existing array locally first
+            // FIX: Initialize immediately if undefined
             let list = team === 'Y' ? (matchDataLocal.playersY || []) : (matchDataLocal.playersB || []);
-            list.push(''); // Add empty slot
+            list.push(''); 
             
-            // Save to DB immediately
+            // Save to DB immediately to sync state
             update(ref(db, `matches/${currentMatchId}/players${team}`), list).then(() => {
                 matchDataLocal[`players${team}`] = list; // Update local
                 renderPlayers(list, team);
@@ -541,12 +574,21 @@
             document.getElementById('plSport').innerText = getSportName(matchDataLocal.sport);
             document.getElementById('plCat').innerText = matchDataLocal.category;
             
-            const listY = document.getElementById('plListY');
-            const listB = document.getElementById('plListB');
-            listY.innerHTML = ''; listB.innerHTML = '';
+            const tbody = document.getElementById('plTableBody');
+            tbody.innerHTML = '';
 
-            (matchDataLocal.playersY || []).forEach(p => listY.innerHTML += `<li>${p}</li>`);
-            (matchDataLocal.playersB || []).forEach(p => listB.innerHTML += `<li>${p}</li>`);
+            const listY = matchDataLocal.playersY || [];
+            const listB = matchDataLocal.playersB || [];
+            const max = Math.max(listY.length, listB.length, 10); // Min 10 rows for nice look
+
+            for(let i=0; i<max; i++) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="height: 35px; vertical-align: middle;">${listY[i] || ''}</td>
+                        <td style="height: 35px; vertical-align: middle;">${listB[i] || ''}</td>
+                    </tr>
+                `;
+            }
 
             const el = document.getElementById('playerListContent');
             const opt = { margin: 10, filename: 'Players_List.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } };
