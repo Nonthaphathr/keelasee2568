@@ -15,8 +15,8 @@
     
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         body {
@@ -47,13 +47,13 @@
 
         /* Navbar */
         .navbar {
-            background: rgba(21, 30, 61, 0.95) !important;
+            background: rgba(21, 30, 61, 0.98) !important;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         .navbar-brand img { height: 50px; margin-right: 12px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
 
-        /* Status & Team Colors */
+        /* Status & Colors */
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
         .bg-live { background: #dc3545; color: white; animation: pulse 1.5s infinite; }
         .bg-wait { background: #6c757d; color: white; }
@@ -64,23 +64,16 @@
         .team-header-y { color: #856404; background-color: #fff3cd; border-left: 5px solid #FFD700; padding: 10px; border-radius: 8px; }
         .team-header-b { color: #084298; background-color: #cfe2ff; border-left: 5px solid #00BFFF; padding: 10px; border-radius: 8px; }
 
-        /* Report Preview Fixes (Anti-Glitch) */
+        /* Report Preview Fixes */
         .report-preview-page {
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 15mm 20mm; /* ลด Padding เพื่อให้ Fit */
-            color: #000;
-            position: relative;
+            background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm 20mm; color: #000; position: relative;
         }
-        /* บังคับปิด Effect เงาตอน Print เพื่อแก้สระลอย/ตัวหนังสือซ้อน */
         .report-preview-page * {
-            text-shadow: none !important;
-            box-shadow: none !important;
-            -webkit-text-stroke: 0 !important;
-            letter-spacing: normal !important;
+            text-shadow: none !important; box-shadow: none !important; -webkit-text-stroke: 0 !important; letter-spacing: normal !important;
         }
+        
+        /* QR Code Modal */
+        #qrImage { max-width: 100%; height: auto; border: 10px solid white; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -99,9 +92,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto gap-2">
-                    <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือการใช้งาน</button></li>
+                    <li class="nav-item"><button class="btn btn-sm btn-outline-light border-0" onclick="showQRCode()"><i class="fas fa-qrcode me-1"></i> QR ระบบ</button></li>
+                    <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
-                    <li class="nav-item"><button class="btn btn-sm btn-warning" onclick="showPage('setup')"><i class="fas fa-plus me-1"></i> เพิ่มรายการแข่ง</button></li>
+                    <li class="nav-item"><button class="btn btn-sm btn-warning" onclick="showPage('setup')"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
                 </ul>
             </div>
         </div>
@@ -134,6 +128,7 @@
                         <option value="yellow">เหลืองชนะ</option>
                         <option value="blue">ฟ้าชนะ</option>
                     </select>
+                    <button class="btn btn-sm btn-dark ms-auto" onclick="showQRCode()"><i class="fas fa-qrcode"></i> Scan เข้าระบบ</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -162,10 +157,10 @@
                             <select class="form-select" id="sportType" required>
                                 <option value="" disabled selected>-- เลือก --</option>
                                 <option value="football">ฟุตบอล 7 คน</option>
-                                <option value="volleyball">วอลเลย์บอล (นับแต้ม)</option>
-                                <option value="beach_volleyball">วอลเลย์บอลชายหาด (นับแต้ม)</option>
-                                <option value="sepaktakraw">เซปักตะกร้อ (นับแต้ม)</option>
-                                <option value="esports">E-Sports ROV (ชนะ/แพ้)</option>
+                                <option value="volleyball">วอลเลย์บอล</option>
+                                <option value="beach_volleyball">วอลเลย์บอลชายหาด</option>
+                                <option value="sepaktakraw">เซปักตะกร้อ</option>
+                                <option value="esports">E-Sports ROV</option>
                                 <option value="petanque">เปตอง</option>
                                 <option value="folksport">กีฬาพื้นบ้าน</option>
                                 <option value="cheer">ประกวดกองเชียร์ฯ</option>
@@ -212,26 +207,34 @@
                                 <div id="refereeSection">
                                     <label class="small fw-bold text-muted">กรรมการผู้ตัดสิน</label>
                                     <div id="refereeInputs"></div> 
-                                    </div>
+                                </div>
                                 <div class="mt-3">
                                     <label class="small fw-bold text-muted" id="signerLabel">ตัวแทนนักกีฬาผู้ชนะ</label>
-                                    <input type="text" class="form-control form-control-sm" id="athleteSign" placeholder="ลงชื่อ..." onchange="autoSave()">
+                                    <input type="text" class="form-control form-control-sm" id="athleteSign" placeholder="ลงชื่อ...">
                                 </div>
                                 <div class="mt-3">
                                     <label class="small fw-bold text-muted">หมายเหตุ</label>
-                                    <textarea id="matchNote" class="form-control form-control-sm" rows="2" onchange="autoSave()"></textarea>
+                                    <textarea id="matchNote" class="form-control form-control-sm" rows="2"></textarea>
                                 </div>
+                                <button class="btn btn-primary w-100 mt-3" onclick="saveMatchInfo()"><i class="fas fa-save me-1"></i> บันทึกข้อมูลการแข่งขัน</button>
                             </div>
 
                             <div class="tab-pane fade" id="tab-players">
                                 <div class="mb-3">
-                                    <h6 class="team-header-y small fw-bold">นักกีฬาสีเหลือง <button class="btn btn-sm btn-outline-warning py-0 float-end" onclick="addPlayerInput('Y')">+</button></h6>
+                                    <h6 class="team-header-y small fw-bold d-flex justify-content-between align-items-center">
+                                        นักกีฬาสีเหลือง 
+                                        <button class="btn btn-sm btn-warning py-0" onclick="addPlayerInput('Y')"><i class="fas fa-plus"></i> เพิ่ม</button>
+                                    </h6>
                                     <div id="playersY" class="d-flex flex-column gap-2"></div>
                                 </div>
                                 <div class="mb-3">
-                                    <h6 class="team-header-b small fw-bold">นักกีฬาสีฟ้า <button class="btn btn-sm btn-outline-primary py-0 float-end" onclick="addPlayerInput('B')">+</button></h6>
+                                    <h6 class="team-header-b small fw-bold d-flex justify-content-between align-items-center">
+                                        นักกีฬาสีฟ้า 
+                                        <button class="btn btn-sm btn-info py-0 text-white" onclick="addPlayerInput('B')"><i class="fas fa-plus"></i> เพิ่ม</button>
+                                    </h6>
                                     <div id="playersB" class="d-flex flex-column gap-2"></div>
                                 </div>
+                                <button class="btn btn-sm btn-dark w-100 mt-2" onclick="printPlayerList()"><i class="fas fa-print me-1"></i> พิมพ์รายชื่อนักกีฬา (PDF)</button>
                             </div>
                         </div>
                     </div>
@@ -241,7 +244,7 @@
                     <div class="glass-card p-4 text-center">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="badge bg-secondary" id="matchCatDisplay">Category</span>
-                            <span class="status-badge bg-live">LIVE - Auto Save</span>
+                            <span class="status-badge bg-live">LIVE - Auto Save Score</span>
                             <button class="btn btn-sm btn-outline-danger" onclick="clearMatchData()">ล้างคะแนน</button>
                         </div>
                         <h3 class="fw-bold mb-4" id="matchTitleDisplay">Sport Name</h3>
@@ -273,25 +276,14 @@
 
     </div>
 
-    <div class="modal fade" id="manualModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal fade" id="qrModal" tabindex="-1">
+        <div class="modal-dialog modal-sm text-center">
             <div class="modal-content">
-                <div class="modal-header bg-info text-white"><h5 class="modal-title">คู่มือการใช้งาน</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header"><h5 class="modal-title">QR Code เข้าระบบ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
-                    <ol>
-                        <li><strong>เพิ่มรายการแข่ง:</strong> กดปุ่ม "เพิ่มรายการแข่ง" เลือกชนิดกีฬาให้ถูกต้อง</li>
-                        <li><strong>ลงทะเบียน:</strong> ในหน้าการแข่ง แท็บ "รายชื่อนักกีฬา" กด + เพื่อเพิ่มคน</li>
-                        <li><strong>การลงคะแนน:</strong>
-                            <ul>
-                                <li><em>ฟุตบอล/เปตอง:</em> กด +1/-1</li>
-                                <li><em>วอลเลย์/ตะกร้อ:</em> กรอกแต้มดิบ (เช่น 25-20) ระบบนับเซตให้เอง</li>
-                                <li><em>E-Sports:</em> เลือกทีมที่ชนะในแต่ละเซต</li>
-                                <li><em>กองเชียร์:</em> กรอกคะแนนจากกรรมการ 3 ท่าน</li>
-                            </ul>
-                        </li>
-                        <li><strong>บันทึก:</strong> ระบบบันทึกอัตโนมัติ (Auto Save) เมื่อแก้ไข กด "จบการแข่งขัน" เพื่อสรุปผล</li>
-                        <li><strong>พิมพ์รายงาน:</strong> เมื่อจบการแข่ง กดปุ่ม PDF สีแดงที่หน้าหลัก</li>
-                    </ol>
+                    <p class="small text-muted">สแกนเพื่อช่วยบันทึกคะแนน</p>
+                    <img id="qrImage" src="" alt="QR Code" class="img-fluid mb-3">
+                    <p class="small fw-bold">กระดุมทองเกมส์ 2568</p>
                 </div>
             </div>
         </div>
@@ -306,54 +298,7 @@
                 </div>
                 <div class="modal-body bg-secondary d-flex justify-content-center overflow-auto" style="max-height: 80vh;">
                     <div id="reportContent" class="report-preview-page">
-                        <div class="text-center mb-4">
-                            <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 90px; margin-bottom: 10px;">
-                            <h3 class="fw-bold mb-1">รายงานผลการแข่งขันกีฬาภายใน</h3>
-                            <h2 class="fw-bold text-primary mb-2">"กระดุมทองเกมส์ 2568"</h2>
-                            <h5 class="text-muted">โรงเรียนกระดุมทองวิทยา</h5>
                         </div>
-                        
-                        <div class="row mb-4 border-top border-bottom py-3">
-                            <div class="col-6">
-                                <p class="mb-1"><strong>ชนิดกีฬา:</strong> <span id="rptSport" class="text-primary fw-bold"></span></p>
-                                <p class="mb-0"><strong>รุ่น/ประเภท:</strong> <span id="rptCategory"></span></p>
-                            </div>
-                            <div class="col-6 text-end">
-                                <p class="mb-1"><strong>วันที่:</strong> <span id="rptDate"></span></p>
-                                <p class="mb-0"><strong>สนาม:</strong> <span id="rptLocation"></span></p>
-                            </div>
-                        </div>
-
-                        <div class="card border-0 mb-4 bg-light">
-                            <div class="card-body text-center py-4">
-                                <div class="row align-items-center">
-                                    <div class="col-5"><h2 class="fw-bold text-warning-emphasis mb-0">สีเหลือง</h2></div>
-                                    <div class="col-2"><h4 class="text-muted">VS</h4></div>
-                                    <div class="col-5"><h2 class="fw-bold text-primary-emphasis mb-0">สีฟ้า</h2></div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-5"><div class="display-2 fw-bold" id="rptScoreY">0</div></div>
-                                    <div class="col-2 pt-3"><span class="badge bg-dark">ผลคะแนน</span></div>
-                                    <div class="col-5"><div class="display-2 fw-bold" id="rptScoreB">0</div></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <h6 class="fw-bold border-bottom pb-2">รายละเอียดการแข่งขัน:</h6>
-                            <div class="p-3 bg-white border rounded">
-                                <p id="rptDetails" class="mb-0 text-muted">-</p>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-success text-center mb-5">
-                            <h4 class="alert-heading fw-bold mb-0">ทีมชนะเลิศ: <span id="rptWinner" class="text-decoration-underline">...</span></h4>
-                        </div>
-
-                        <div class="row mt-5 pt-3">
-                            <div class="col-12" id="rptSignatures"></div>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -363,11 +308,35 @@
         </div>
     </div>
 
+    <div class="d-none">
+        <div id="playerListContent" class="report-preview-page">
+            <div class="text-center mb-4">
+                <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 70px;">
+                <h4 class="fw-bold mt-2">รายชื่อนักกีฬา "กระดุมทองเกมส์ 2568"</h4>
+                <p class="mb-0"><strong>กีฬา:</strong> <span id="plSport"></span> <strong>รุ่น:</strong> <span id="plCat"></span></p>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="border border-warning rounded p-3">
+                        <h5 class="text-center fw-bold text-warning-emphasis bg-warning bg-opacity-10 py-2">ทีมสีเหลือง</h5>
+                        <ol id="plListY" class="ps-4"></ol>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="border border-info rounded p-3">
+                        <h5 class="text-center fw-bold text-primary-emphasis bg-info bg-opacity-10 py-2">ทีมสีฟ้า</h5>
+                        <ol id="plListB" class="ps-4"></ol>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 text-center small text-muted">พิมพ์จากระบบบันทึกผลการแข่งขัน โรงเรียนกระดุมทองวิทยา</div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
-        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
             authDomain: "kradumthong-esports.firebaseapp.com",
@@ -384,7 +353,7 @@
         let currentMatchId = null;
         let matchDataLocal = {};
 
-        // --- ROUTING ---
+        // --- GLOBAL FUNCTIONS ---
         window.showPage = (id) => {
             document.querySelectorAll('.page-section').forEach(el => el.classList.add('d-none'));
             const target = document.getElementById('page-' + id);
@@ -393,7 +362,24 @@
             if(id === 'dashboard') loadMatches();
         };
 
-        window.showManual = () => new bootstrap.Modal(document.getElementById('manualModal')).show();
+        window.showQRCode = () => {
+            const url = window.location.href;
+            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+            new bootstrap.Modal(document.getElementById('qrModal')).show();
+        };
+
+        window.showManual = () => {
+            Swal.fire({
+                title: 'คู่มือการใช้งาน',
+                html: `<ul class="text-start small">
+                    <li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่ เลือกชนิดกีฬา</li>
+                    <li><b>ลงทะเบียน:</b> ในหน้าแข่ง แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา และกด "พิมพ์รายชื่อ" เพื่อปริ้นท์ใบเช็คชื่อ</li>
+                    <li><b>บันทึกข้อมูล:</b> ข้อมูลกรรมการ/หมายเหตุ ให้กดปุ่ม "บันทึกข้อมูลการแข่งขัน"</li>
+                    <li><b>ลงคะแนน:</b> กดแต้มระบบจะเซฟอัตโนมัติ (Auto Save)</li>
+                    <li><b>QR Code:</b> กดปุ่ม QR เพื่อให้คนอื่นช่วยสแกนบันทึกผล</li>
+                </ul>`
+            });
+        };
 
         // --- DASHBOARD ---
         window.loadMatches = () => {
@@ -411,7 +397,6 @@
                 let matches = Object.keys(data).map(k => ({...data[k], id:k}));
                 matches.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
 
-                // Populate Sport Filter
                 if(filterSportSel.options.length === 1) {
                     [...new Set(matches.map(m=>m.sport))].forEach(s => {
                         filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
@@ -424,7 +409,6 @@
                         if(m.winner === 'yellow') wY++;
                         if(m.winner === 'blue') wB++;
                     }
-                    
                     if(filterS !== 'all' && m.sport !== filterS) return;
                     if(filterW === 'yellow' && m.winner !== 'yellow') return;
                     if(filterW === 'blue' && m.winner !== 'blue') return;
@@ -452,38 +436,32 @@
         };
 
         window.deleteMatch = (id) => {
-            Swal.fire({
-                title: 'ยืนยันการลบ?', text: "ข้อมูลจะหายไปถาวร", icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบเลย'
-            }).then((result) => {
-                if(result.isConfirmed) remove(ref(db, 'matches/'+id));
+            Swal.fire({ title: 'ลบรายการ?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ' }).then((r) => {
+                if(r.isConfirmed) remove(ref(db, 'matches/'+id));
             });
         };
 
-        // --- SETUP ---
         document.getElementById('setupForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const sport = document.getElementById('sportType').value;
-            // Default Referees: 3 for Cheer, 1 for others
             let refs = sport === 'cheer' ? ['','',''] : ['']; 
-            
             push(ref(db, 'matches'), {
-                sport: sport,
-                category: document.getElementById('category').value,
-                date: document.getElementById('matchDate').value,
-                time: document.getElementById('matchTime').value,
-                location: document.getElementById('location').value,
-                status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
+                sport: sport, category: document.getElementById('category').value,
+                date: document.getElementById('matchDate').value, time: document.getElementById('matchTime').value,
+                location: document.getElementById('location').value, status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
                 details: {}, referees: refs, athleteSign: '', note: '', playersY: [], playersB: []
             }).then(() => { showPage('dashboard'); });
         });
 
-        // --- MATCH & SCORING ---
+        // --- MATCH MANAGEMENT ---
         window.openMatch = (id) => {
             currentMatchId = id;
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
+                if(!m) return;
                 matchDataLocal = m;
                 
+                // Header & Info
                 document.getElementById('matchTitleDisplay').innerText = getSportName(m.sport);
                 document.getElementById('matchCatDisplay').innerText = m.category;
                 document.getElementById('scoreDisplayY').innerText = m.scoreY;
@@ -491,293 +469,196 @@
                 document.getElementById('matchNote').value = m.note || '';
                 document.getElementById('athleteSign').value = m.athleteSign || '';
                 
-                // 1. Referees
+                // Referees
                 const refDiv = document.getElementById('refereeInputs');
                 refDiv.innerHTML = '';
                 const refCount = (m.sport === 'cheer') ? 3 : 1;
-                // Ensure array size
-                if(!m.referees || m.referees.length < refCount) {
-                    m.referees = new Array(refCount).fill('');
-                }
-                m.referees.forEach((name, i) => {
-                    refDiv.innerHTML += `<input type="text" class="form-control form-control-sm mb-2" placeholder="ชื่อกรรมการคนที่ ${i+1}" value="${name}" onchange="updateReferee(${i}, this.value)">`;
+                let currentRefs = m.referees || [];
+                // Fix: Ensure array has correct length
+                while(currentRefs.length < refCount) currentRefs.push('');
+                
+                currentRefs.forEach((name, i) => {
+                    if(i < refCount) {
+                        refDiv.innerHTML += `<input type="text" class="form-control form-control-sm mb-2" placeholder="ชื่อกรรมการคนที่ ${i+1}" value="${name}" id="refInput_${i}">`;
+                    }
                 });
 
-                // 2. Signer Label
                 document.getElementById('signerLabel').innerText = (m.sport === 'cheer') ? "ประธานสีผู้รับรอง" : "ตัวแทนนักกีฬาผู้ชนะ";
 
-                // 3. Players
-                renderPlayers(m.playersY || [], 'Y');
-                renderPlayers(m.playersB || [], 'B');
+                // Players (Initialize if undefined)
+                if(!m.playersY) m.playersY = [];
+                if(!m.playersB) m.playersB = [];
+                renderPlayers(m.playersY, 'Y');
+                renderPlayers(m.playersB, 'B');
 
-                // 4. Score Controls
                 renderScoreControls(m);
-
                 showPage('match');
             }, { onlyOnce: true });
         };
 
-        // Player Management
+        // --- PLAYERS (FIXED BUG) ---
         window.renderPlayers = (list, team) => {
             const div = document.getElementById(`players${team}`);
             div.innerHTML = '';
-            list.forEach((p, i) => {
-                div.innerHTML += `
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" value="${p}" onchange="updatePlayer('${team}', ${i}, this.value)">
-                        <button class="btn btn-outline-danger" onclick="removePlayer('${team}', ${i})">×</button>
-                    </div>`;
-            });
+            if(!list || list.length === 0) {
+                div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ</small>';
+            } else {
+                list.forEach((p, i) => {
+                    div.innerHTML += `
+                        <div class="input-group input-group-sm mb-1">
+                            <input type="text" class="form-control" value="${p}" onchange="updatePlayer('${team}', ${i}, this.value)">
+                            <button class="btn btn-outline-danger" onclick="removePlayer('${team}', ${i})">×</button>
+                        </div>`;
+                });
+            }
         };
+
         window.addPlayerInput = (team) => {
-            const list = team === 'Y' ? (matchDataLocal.playersY || []) : (matchDataLocal.playersB || []);
-            list.push('');
+            // Fix: Check existing array locally first
+            let list = team === 'Y' ? (matchDataLocal.playersY || []) : (matchDataLocal.playersB || []);
+            list.push(''); // Add empty slot
+            
+            // Save to DB immediately
             update(ref(db, `matches/${currentMatchId}/players${team}`), list).then(() => {
+                matchDataLocal[`players${team}`] = list; // Update local
                 renderPlayers(list, team);
             });
         };
+
         window.updatePlayer = (team, idx, val) => {
             update(ref(db, `matches/${currentMatchId}/players${team}/${idx}`), val);
         };
+
         window.removePlayer = (team, idx) => {
-            const list = team === 'Y' ? matchDataLocal.playersY : matchDataLocal.playersB;
+            let list = team === 'Y' ? matchDataLocal.playersY : matchDataLocal.playersB;
             list.splice(idx, 1);
             update(ref(db, `matches/${currentMatchId}/players${team}`), list).then(() => {
                 renderPlayers(list, team);
             });
         };
 
-        // Score Controls Logic
+        window.printPlayerList = () => {
+            document.getElementById('plSport').innerText = getSportName(matchDataLocal.sport);
+            document.getElementById('plCat').innerText = matchDataLocal.category;
+            
+            const listY = document.getElementById('plListY');
+            const listB = document.getElementById('plListB');
+            listY.innerHTML = ''; listB.innerHTML = '';
+
+            (matchDataLocal.playersY || []).forEach(p => listY.innerHTML += `<li>${p}</li>`);
+            (matchDataLocal.playersB || []).forEach(p => listB.innerHTML += `<li>${p}</li>`);
+
+            const el = document.getElementById('playerListContent');
+            const opt = { margin: 10, filename: 'Players_List.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } };
+            html2pdf().set(opt).from(el).save();
+        };
+
+        // --- SAVE INFO BUTTON ---
+        window.saveMatchInfo = () => {
+            // Collect Referees
+            const refs = [];
+            const refInputs = document.querySelectorAll('[id^="refInput_"]');
+            refInputs.forEach(input => refs.push(input.value));
+
+            update(ref(db, `matches/${currentMatchId}`), {
+                referees: refs,
+                athleteSign: document.getElementById('athleteSign').value,
+                note: document.getElementById('matchNote').value
+            }).then(() => {
+                Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลเรียบร้อย', timer: 1500, showConfirmButton: false });
+            });
+        };
+
+        // --- SCORING ---
         function renderScoreControls(m) {
             const div = document.getElementById('dynamicScoreControls');
             let html = '';
-
-            // A. กองเชียร์ (Cheer) - 3 Judges scoring
             if(m.sport === 'cheer') {
-                html = `<h6 class="border-bottom pb-2">คะแนนจากกรรมการ 3 ท่าน</h6>
-                        <div class="row g-2">
-                            <div class="col-6 text-center"><strong class="text-warning">สีเหลือง</strong></div>
-                            <div class="col-6 text-center"><strong class="text-info">สีฟ้า</strong></div>
-                `;
+                html = `<h6 class="border-bottom pb-2">คะแนนจากกรรมการ 3 ท่าน</h6><div class="row g-2"><div class="col-6 text-center"><strong class="text-warning">สีเหลือง</strong></div><div class="col-6 text-center"><strong class="text-info">สีฟ้า</strong></div>`;
                 for(let i=1; i<=3; i++) {
                     let sY = m.details && m.details[`j${i}y`] ? m.details[`j${i}y`] : 0;
                     let sB = m.details && m.details[`j${i}b`] ? m.details[`j${i}b`] : 0;
-                    html += `
-                        <div class="col-6"><input type="number" class="form-control text-center" placeholder="ก. ${i}" value="${sY}" onchange="updateCheerScore(${i}, 'y', this.value)"></div>
-                        <div class="col-6"><input type="number" class="form-control text-center" placeholder="ก. ${i}" value="${sB}" onchange="updateCheerScore(${i}, 'b', this.value)"></div>
-                    `;
+                    html += `<div class="col-6"><input type="number" class="form-control text-center" placeholder="ก. ${i}" value="${sY}" onchange="updateCheerScore(${i}, 'y', this.value)"></div><div class="col-6"><input type="number" class="form-control text-center" placeholder="ก. ${i}" value="${sB}" onchange="updateCheerScore(${i}, 'b', this.value)"></div>`;
                 }
                 html += `</div>`;
-            }
-            // B. กีฬาที่นับแต้มเป็นเซต (Volley, Takraw, Beach)
-            else if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
+            } else if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
                 html = `<h6 class="border-bottom pb-2">คะแนนรายเซต (ชนะ 2 ใน 3)</h6>`;
                 for(let i=1; i<=3; i++) {
                      let pY = m.details && m.details[`s${i}y`] ? m.details[`s${i}y`] : 0;
                      let pB = m.details && m.details[`s${i}b`] ? m.details[`s${i}b`] : 0;
-                     html += `
-                        <div class="d-flex align-items-center mb-2 gap-2">
-                            <span class="fw-bold" style="width:50px">SET ${i}</span>
-                            <input type="number" class="form-control text-center" value="${pY}" onchange="updateSetPoint(${i}, 'y', this.value)">
-                            <span>:</span>
-                            <input type="number" class="form-control text-center" value="${pB}" onchange="updateSetPoint(${i}, 'b', this.value)">
-                        </div>`;
+                     html += `<div class="d-flex align-items-center mb-2 gap-2"><span class="fw-bold" style="width:50px">SET ${i}</span><input type="number" class="form-control text-center" value="${pY}" onchange="updateSetPoint(${i}, 'y', this.value)"><span>:</span><input type="number" class="form-control text-center" value="${pB}" onchange="updateSetPoint(${i}, 'b', this.value)"></div>`;
                 }
-            }
-            // C. E-Sports (Win/Loss Set)
-            else if(m.sport === 'esports') {
+            } else if(m.sport === 'esports') {
                 html = `<h6 class="border-bottom pb-2">เลือกผู้ชนะรายเซต</h6>`;
                 for(let i=1; i<=3; i++) {
                     let w = m.details && m.details[`set${i}`] ? m.details[`set${i}`] : 'none';
-                    html += `
-                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                            <span class="fw-bold">Set ${i}</span>
-                            <div class="btn-group btn-group-sm">
-                                <input type="radio" class="btn-check" name="s${i}" id="s${i}y" ${w==='yellow'?'checked':''} onchange="updateSetWin(${i}, 'yellow')"><label class="btn btn-outline-warning" for="s${i}y">เหลือง</label>
-                                <input type="radio" class="btn-check" name="s${i}" id="s${i}n" ${w==='none'?'checked':''} onchange="updateSetWin(${i}, 'none')"><label class="btn btn-outline-secondary" for="s${i}n">-</label>
-                                <input type="radio" class="btn-check" name="s${i}" id="s${i}b" ${w==='blue'?'checked':''} onchange="updateSetWin(${i}, 'blue')"><label class="btn btn-outline-primary" for="s${i}b">ฟ้า</label>
-                            </div>
-                        </div>`;
+                    html += `<div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded"><span class="fw-bold">Set ${i}</span><div class="btn-group btn-group-sm"><input type="radio" class="btn-check" name="s${i}" id="s${i}y" ${w==='yellow'?'checked':''} onchange="updateSetWin(${i}, 'yellow')"><label class="btn btn-outline-warning" for="s${i}y">เหลือง</label><input type="radio" class="btn-check" name="s${i}" id="s${i}n" ${w==='none'?'checked':''} onchange="updateSetWin(${i}, 'none')"><label class="btn btn-outline-secondary" for="s${i}n">-</label><input type="radio" class="btn-check" name="s${i}" id="s${i}b" ${w==='blue'?'checked':''} onchange="updateSetWin(${i}, 'blue')"><label class="btn btn-outline-primary" for="s${i}b">ฟ้า</label></div></div>`;
                 }
-            }
-            // D. Standard Score (Football, Petanque, etc.)
-            else {
-                html = `
-                    <div class="row text-center mt-3">
-                        <div class="col-6"><button class="btn btn-warning w-100 py-3 fw-bold" onclick="manualScore('Y', 1)">+1 เหลือง</button></div>
-                        <div class="col-6"><button class="btn btn-info w-100 py-3 fw-bold" onclick="manualScore('B', 1)">+1 ฟ้า</button></div>
-                        <div class="col-6 mt-2"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('Y', -1)">-1</button></div>
-                        <div class="col-6 mt-2"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('B', -1)">-1</button></div>
-                    </div>`;
+            } else {
+                html = `<div class="row text-center mt-3"><div class="col-6"><button class="btn btn-warning w-100 py-3 fw-bold" onclick="manualScore('Y', 1)">+1 เหลือง</button></div><div class="col-6"><button class="btn btn-info w-100 py-3 fw-bold" onclick="manualScore('B', 1)">+1 ฟ้า</button></div><div class="col-6 mt-2"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('Y', -1)">-1</button></div><div class="col-6 mt-2"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('B', -1)">-1</button></div></div>`;
             }
             div.innerHTML = html;
         }
 
-        // --- UPDATE LOGIC (Auto Save) ---
-        window.autoSave = () => {
-             update(ref(db, `matches/${currentMatchId}`), {
-                 athleteSign: document.getElementById('athleteSign').value,
-                 note: document.getElementById('matchNote').value
-             });
-        };
-        window.updateReferee = (idx, val) => {
-            update(ref(db, `matches/${currentMatchId}/referees/${idx}`), val);
-        };
-        window.manualScore = (team, val) => {
-            let path = team==='Y' ? 'scoreY' : 'scoreB';
-            let curr = matchDataLocal[path] || 0;
-            update(ref(db, `matches/${currentMatchId}/${path}`), Math.max(0, curr + val));
-        };
-        
-        // Logic: Cheer
-        window.updateCheerScore = (judge, team, val) => {
-            const key = `j${judge}${team}`;
+        window.updateCheerScore = (j, t, v) => {
             if(!matchDataLocal.details) matchDataLocal.details = {};
-            matchDataLocal.details[key] = parseInt(val) || 0;
-            update(ref(db, `matches/${currentMatchId}/details`), matchDataLocal.details).then(recalcCheerTotal);
+            matchDataLocal.details[`j${j}${t}`] = parseInt(v) || 0;
+            update(ref(db, `matches/${currentMatchId}/details`), matchDataLocal.details).then(() => {
+                let y=0,b=0; for(let i=1;i<=3;i++){ y+=(matchDataLocal.details[`j${i}y`]||0); b+=(matchDataLocal.details[`j${i}b`]||0); }
+                update(ref(db, `matches/${currentMatchId}`), { scoreY: y, scoreB: b });
+            });
         };
-        function recalcCheerTotal() {
-            let totY = 0, totB = 0;
-            for(let i=1; i<=3; i++) {
-                totY += (matchDataLocal.details[`j${i}y`] || 0);
-                totB += (matchDataLocal.details[`j${i}b`] || 0);
-            }
-            update(ref(db, `matches/${currentMatchId}`), { scoreY: totY, scoreB: totB });
-        }
-
-        // Logic: Set Points (Volley)
-        window.updateSetPoint = (set, team, val) => {
-            const key = `s${set}${team}`;
+        window.updateSetPoint = (s, t, v) => {
             if(!matchDataLocal.details) matchDataLocal.details = {};
-            matchDataLocal.details[key] = parseInt(val) || 0;
-            update(ref(db, `matches/${currentMatchId}/details`), matchDataLocal.details).then(recalcSetWins);
+            matchDataLocal.details[`s${s}${t}`] = parseInt(v) || 0;
+            update(ref(db, `matches/${currentMatchId}/details`), matchDataLocal.details).then(() => {
+                let y=0,b=0; for(let i=1;i<=3;i++){ let py=matchDataLocal.details[`s${i}y`]||0; let pb=matchDataLocal.details[`s${i}b`]||0; if(py>pb)y++; else if(pb>py)b++; }
+                update(ref(db, `matches/${currentMatchId}`), { scoreY: y, scoreB: b });
+            });
         };
-        function recalcSetWins() {
-            // คำนวณว่าใครชนะเซตไหนบ้าง แล้วเอามาเป็นคะแนนรวม (เช่น ชนะ 2-1 เซต)
-            let winY = 0, winB = 0;
-            for(let i=1; i<=3; i++) {
-                let pY = matchDataLocal.details[`s${i}y`] || 0;
-                let pB = matchDataLocal.details[`s${i}b`] || 0;
-                // ต้องมีคะแนนถึงจะนับ (เช่น เกิน 0 และไม่เท่ากัน)
-                if(pY > pB && pY > 0) winY++;
-                else if(pB > pY && pB > 0) winB++;
-            }
-            update(ref(db, `matches/${currentMatchId}`), { scoreY: winY, scoreB: winB });
-        }
-
-        // Logic: Set Wins (E-sport)
-        window.updateSetWin = (set, winner) => {
+        window.updateSetWin = (s, w) => {
             if(!matchDataLocal.details) matchDataLocal.details = {};
-            matchDataLocal.details[`set${set}`] = winner;
-            
-            let sY = 0, sB = 0;
-            for(let i=1; i<=3; i++) {
-                if(matchDataLocal.details[`set${i}`] === 'yellow') sY++;
-                if(matchDataLocal.details[`set${i}`] === 'blue') sB++;
-            }
-            update(ref(db, `matches/${currentMatchId}`), { scoreY: sY, scoreB: sB, details: matchDataLocal.details });
+            matchDataLocal.details[`set${s}`] = w;
+            let y=0,b=0; for(let i=1;i<=3;i++){ if(matchDataLocal.details[`set${i}`]==='yellow')y++; if(matchDataLocal.details[`set${i}`]==='blue')b++; }
+            update(ref(db, `matches/${currentMatchId}`), { scoreY: y, scoreB: b, details: matchDataLocal.details });
         };
-
-        window.clearMatchData = () => {
-            if(confirm('ต้องการล้างคะแนนทั้งหมดใช่ไหม?')) {
-                update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} });
-            }
+        window.manualScore = (t, v) => {
+            let path = t==='Y'?'scoreY':'scoreB';
+            update(ref(db, `matches/${currentMatchId}/${path}`), Math.max(0, (matchDataLocal[path]||0)+v));
         };
-
+        window.clearMatchData = () => { if(confirm('ล้างคะแนน?')) update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} }); };
         window.finishMatch = () => {
-            const y = matchDataLocal.scoreY;
-            const b = matchDataLocal.scoreB;
-            let w = y > b ? 'yellow' : (b > y ? 'blue' : 'draw');
-            update(ref(db, `matches/${currentMatchId}`), { status: 'done', winner: w }).then(()=>showPage('dashboard'));
+            let y = matchDataLocal.scoreY, b = matchDataLocal.scoreB;
+            update(ref(db, `matches/${currentMatchId}`), { status: 'done', winner: y>b?'yellow':(b>y?'blue':'draw') }).then(()=>showPage('dashboard'));
         };
 
-        // --- REPORT PDF ---
+        // --- PDF PREVIEW ---
         window.previewReport = (id) => {
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
-                document.getElementById('rptSport').innerText = getSportName(m.sport);
-                document.getElementById('rptCategory').innerText = m.category;
-                document.getElementById('rptDate').innerText = m.date;
-                document.getElementById('rptLocation').innerText = m.location;
-                document.getElementById('rptScoreY').innerText = m.scoreY;
-                document.getElementById('rptScoreB').innerText = m.scoreB;
+                let html = `
+                    <div class="text-center mb-4"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:90px"><h3 class="fw-bold mt-2">รายงานผลการแข่งขัน</h3><h2 class="fw-bold text-primary">"กระดุมทองเกมส์ 2568"</h2></div>
+                    <div class="row mb-4 border-top border-bottom py-3"><div class="col-6"><p class="mb-1"><strong>กีฬา:</strong> ${getSportName(m.sport)}</p><p><strong>รุ่น:</strong> ${m.category}</p></div><div class="col-6 text-end"><p class="mb-1"><strong>วันที่:</strong> ${m.date}</p><p><strong>สนาม:</strong> ${m.location}</p></div></div>
+                    <div class="card border-0 mb-4 bg-light"><div class="card-body text-center"><div class="row"><div class="col-5"><h2 class="fw-bold text-warning-emphasis">สีเหลือง</h2></div><div class="col-2"><h4>VS</h4></div><div class="col-5"><h2 class="fw-bold text-primary-emphasis">สีฟ้า</h2></div></div><div class="row"><div class="col-5"><div class="display-2 fw-bold">${m.scoreY}</div></div><div class="col-2 pt-3"><span class="badge bg-dark">ผลคะแนน</span></div><div class="col-5"><div class="display-2 fw-bold">${m.scoreB}</div></div></div></div></div>
+                    <div class="mb-4"><h6>รายละเอียด:</h6><div class="p-3 border rounded">${m.note||'-'}</div></div>
+                    <div class="alert alert-success text-center"><h4>ผู้ชนะ: <span class="fw-bold text-decoration-underline">${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</span></h4></div>
+                    <div class="row mt-5 pt-3">`;
                 
-                // Winner
-                const winEl = document.getElementById('rptWinner');
-                if(m.winner === 'yellow') { winEl.innerText = 'ทีมสีเหลือง'; winEl.className = 'text-warning fw-bold text-decoration-underline'; }
-                else if(m.winner === 'blue') { winEl.innerText = 'ทีมสีฟ้า'; winEl.className = 'text-primary fw-bold text-decoration-underline'; }
-                else { winEl.innerText = 'เสมอ'; winEl.className = 'text-dark'; }
-
-                // Details Text
-                let txt = m.note || '';
-                if(m.sport === 'esports') {
-                    for(let i=1; i<=3; i++) {
-                        if(m.details && m.details[`set${i}`]) txt += ` | Set ${i}: ${m.details[`set${i}`]==='yellow'?'เหลือง':'ฟ้า'}`;
-                    }
-                } else if(['volleyball','sepaktakraw'].includes(m.sport)) {
-                    for(let i=1; i<=3; i++) {
-                        let sy = m.details[`s${i}y`]||0; let sb = m.details[`s${i}b`]||0;
-                        if(sy>0||sb>0) txt += ` | Set ${i}: ${sy}-${sb}`;
-                    }
-                }
-                document.getElementById('rptDetails').innerText = txt.replace(/^ \| /, '') || '-';
-
-                // Signatures
-                const signArea = document.getElementById('rptSignatures');
-                signArea.innerHTML = '';
+                (m.referees||['']).forEach((r,i) => { if(r) html += `<div class="col text-center"><div style="border-bottom:1px dotted #000;width:120px;margin:0 auto 5px"></div><small>(${r})<br>กรรมการ ${i+1}</small></div>`; });
+                html += `<div class="col text-center"><div style="border-bottom:1px dotted #000;width:120px;margin:0 auto 5px"></div><small>(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></div></div>`;
                 
-                // Logic ลายเซ็น: ถ้า Cheer ใช้ 3 คน, อื่นๆ 1 คน
-                let htmlSign = `<div class="d-flex justify-content-around text-center pt-4">`;
-                
-                // 1. กรรมการ
-                m.referees.forEach((r, i) => {
-                    if(r.trim() !== "") {
-                        htmlSign += `
-                        <div class="px-3">
-                            <div style="border-bottom: 1px dotted #000; width: 140px; margin: 0 auto 5px;"></div>
-                            <p class="mb-0 small">(${r})</p>
-                            <small class="text-muted">กรรมการผู้ตัดสิน ${i+1}</small>
-                        </div>`;
-                    }
-                });
-
-                // 2. ตัวแทนนักกีฬา/ประธานสี
-                let role = m.sport === 'cheer' ? 'ประธานสี' : 'ตัวแทนนักกีฬาผู้ชนะ';
-                htmlSign += `
-                        <div class="px-3">
-                            <div style="border-bottom: 1px dotted #000; width: 140px; margin: 0 auto 5px;"></div>
-                            <p class="mb-0 small">(${m.athleteSign || '..................'})</p>
-                            <small class="text-muted">${role}</small>
-                        </div>
-                </div>`;
-                
-                signArea.innerHTML = htmlSign;
-
+                document.getElementById('reportContent').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
-            });
+            }, { onlyOnce: true });
         };
-
+        
         window.downloadPDF = () => {
             const el = document.getElementById('reportContent');
-            const sport = document.getElementById('rptSport').innerText;
-            const opt = {
-                margin: 0,
-                filename: `Report_${sport}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            const opt = { margin: 0, filename: 'Report.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } };
             html2pdf().set(opt).from(el).save();
         };
 
-        window.getSportName = (k) => {
-            const map = {
-                'football':'ฟุตบอล 7 คน', 'volleyball':'วอลเลย์บอล', 'beach_volleyball':'วอลเลย์บอลชายหาด',
-                'esports':'E-Sports (ROV)', 'petanque':'เปตอง', 'sepaktakraw':'เซปักตะกร้อ',
-                'folksport':'กีฬาพื้นบ้าน', 'cheer':'ประกวดกองเชียร์ฯ'
-            };
-            return map[k] || k;
-        };
+        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
     </script>
 </body>
 </html>
