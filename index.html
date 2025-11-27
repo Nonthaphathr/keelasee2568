@@ -17,16 +17,19 @@
         :root {
             --primary-bg: #ffffff;
             --yellow-team: #FFD700;
-            --yellow-dark: #B8860B;
             --blue-team: #00BFFF;
-            --blue-dark: #0056b3;
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.95); /* เพิ่มความทึบของกระจก */
+            --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         body {
             font-family: 'Sarabun', sans-serif;
-            background: url('https://nonthaphathr.github.io/uploadimg/keelaseebg.png') no-repeat center center fixed;
+            /* แก้ไขพื้นหลัง: เพิ่ม Overlay สีขาว 85% ทับภาพเดิม */
+            background: linear-gradient(rgba(245, 247, 250, 0.85), rgba(245, 247, 250, 0.85)), 
+                        url('https://nonthaphathr.github.io/uploadimg/keelaseebg.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
             background-size: cover;
             min-height: 100vh;
             padding-bottom: 50px;
@@ -34,26 +37,25 @@
 
         h1, h2, h3, h4, h5, .nav-link, .btn { font-family: 'Kanit', sans-serif; }
 
-        /* Glassmorphism Cards */
+        /* Glassmorphism Cards ปรับปรุงให้อ่านง่ายขึ้น */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: var(--glass-shadow);
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
         }
         
         /* Navbar */
         .navbar {
             background: rgba(26, 35, 126, 0.95) !important;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .navbar-brand img { height: 45px; margin-right: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-        .navbar-brand span { font-weight: 600; font-size: 1.2rem; color: #fff; }
+        .navbar-brand img { height: 45px; margin-right: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
         /* Animations */
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
@@ -61,65 +63,58 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Badges & Status */
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        /* Status Badges */
+        .status-badge { padding: 6px 14px; border-radius: 30px; font-size: 0.85em; font-weight: 600; letter-spacing: 0.5px; }
         .bg-live { background-color: #dc3545; color: white; animation: pulse 1.5s infinite; }
         .bg-wait { background-color: #6c757d; color: white; }
         .bg-done { background-color: #198754; color: white; }
         @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); } 70% { opacity: 1; box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); } 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); } }
 
         /* Scoreboard Specifics */
-        .team-box { border-radius: 10px; padding: 15px; text-align: center; position: relative; overflow: hidden; }
-        .team-box.yellow { background: linear-gradient(135deg, #FFFDE7, #FFF59D); border: 2px solid var(--yellow-team); }
-        .team-box.blue { background: linear-gradient(135deg, #E1F5FE, #81D4FA); border: 2px solid var(--blue-team); }
-        .score-big { font-size: 4rem; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .team-box { border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .team-box.yellow { background: linear-gradient(135deg, #fff9c4, #fff176); border: 2px solid #fbc02d; color: #7f6000; }
+        .team-box.blue { background: linear-gradient(135deg, #b3e5fc, #81d4fa); border: 2px solid #039be5; color: #01579b; }
+        .score-big { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-top: 10px; }
         
         /* Summary Table Colors */
-        .winner-cell { font-weight: bold; }
-        .winner-yellow { color: #9A7D0A; background-color: #FFF9C4; }
-        .winner-blue { color: #0056b3; background-color: #E1F5FE; }
-        .draw-cell { color: #555; background-color: #f0f0f0; }
+        .winner-yellow { color: #856404; background-color: #fff3cd !important; font-weight: bold; }
+        .winner-blue { color: #084298; background-color: #cfe2ff !important; font-weight: bold; }
 
-        /* Print Settings */
-        @media print {
-            body { background: white; padding: 0; }
-            .no-print { display: none !important; }
-            .glass-card { box-shadow: none; border: none; backdrop-filter: none; background: white; }
-            
-            /* Print Table Styling */
-            .table-print-optimized {
-                width: 100% !important;
-                border-collapse: collapse !important;
-                font-size: 11pt !important;
-                color: black !important;
-            }
-            .table-print-optimized th, 
-            .table-print-optimized td {
-                border: 1px solid #000 !important;
-                padding: 8px !important;
-                text-align: center !important;
-                white-space: nowrap; /* Prevent wrapping if possible */
-            }
-            .table-print-optimized th { background-color: #f0f0f0 !important; font-weight: bold; }
-            
-            /* Hide Buttons in table */
-            .btn-action-group { display: none !important; }
+        /* Modal Preview & Report Fixes */
+        .modal-body-scroll { max-height: 75vh; overflow-y: auto; background: #525659; padding: 20px; }
+        .report-preview-page { 
+            background: white; 
+            width: 210mm; 
+            min-height: 297mm; 
+            margin: 0 auto; 
+            padding: 20mm; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            position: relative;
         }
 
-        /* Modal Preview */
-        .modal-body-scroll { max-height: 70vh; overflow-y: auto; background: #555; }
-        .report-preview-page { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 20mm; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        /* --- CSS Fix สำหรับแก้ตัวหนังสือเพี้ยนใน PDF --- */
+        .report-preview-page * {
+            text-shadow: none !important; /* ลบเงา */
+            -webkit-text-stroke: 0 !important; /* ลบเส้นขอบตัวอักษร */
+            letter-spacing: normal !important; /* จัดระยะห่างปกติ */
+        }
+        .report-preview-page h1, 
+        .report-preview-page h2, 
+        .report-preview-page h3 {
+            font-family: 'Kanit', sans-serif !important;
+            font-weight: 700 !important; /* บังคับน้ำหนักฟอนต์ */
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top no-print">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" alt="Logo">
                 <div class="d-flex flex-column ms-2">
-                    <span>กีฬาภายใน กระดุมทองเกมส์ 2568</span>
-                    <small style="font-size: 0.7rem; font-weight: 300; color: #ccc;">Kradumthong Wittaya School</small>
+                    <span style="font-size: 1.1rem;">กีฬาภายใน กระดุมทองเกมส์ 2568</span>
+                    <small style="font-size: 0.75rem; font-weight: 300; opacity: 0.8;">Kradumthong Wittaya School</small>
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -127,8 +122,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto gap-2">
-                    <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-light border-0 active" href="#" onclick="showPage('dashboard')"><i class="fas fa-chart-pie me-1"></i> สรุปผลการแข่งขัน</a></li>
-                    <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-warning border-0 text-warning" href="#" onclick="showPage('setup')"><i class="fas fa-plus-circle me-1"></i> เพิ่มรายการแข่ง</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-light border-0 active" href="#" onclick="showPage('dashboard')"><i class="fas fa-chart-pie me-1"></i> สรุปผล</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-warning border-0 text-warning" href="#" onclick="showPage('setup')"><i class="fas fa-plus-circle me-1"></i> เพิ่มรายการ</a></li>
                 </ul>
             </div>
         </div>
@@ -140,63 +135,60 @@
             
             <div class="row g-3 mb-4">
                 <div class="col-md-6 col-lg-4">
-                    <div class="glass-card p-3 d-flex align-items-center justify-content-between text-dark" style="background: linear-gradient(to right, rgba(255,215,0,0.8), rgba(255,255,255,0.6));">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between text-dark" style="background: linear-gradient(to right, rgba(255,249,196,0.9), rgba(255,255,255,0.8)); border-left: 5px solid #FFD700;">
                         <div>
-                            <h4 class="mb-0 fw-bold"><i class="fas fa-medal me-2"></i>สีเหลือง</h4>
-                            <small>Yellow Team</small>
+                            <h4 class="mb-0 fw-bold text-warning-emphasis"><i class="fas fa-medal me-2"></i>สีเหลือง</h4>
+                            <small class="text-muted">Yellow Team</small>
                         </div>
                         <div class="text-end">
                             <span class="display-5 fw-bold" id="sumWinY">0</span>
-                            <span class="d-block small">รายการชนะเลิศ</span>
+                            <span class="d-block small text-muted">เหรียญทอง</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="glass-card p-3 d-flex align-items-center justify-content-between text-white" style="background: linear-gradient(to right, rgba(0,191,255,0.8), rgba(255,255,255,0.2));">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between text-dark" style="background: linear-gradient(to right, rgba(225,245,254,0.9), rgba(255,255,255,0.8)); border-left: 5px solid #00BFFF;">
                         <div>
-                            <h4 class="mb-0 fw-bold"><i class="fas fa-medal me-2"></i>สีฟ้า</h4>
-                            <small>Blue Team</small>
+                            <h4 class="mb-0 fw-bold text-primary-emphasis"><i class="fas fa-medal me-2"></i>สีฟ้า</h4>
+                            <small class="text-muted">Blue Team</small>
                         </div>
                         <div class="text-end">
                             <span class="display-5 fw-bold" id="sumWinB">0</span>
-                            <span class="d-block small">รายการชนะเลิศ</span>
+                            <span class="d-block small text-muted">เหรียญทอง</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card p-3 mb-3 no-print">
+            <div class="glass-card p-3 mb-3">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-auto fw-bold"><i class="fas fa-filter me-1"></i> ตัวกรอง:</div>
+                    <div class="col-md-auto fw-bold text-secondary"><i class="fas fa-filter me-1"></i> ตัวกรอง:</div>
                     <div class="col-md-3">
-                        <select id="filterSport" class="form-select form-select-sm" onchange="loadMatches()">
+                        <select id="filterSport" class="form-select form-select-sm border-secondary-subtle" onchange="loadMatches()">
                             <option value="all">ทุกชนิดกีฬา</option>
                             </select>
                     </div>
                     <div class="col-md-3">
-                        <select id="filterWinner" class="form-select form-select-sm" onchange="loadMatches()">
+                        <select id="filterWinner" class="form-select form-select-sm border-secondary-subtle" onchange="loadMatches()">
                             <option value="all">แสดงทั้งหมด</option>
-                            <option value="yellow">เฉพาะรายการที่ สีเหลือง ชนะเลิศ</option>
-                            <option value="blue">เฉพาะรายการที่ สีฟ้า ชนะเลิศ</option>
+                            <option value="yellow">เฉพาะรายการที่ สีเหลือง ชนะ</option>
+                            <option value="blue">เฉพาะรายการที่ สีฟ้า ชนะ</option>
                         </select>
-                    </div>
-                    <div class="col-md-auto ms-auto">
-                        <button class="btn btn-dark btn-sm shadow-sm" onclick="window.print()"><i class="fas fa-print me-1"></i> พิมพ์ตารางสรุป</button>
                     </div>
                 </div>
             </div>
 
             <div class="glass-card p-0 overflow-hidden slide-up">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 table-print-optimized" id="matchTable">
+                    <table class="table table-hover align-middle mb-0" id="matchTable">
                         <thead class="table-light text-uppercase small text-muted">
                             <tr>
-                                <th width="15%">เวลา/สถานะ</th>
+                                <th width="15%" class="ps-4">เวลา/สถานะ</th>
                                 <th width="20%">ชนิดกีฬา</th>
                                 <th width="15%">รุ่น/ประเภท</th>
                                 <th width="20%" class="text-center">ผลการแข่งขัน</th>
                                 <th width="15%" class="text-center">ทีมชนะเลิศ</th>
-                                <th width="15%" class="text-end pe-3 btn-action-group">จัดการ</th>
+                                <th width="15%" class="text-end pe-4">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="matchList" class="bg-white">
@@ -212,7 +204,7 @@
                 <form id="setupForm">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label text-muted small">ชนิดกีฬา</label>
+                            <label class="form-label text-muted small fw-bold">ชนิดกีฬา</label>
                             <select class="form-select" id="sportType" required>
                                 <option value="" disabled selected>-- เลือกกีฬา --</option>
                                 <option value="football">ฟุตบอล 7 คน</option>
@@ -227,24 +219,24 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-muted small">รุ่น/ประเภท</label>
+                            <label class="form-label text-muted small fw-bold">รุ่น/ประเภท</label>
                             <input type="text" class="form-control" id="category" placeholder="เช่น ม.ต้น ชาย, ทีมผสม" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-muted small">วันที่แข่งขัน</label>
+                            <label class="form-label text-muted small fw-bold">วันที่แข่งขัน</label>
                             <input type="date" class="form-control" id="matchDate" required value="2025-12-03">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-muted small">เวลา</label>
+                            <label class="form-label text-muted small fw-bold">เวลา</label>
                             <input type="time" class="form-control" id="matchTime" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label text-muted small">สถานที่</label>
+                            <label class="form-label text-muted small fw-bold">สถานที่</label>
                             <input type="text" class="form-control" id="location" placeholder="เช่น สนาม 1">
                         </div>
                         <div class="col-12 mt-4 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary flex-grow-1">บันทึกรายการ</button>
-                            <button type="button" class="btn btn-light" onclick="showPage('dashboard')">ยกเลิก</button>
+                            <button type="submit" class="btn btn-primary flex-grow-1 shadow-sm">บันทึกรายการ</button>
+                            <button type="button" class="btn btn-light border" onclick="showPage('dashboard')">ยกเลิก</button>
                         </div>
                     </div>
                 </form>
@@ -252,25 +244,25 @@
         </div>
 
         <div id="page-match" class="page-section d-none fade-in">
-            <button class="btn btn-sm btn-light mb-3 shadow-sm" onclick="showPage('dashboard')"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</button>
+            <button class="btn btn-sm btn-light mb-3 shadow-sm border" onclick="showPage('dashboard')"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</button>
             
             <div class="row">
                 <div class="col-lg-4 mb-3">
                     <div class="glass-card p-3 h-100">
-                        <h5 class="text-muted border-bottom pb-2"><i class="fas fa-user-edit"></i> ข้อมูลการแข่งขัน</h5>
+                        <h5 class="text-dark border-bottom pb-2 fw-bold"><i class="fas fa-user-edit"></i> ข้อมูลการแข่งขัน</h5>
                         <div class="mb-3">
-                            <label class="small text-muted">กรรมการผู้ตัดสิน (1 ท่าน)</label>
+                            <label class="small text-muted fw-bold">กรรมการผู้ตัดสิน (1 ท่าน)</label>
                             <input type="text" class="form-control form-control-sm" id="refereeName" placeholder="ชื่อ-สกุล กรรมการ">
                         </div>
                          <div class="mb-3">
-                            <label class="small text-muted">ตัวแทนนักกีฬาที่ชนะ (ผู้เซ็นรับรอง)</label>
+                            <label class="small text-muted fw-bold">ตัวแทนนักกีฬาที่ชนะ (ผู้เซ็นรับรอง)</label>
                             <input type="text" class="form-control form-control-sm" id="athleteName" placeholder="ชื่อ-สกุล ตัวแทนนักกีฬา">
                         </div>
                         <div class="mb-3">
-                            <label class="small text-muted">หมายเหตุ</label>
+                            <label class="small text-muted fw-bold">หมายเหตุ</label>
                             <textarea id="matchNote" class="form-control form-control-sm" rows="3" placeholder="เช่น ต่อเวลา, ปรับแพ้ฟาวล์"></textarea>
                         </div>
-                        <button class="btn btn-success w-100 mt-auto" onclick="finishMatch()"><i class="fas fa-save me-1"></i> บันทึกและจบเกม</button>
+                        <button class="btn btn-success w-100 mt-auto shadow-sm" onclick="finishMatch()"><i class="fas fa-save me-1"></i> บันทึกและจบเกม</button>
                     </div>
                 </div>
 
@@ -278,7 +270,7 @@
                     <div class="glass-card p-4">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <h3 class="fw-bold mb-0" id="matchTitleDisplay">Name</h3>
+                                <h3 class="fw-bold mb-0 text-dark" id="matchTitleDisplay">Name</h3>
                                 <span class="badge bg-secondary" id="matchCatDisplay">Category</span>
                             </div>
                             <span class="status-badge bg-live" id="liveTag">LIVE</span>
@@ -287,22 +279,22 @@
                         <div class="row align-items-center text-center mb-4">
                             <div class="col-4">
                                 <div class="team-box yellow shadow-sm">
-                                    <h4 class="text-warning-emphasis fw-bold">สีเหลือง</h4>
+                                    <h4 class="fw-bold mb-0">สีเหลือง</h4>
                                     <div class="score-big" id="scoreDisplayY">0</div>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <h1 class="fw-bold text-muted" style="font-size: 3rem; opacity: 0.3;">VS</h1>
+                                <h1 class="fw-bold text-secondary" style="font-size: 3rem; opacity: 0.3;">VS</h1>
                             </div>
                             <div class="col-4">
                                 <div class="team-box blue shadow-sm">
-                                    <h4 class="text-primary-emphasis fw-bold">สีฟ้า</h4>
+                                    <h4 class="fw-bold mb-0">สีฟ้า</h4>
                                     <div class="score-big" id="scoreDisplayB">0</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="dynamicScoreControls" class="bg-white rounded p-3 shadow-inner">
+                        <div id="dynamicScoreControls" class="bg-white rounded p-3 shadow-inner border">
                             </div>
 
                     </div>
@@ -322,80 +314,80 @@
                 <div class="modal-body modal-body-scroll d-flex justify-content-center">
                     
                     <div id="reportContent" class="report-preview-page">
-                        <div class="text-center mb-4">
-                            <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="width: 90px; margin-bottom: 10px;">
-                            <h3 class="fw-bold">รายงานผลการแข่งขันกีฬาภายใน "กระดุมทองเกมส์ 2568"</h3>
-                            <h5 class="text-muted">โรงเรียนกระดุมทองวิทยา</h5>
+                        <div class="text-center mb-5">
+                            <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="width: 100px; margin-bottom: 15px;">
+                            <h3 class="fw-bold mb-2">รายงานผลการแข่งขันกีฬาภายใน</h3>
+                            <h2 class="fw-bold text-primary" style="font-size: 2rem;">"กระดุมทองเกมส์ 2568"</h2>
+                            <h5 class="text-muted mt-2">โรงเรียนกระดุมทองวิทยา</h5>
                         </div>
                         
-                        <div class="d-flex justify-content-between border-top border-bottom py-3 mb-4">
+                        <div class="d-flex justify-content-between border-top border-bottom py-4 mb-5" style="border-color: #eee !important;">
                             <div>
-                                <p class="mb-1"><strong>ชนิดกีฬา:</strong> <span id="rptSport" class="text-primary"></span></p>
-                                <p class="mb-0"><strong>รุ่น/ประเภท:</strong> <span id="rptCategory"></span></p>
+                                <p class="mb-2 fs-5"><strong>ชนิดกีฬา:</strong> <span id="rptSport" class="text-primary"></span></p>
+                                <p class="mb-0 fs-5"><strong>รุ่น/ประเภท:</strong> <span id="rptCategory"></span></p>
                             </div>
                             <div class="text-end">
-                                <p class="mb-1"><strong>วันที่:</strong> <span id="rptDate"></span></p>
-                                <p class="mb-0"><strong>สนาม:</strong> <span id="rptLocation"></span></p>
+                                <p class="mb-2 fs-5"><strong>วันที่:</strong> <span id="rptDate"></span></p>
+                                <p class="mb-0 fs-5"><strong>สนาม:</strong> <span id="rptLocation"></span></p>
                             </div>
                         </div>
 
-                        <div class="card border-0 bg-light mb-4">
+                        <div class="card border-0 mb-5" style="background-color: #f8f9fa;">
                             <div class="card-body text-center p-5">
                                 <div class="row align-items-center">
                                     <div class="col-5">
-                                        <h2 class="text-warning fw-bold mb-0">ทีมสีเหลือง</h2>
+                                        <h2 class="fw-bold mb-0" style="color: #FFD700; -webkit-text-stroke: 1px #B8860B;">ทีมสีเหลือง</h2>
                                     </div>
                                     <div class="col-2">
-                                        <div class="display-4 fw-bold text-muted">VS</div>
+                                        <div class="display-5 fw-bold text-muted">VS</div>
                                     </div>
                                     <div class="col-5">
-                                        <h2 class="text-info fw-bold mb-0">ทีมสีฟ้า</h2>
+                                        <h2 class="fw-bold mb-0" style="color: #00BFFF; -webkit-text-stroke: 1px #0056b3;">ทีมสีฟ้า</h2>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
+                                <div class="row mt-3 align-items-center">
                                     <div class="col-5">
-                                        <div class="display-1 fw-bold" id="rptScoreY">0</div>
+                                        <div class="display-1 fw-bold text-dark" id="rptScoreY">0</div>
                                     </div>
-                                    <div class="col-2 d-flex align-items-center justify-content-center">
-                                        <span class="badge bg-dark">ผลการแข่งขัน</span>
+                                    <div class="col-2">
+                                        <span class="badge bg-dark px-3 py-2">ผลการแข่งขัน</span>
                                     </div>
                                     <div class="col-5">
-                                        <div class="display-1 fw-bold" id="rptScoreB">0</div>
+                                        <div class="display-1 fw-bold text-dark" id="rptScoreB">0</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="alert alert-secondary mb-4">
-                            <strong><i class="fas fa-info-circle"></i> รายละเอียดคะแนน/เซต:</strong>
-                            <p id="rptDetails" class="mb-0 mt-1 ms-3">-</p>
-                        </div>
-
-                        <div class="text-center py-4 mb-5">
-                            <h4>สรุปผลการแข่งขัน: ทีมชนะเลิศ ได้แก่ <span id="rptWinner" class="text-decoration-underline text-success fw-bold">...</span></h4>
-                        </div>
-
-                        <div class="row mt-5" style="page-break-inside: avoid;">
-                            <div class="col-6 text-center">
-                                <div style="border-bottom: 1px dotted #000; height: 30px; margin-bottom: 10px; width: 80%; margin-left: auto; margin-right: auto;"></div>
-                                <p>( <span id="rptRefName">.............................................</span> )</p>
-                                <p class="small">กรรมการผู้ตัดสิน</p>
-                            </div>
-                            <div class="col-6 text-center">
-                                <div style="border-bottom: 1px dotted #000; height: 30px; margin-bottom: 10px; width: 80%; margin-left: auto; margin-right: auto;"></div>
-                                <p>( <span id="rptAthleteName">.............................................</span> )</p>
-                                <p class="small">ตัวแทนนักกีฬาผู้ชนะ</p>
+                        <div class="mb-5">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-info-circle text-muted"></i> รายละเอียดคะแนน:</h5>
+                            <div class="p-4 rounded border bg-white">
+                                <p id="rptDetails" class="mb-0 fs-5">-</p>
                             </div>
                         </div>
-                        
-                        <div class="text-center mt-5 text-muted small">
-                            <p>ระบบบันทึกผลการแข่งขัน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
+
+                        <div class="text-center py-4 mb-5" style="background: #e9ecef; border-radius: 10px;">
+                            <h3>สรุปผลการแข่งขัน: ทีมชนะเลิศ ได้แก่</h3>
+                            <h1 id="rptWinner" class="fw-bold mt-2" style="color: #198754;">...</h1>
+                        </div>
+
+                        <div class="row mt-5 pt-5">
+                            <div class="col-6 text-center">
+                                <div style="border-bottom: 2px dotted #000; height: 30px; margin-bottom: 10px; width: 80%; margin-left: auto; margin-right: auto;"></div>
+                                <p class="mb-1 fs-5">( <span id="rptRefName">.............................................</span> )</p>
+                                <p class="text-muted">กรรมการผู้ตัดสิน</p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div style="border-bottom: 2px dotted #000; height: 30px; margin-bottom: 10px; width: 80%; margin-left: auto; margin-right: auto;"></div>
+                                <p class="mb-1 fs-5">( <span id="rptAthleteName">.............................................</span> )</p>
+                                <p class="text-muted">ตัวแทนนักกีฬาผู้ชนะ</p>
+                            </div>
                         </div>
                     </div>
                     </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                    <button type="button" class="btn btn-danger" onclick="downloadPDF()"><i class="fas fa-download me-1"></i> ดาวน์โหลด PDF</button>
+                    <button type="button" class="btn btn-danger shadow" onclick="downloadPDF()"><i class="fas fa-download me-1"></i> ดาวน์โหลด PDF</button>
                 </div>
             </div>
         </div>
@@ -473,7 +465,7 @@
                 
                 const data = snapshot.val();
                 if (!data) {
-                    list.innerHTML = '<tr><td colspan="6" class="text-center py-4">ยังไม่มีข้อมูลการแข่งขัน</td></tr>';
+                    list.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลการแข่งขัน</td></tr>';
                     return;
                 }
 
@@ -514,34 +506,33 @@
                     let rowClass = '';
                     if(m.status === 'done') {
                         if(m.winner === 'yellow') {
-                            winnerDisplay = '<span class="text-warning fw-bold"><i class="fas fa-trophy"></i> สีเหลือง</span>';
+                            winnerDisplay = '<span class="text-warning-emphasis fw-bold"><i class="fas fa-trophy"></i> สีเหลือง</span>';
                             rowClass = 'winner-yellow';
                         } else if(m.winner === 'blue') {
-                            winnerDisplay = '<span class="text-primary fw-bold"><i class="fas fa-trophy"></i> สีฟ้า</span>';
+                            winnerDisplay = '<span class="text-primary-emphasis fw-bold"><i class="fas fa-trophy"></i> สีฟ้า</span>';
                             rowClass = 'winner-blue';
                         } else {
                             winnerDisplay = 'เสมอ';
-                            rowClass = 'draw-cell';
                         }
                     }
 
                     list.innerHTML += `
-                        <tr class="${m.status === 'done' ? '' : ''}">
-                            <td><span class="fw-bold">${m.time}</span><br>${statusBadge}</td>
+                        <tr class="${rowClass}">
+                            <td class="ps-4"><span class="fw-bold">${m.time}</span><br>${statusBadge}</td>
                             <td><i class="fas fa-running text-muted me-1"></i> ${getSportNameThai(m.sport)}</td>
                             <td>${m.category}</td>
                             <td class="text-center">
                                 <span class="badge rounded-pill bg-light text-dark border px-3 py-2" style="font-size:1em;">
-                                    <span class="text-warning fw-bold">${m.scoreY}</span> - <span class="text-primary fw-bold">${m.scoreB}</span>
+                                    <span class="text-warning-emphasis fw-bold">${m.scoreY}</span> - <span class="text-primary-emphasis fw-bold">${m.scoreB}</span>
                                 </span>
                             </td>
-                            <td class="text-center ${rowClass}">${winnerDisplay}</td>
-                            <td class="text-end btn-action-group">
+                            <td class="text-center">${winnerDisplay}</td>
+                            <td class="text-end pe-4">
                                 <button class="btn btn-sm btn-outline-dark" onclick="openMatch('${m.id}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 ${m.status === 'done' ? `
-                                <button class="btn btn-sm btn-danger ms-1" onclick="previewReport('${m.id}')">
+                                <button class="btn btn-sm btn-danger ms-1 shadow-sm" onclick="previewReport('${m.id}')">
                                     <i class="fas fa-print"></i>
                                 </button>` : ''}
                             </td>
@@ -580,17 +571,17 @@
 
             // CASE 1: E-Sports, Volleyball, Takraw (Best of 3 / Sets)
             if(['esports', 'volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
-                html = `<h6 class="text-muted mb-3">เลือกผู้ชนะในแต่ละเซต (ชนะ 2 ใน 3)</h6>`;
+                html = `<h6 class="text-muted mb-3"><i class="fas fa-list-ol me-1"></i> เลือกผู้ชนะในแต่ละเซต (ชนะ 2 ใน 3)</h6>`;
                 
                 for(let i=1; i<=3; i++) {
                     let setWinner = m.details && m.details['set'+i] ? m.details['set'+i] : 'none';
                     html += `
-                        <div class="d-flex align-items-center justify-content-between mb-2 p-2 border rounded bg-light">
-                            <span class="fw-bold">SET ${i}</span>
+                        <div class="d-flex align-items-center justify-content-between mb-2 p-3 border rounded bg-light">
+                            <span class="fw-bold fs-5">SET ${i}</span>
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="set${i}" id="s${i}y" autocomplete="off" 
                                     ${setWinner==='yellow'?'checked':''} onchange="updateSetWinner(${i}, 'yellow')">
-                                <label class="btn btn-outline-warning" for="s${i}y">สีเหลืองชนะ</label>
+                                <label class="btn btn-outline-warning fw-bold" for="s${i}y">เหลืองชนะ</label>
 
                                 <input type="radio" class="btn-check" name="set${i}" id="s${i}n" autocomplete="off"
                                     ${setWinner==='none'?'checked':''} onchange="updateSetWinner(${i}, 'none')">
@@ -598,7 +589,7 @@
 
                                 <input type="radio" class="btn-check" name="set${i}" id="s${i}b" autocomplete="off"
                                     ${setWinner==='blue'?'checked':''} onchange="updateSetWinner(${i}, 'blue')">
-                                <label class="btn btn-outline-primary" for="s${i}b">สีฟ้าชนะ</label>
+                                <label class="btn btn-outline-primary fw-bold" for="s${i}b">ฟ้าชนะ</label>
                             </div>
                         </div>
                     `;
@@ -609,11 +600,11 @@
                 html = `
                     <div class="row text-center mt-3">
                         <div class="col-6">
-                            <button class="btn btn-warning w-100 py-3 fw-bold mb-2" onclick="manualScore('Y', 1)">+1 เหลือง</button>
+                            <button class="btn btn-warning w-100 py-3 fw-bold mb-2 shadow-sm" onclick="manualScore('Y', 1)">+1 เหลือง</button>
                             <button class="btn btn-outline-secondary btn-sm" onclick="manualScore('Y', -1)">-1</button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-info w-100 py-3 fw-bold mb-2" onclick="manualScore('B', 1)">+1 ฟ้า</button>
+                            <button class="btn btn-info w-100 py-3 fw-bold mb-2 shadow-sm" onclick="manualScore('B', 1)">+1 ฟ้า</button>
                             <button class="btn btn-outline-secondary btn-sm" onclick="manualScore('B', -1)">-1</button>
                         </div>
                     </div>
@@ -685,9 +676,9 @@
 
                 // Winner Text
                 const winnerEl = document.getElementById('rptWinner');
-                if(m.winner === 'yellow') { winnerEl.innerText = "ทีมสีเหลือง"; winnerEl.className = "text-warning fw-bold text-decoration-underline"; }
-                else if(m.winner === 'blue') { winnerEl.innerText = "ทีมสีฟ้า"; winnerEl.className = "text-info fw-bold text-decoration-underline"; }
-                else { winnerEl.innerText = "เสมอ"; winnerEl.className = "text-dark fw-bold"; }
+                if(m.winner === 'yellow') { winnerEl.innerText = "ทีมสีเหลือง"; winnerEl.style.color = "#856404"; }
+                else if(m.winner === 'blue') { winnerEl.innerText = "ทีมสีฟ้า"; winnerEl.style.color = "#084298"; }
+                else { winnerEl.innerText = "เสมอ"; winnerEl.style.color = "black"; }
 
                 // Details Text
                 let detailTxt = '';
@@ -695,13 +686,13 @@
                     for(let i=1; i<=3; i++){
                         if(m.details['set'+i]) {
                             let w = m.details['set'+i] === 'yellow' ? 'เหลืองชนะ' : (m.details['set'+i] === 'blue' ? 'ฟ้าชนะ' : '-');
-                            detailTxt += ` เซตที่ ${i}: ${w} |`;
+                            detailTxt += ` | เซตที่ ${i}: ${w}`;
                         }
                     }
                 } else {
                     detailTxt = m.note || 'ไม่มีข้อมูลเพิ่มเติม';
                 }
-                document.getElementById('rptDetails').innerText = detailTxt;
+                document.getElementById('rptDetails').innerText = detailTxt.startsWith(' |') ? detailTxt.substring(3) : detailTxt;
 
                 // Show Modal
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
@@ -715,7 +706,7 @@
                 margin: 0,
                 filename: `Result_${sportName}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
