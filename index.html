@@ -33,7 +33,6 @@
 
         h1, h2, h3, h4, h5, .nav-link, .btn, .modal-title { font-family: 'Kanit', sans-serif; }
 
-        /* Loading Screen */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95);
@@ -47,7 +46,6 @@
         .spinner-logo { width: 80px; animation: spin 2s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Glass Card */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -59,7 +57,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Navbar */
         .navbar {
             background: rgba(21, 30, 61, 0.98) !important;
             backdrop-filter: blur(10px);
@@ -67,16 +64,13 @@
         }
         .navbar-brand img { height: 50px; margin-right: 12px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
 
-        /* Status & Colors */
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
         .bg-live { background: #dc3545; color: white; animation: pulse 1.5s infinite; }
         .bg-wait { background: #6c757d; color: white; }
         .bg-done { background: #198754; color: white; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* ============================================ */
-        /* [NEW] ปุ่มเพิ่มรายการเน้นพิเศษ - Glowing Effect */
-        /* ============================================ */
+        /* ปุ่มเพิ่มรายการเน้นพิเศษ */
         .btn-add-match {
             background: linear-gradient(135deg, #ffc107 0%, #ff9800 50%, #ffc107 100%);
             background-size: 200% 200%;
@@ -89,7 +83,6 @@
             overflow: hidden;
             animation: gradient-shift 3s ease infinite, btn-glow 2s ease-in-out infinite;
             box-shadow: 0 4px 15px rgba(255, 193, 7, 0.5);
-            text-shadow: 0 1px 1px rgba(255,255,255,0.3);
             transition: all 0.3s ease;
         }
         .btn-add-match::before {
@@ -103,39 +96,15 @@
             transform: skewX(-25deg);
             animation: shimmer 2.5s infinite;
         }
-        .btn-add-match::after {
-            content: '✨';
-            position: absolute;
-            right: -5px;
-            top: -5px;
-            font-size: 14px;
-            animation: sparkle 1s ease-in-out infinite;
-        }
         .btn-add-match:hover {
             transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255, 193, 7, 0.7), 0 0 40px rgba(255, 152, 0, 0.4);
+            box-shadow: 0 8px 30px rgba(255, 193, 7, 0.7);
             color: #000 !important;
         }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 200%; }
-        }
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        @keyframes btn-glow {
-            0%, 100% { box-shadow: 0 4px 15px rgba(255, 193, 7, 0.5); }
-            50% { box-shadow: 0 4px 25px rgba(255, 193, 7, 0.9), 0 0 35px rgba(255, 152, 0, 0.5); }
-        }
-        @keyframes sparkle {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.2); }
-        }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
+        @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes btn-glow { 0%, 100% { box-shadow: 0 4px 15px rgba(255, 193, 7, 0.5); } 50% { box-shadow: 0 4px 25px rgba(255, 193, 7, 0.9); } }
 
-        /* ============================================ */
-        /* PDF Styles */
-        /* ============================================ */
         .report-preview-page {
             background: white;
             width: 210mm;
@@ -150,43 +119,11 @@
         .report-preview-page * {
             text-shadow: none !important;
             -webkit-text-stroke: 0 !important;
-            letter-spacing: normal !important;
-        }
-        .report-preview-page h1, 
-        .report-preview-page h2, 
-        .report-preview-page h3, 
-        .report-preview-page h4, 
-        .report-preview-page h5 {
-            font-family: 'Kanit', sans-serif;
-        }
-
-        /* PDF Table Styles */
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11pt;
-        }
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #333;
-            padding: 6px 8px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .pdf-table th {
-            background: #1a237e;
-            color: white;
-            font-weight: 600;
-            font-family: 'Kanit', sans-serif;
-        }
-        .pdf-table tr:nth-child(even) {
-            background: #f5f5f5;
         }
         
-        /* Winner Highlight */
-        .winner-yellow { background: #fff8e1 !important; }
+        .winner-yellow { background: #fffde7 !important; }
         .winner-blue { background: #e3f2fd !important; }
         
-        /* QR Code Modal */
         #qrImage { max-width: 100%; height: auto; border: 10px solid white; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
     </style>
 </head>
@@ -216,7 +153,6 @@
                     <li class="nav-item"><button class="btn btn-sm btn-outline-light border-0" onclick="showQRCode()"><i class="fas fa-qrcode me-1"></i> QR ระบบ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
-                    <!-- [NEW] ปุ่มเน้นพิเศษ -->
                     <li class="nav-item"><button class="btn btn-sm btn-add-match" onclick="showPage('setup')"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
                 </ul>
             </div>
@@ -244,13 +180,12 @@
             <div class="glass-card p-3">
                 <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
                     <span class="fw-bold"><i class="fas fa-filter"></i> ตัวกรอง:</span>
-                    <select id="filterSport" class="form-select form-select-sm w-auto" onchange="loadMatches()"><option value="all">ทุกกีฬา</option></select>
-                    <select id="filterWinner" class="form-select form-select-sm w-auto" onchange="loadMatches()">
+                    <select id="filterSport" class="form-select form-select-sm w-auto" onchange="applyFilters()"><option value="all">ทุกกีฬา</option></select>
+                    <select id="filterWinner" class="form-select form-select-sm w-auto" onchange="applyFilters()">
                         <option value="all">ทั้งหมด</option>
                         <option value="yellow">เหลืองชนะ</option>
                         <option value="blue">ฟ้าชนะ</option>
                     </select>
-                    <!-- [NEW] ปุ่มดูสรุปผล PDF -->
                     <button class="btn btn-sm btn-danger ms-auto" onclick="previewSummaryReport()"><i class="fas fa-file-pdf me-1"></i> สรุปผลการแข่งขัน</button>
                     <button class="btn btn-sm btn-dark" onclick="showQRCode()"><i class="fas fa-qrcode"></i> Scan</button>
                 </div>
@@ -432,7 +367,7 @@
         </div>
     </div>
 
-    <!-- [NEW] Summary Report Modal -->
+    <!-- Summary Report Modal -->
     <div class="modal fade" id="summaryModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -458,7 +393,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
@@ -475,7 +410,8 @@
         
         let currentMatchId = null;
         let matchDataLocal = {};
-        let allMatchesData = {};
+        let allMatchesData = {};  // เก็บข้อมูลทั้งหมด
+        let allMatchesArray = []; // เก็บเป็น Array สำหรับแสดงผล
 
         window.forceHideLoader = () => {
             const overlay = document.getElementById('loadingOverlay');
@@ -487,9 +423,10 @@
 
         window.showPage = (id) => {
             document.querySelectorAll('.page-section').forEach(el => el.classList.add('d-none'));
-            const target = document.getElementById('page-' + id);
-            target.classList.remove('d-none');
-            if(id === 'dashboard') loadMatches();
+            document.getElementById('page-' + id).classList.remove('d-none');
+            if(id === 'dashboard') {
+                renderMatchList();
+            }
         };
 
         window.showQRCode = () => {
@@ -511,85 +448,197 @@
             });
         };
 
-        // --- DASHBOARD ---
-        window.loadMatches = () => {
-            const filterS = document.getElementById('filterSport').value;
-            const filterW = document.getElementById('filterWinner').value;
+        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
+
+        // ============================================
+        // [FIX] แยก loadMatches และ renderMatchList
+        // ============================================
+        function loadMatches() {
+            console.log('Loading matches from Firebase...');
             
             onValue(ref(db, 'matches'), (snap) => {
                 forceHideLoader();
-                const list = document.getElementById('matchList');
-                const filterSportSel = document.getElementById('filterSport');
-                list.innerHTML = '';
                 const data = snap.val();
+                console.log('Data received:', data);
+                
                 allMatchesData = data || {};
-
-                if(!data) { 
-                    list.innerHTML = '<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล (เพิ่มรายการใหม่ได้เลย)</td></tr>'; 
-                    return; 
+                
+                // แปลงเป็น Array
+                if(data) {
+                    allMatchesArray = Object.keys(data).map(k => ({...data[k], id: k}));
+                    allMatchesArray.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+                } else {
+                    allMatchesArray = [];
                 }
-
-                let matches = Object.keys(data).map(k => ({...data[k], id:k}));
-                matches.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
-
-                if(filterSportSel.options.length === 1) {
-                    [...new Set(matches.map(m=>m.sport))].forEach(s => {
-                        filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
-                    });
-                }
-
-                let wY = 0, wB = 0;
-                matches.forEach(m => {
-                    if(m.status === 'done') {
-                        if(m.winner === 'yellow') wY++;
-                        if(m.winner === 'blue') wB++;
-                    }
-                    if(filterS !== 'all' && m.sport !== filterS) return;
-                    if(filterW === 'yellow' && m.winner !== 'yellow') return;
-                    if(filterW === 'blue' && m.winner !== 'blue') return;
-
-                    let badge = m.status === 'done' ? '<span class="status-badge bg-done">จบแล้ว</span>' : '<span class="status-badge bg-wait">รอแข่ง</span>';
-                    let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'<span class="text-warning fw-bold">สีเหลือง</span>':(m.winner==='blue'?'<span class="text-primary fw-bold">สีฟ้า</span>':'เสมอ')) : '-';
-
-                    list.innerHTML += `
-                        <tr>
-                            <td>${m.time}<br>${badge}</td>
-                            <td><strong>${getSportName(m.sport)}</strong><br><small>${m.category}</small></td>
-                            <td class="text-center"><span class="badge bg-light text-dark border">${m.scoreY || 0} - ${m.scoreB || 0}</span></td>
-                            <td class="text-center">${winnerTxt}</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-dark" onclick="openMatch('${m.id}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteMatch('${m.id}')"><i class="fas fa-trash"></i></button>
-                                ${m.status === 'done' ? `<button class="btn btn-sm btn-danger ms-1" onclick="previewReport('${m.id}')"><i class="fas fa-print"></i></button>` : ''}
-                            </td>
-                        </tr>
-                    `;
-                });
-                document.getElementById('sumWinY').innerText = wY;
-                document.getElementById('sumWinB').innerText = wB;
+                
+                console.log('Matches array:', allMatchesArray);
+                
+                // Update filter dropdown
+                updateFilterOptions();
+                
+                // Render list
+                renderMatchList();
+                
             }, (error) => {
-                console.error(error);
+                console.error('Firebase error:', error);
                 forceHideLoader();
-                Swal.fire('Error', 'เชื่อมต่อ Firebase ไม่ได้', 'error');
+                Swal.fire('Error', 'เชื่อมต่อ Firebase ไม่ได้: ' + error.message, 'error');
             });
+        }
+
+        function updateFilterOptions() {
+            const filterSportSel = document.getElementById('filterSport');
+            const currentValue = filterSportSel.value;
+            
+            // Reset options
+            filterSportSel.innerHTML = '<option value="all">ทุกกีฬา</option>';
+            
+            // Get unique sports
+            const sports = [...new Set(allMatchesArray.map(m => m.sport))];
+            sports.forEach(s => {
+                filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
+            });
+            
+            // Restore selection if still valid
+            if([...filterSportSel.options].some(o => o.value === currentValue)) {
+                filterSportSel.value = currentValue;
+            }
+        }
+
+        window.renderMatchList = () => {
+            const filterS = document.getElementById('filterSport').value;
+            const filterW = document.getElementById('filterWinner').value;
+            const list = document.getElementById('matchList');
+            
+            list.innerHTML = '';
+            
+            if(allMatchesArray.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">ไม่พบข้อมูล (กดปุ่ม "เพิ่มรายการ" เพื่อสร้างรายการแข่งขันใหม่)</td></tr>';
+                document.getElementById('sumWinY').innerText = '0';
+                document.getElementById('sumWinB').innerText = '0';
+                return;
+            }
+
+            let wY = 0, wB = 0;
+            let displayCount = 0;
+            
+            allMatchesArray.forEach(m => {
+                // Count wins
+                if(m.status === 'done') {
+                    if(m.winner === 'yellow') wY++;
+                    if(m.winner === 'blue') wB++;
+                }
+                
+                // Apply filters
+                if(filterS !== 'all' && m.sport !== filterS) return;
+                if(filterW === 'yellow' && m.winner !== 'yellow') return;
+                if(filterW === 'blue' && m.winner !== 'blue') return;
+
+                displayCount++;
+                
+                let badge = m.status === 'done' ? '<span class="status-badge bg-done">จบแล้ว</span>' : '<span class="status-badge bg-wait">รอแข่ง</span>';
+                let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'<span class="text-warning fw-bold">สีเหลือง</span>':(m.winner==='blue'?'<span class="text-primary fw-bold">สีฟ้า</span>':'เสมอ')) : '-';
+
+                list.innerHTML += `
+                    <tr>
+                        <td>${m.time || '-'}<br>${badge}</td>
+                        <td><strong>${getSportName(m.sport)}</strong><br><small class="text-muted">${m.category || '-'}</small></td>
+                        <td class="text-center"><span class="badge bg-light text-dark border fs-6">${m.scoreY || 0} - ${m.scoreB || 0}</span></td>
+                        <td class="text-center">${winnerTxt}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-dark" onclick="openMatch('${m.id}')" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteMatch('${m.id}')" title="ลบ"><i class="fas fa-trash"></i></button>
+                            ${m.status === 'done' ? `<button class="btn btn-sm btn-danger ms-1" onclick="previewReport('${m.id}')" title="พิมพ์รายงาน"><i class="fas fa-print"></i></button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            if(displayCount === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">ไม่พบรายการที่ตรงกับตัวกรอง</td></tr>';
+            }
+            
+            document.getElementById('sumWinY').innerText = wY;
+            document.getElementById('sumWinB').innerText = wB;
+        };
+
+        window.applyFilters = () => {
+            renderMatchList();
         };
 
         window.deleteMatch = (id) => {
-            Swal.fire({ title: 'ลบรายการ?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ' }).then((r) => {
-                if(r.isConfirmed) remove(ref(db, 'matches/'+id));
+            Swal.fire({ 
+                title: 'ลบรายการนี้?', 
+                text: 'การลบจะไม่สามารถกู้คืนได้',
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#dc3545'
+            }).then((r) => {
+                if(r.isConfirmed) {
+                    remove(ref(db, 'matches/'+id)).then(() => {
+                        Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1000, showConfirmButton: false });
+                    });
+                }
             });
         };
 
+        // ============================================
+        // [FIX] Form Submit - เพิ่มรายการใหม่
+        // ============================================
         document.getElementById('setupForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            
             const sport = document.getElementById('sportType').value;
+            const category = document.getElementById('category').value;
+            const matchDate = document.getElementById('matchDate').value;
+            const matchTime = document.getElementById('matchTime').value;
+            const location = document.getElementById('location').value;
+            
+            if(!sport || !category || !matchDate || !matchTime) {
+                Swal.fire('กรุณากรอกข้อมูลให้ครบ', '', 'warning');
+                return;
+            }
+            
             let refs = sport === 'cheer' ? ['','',''] : ['']; 
-            push(ref(db, 'matches'), {
-                sport: sport, category: document.getElementById('category').value,
-                date: document.getElementById('matchDate').value, time: document.getElementById('matchTime').value,
-                location: document.getElementById('location').value, status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
-                details: {}, referees: refs, athleteSign: '', note: '', playersY: [], playersB: []
-            }).then(() => { showPage('dashboard'); });
+            
+            const newMatch = {
+                sport: sport,
+                category: category,
+                date: matchDate,
+                time: matchTime,
+                location: location || '',
+                status: 'wait',
+                scoreY: 0,
+                scoreB: 0,
+                winner: 'none',
+                details: {},
+                referees: refs,
+                athleteSign: '',
+                note: '',
+                playersY: [],
+                playersB: [],
+                createdAt: new Date().toISOString()
+            };
+            
+            console.log('Adding new match:', newMatch);
+            
+            push(ref(db, 'matches'), newMatch)
+                .then(() => {
+                    console.log('Match added successfully');
+                    Swal.fire({ icon: 'success', title: 'เพิ่มรายการเรียบร้อย', timer: 1500, showConfirmButton: false });
+                    
+                    // Reset form
+                    document.getElementById('setupForm').reset();
+                    document.getElementById('matchDate').value = '2025-12-03';
+                    
+                    showPage('dashboard');
+                })
+                .catch((error) => {
+                    console.error('Error adding match:', error);
+                    Swal.fire('Error', 'ไม่สามารถเพิ่มรายการได้: ' + error.message, 'error');
+                });
         });
 
         // --- MATCH MANAGEMENT ---
@@ -664,8 +713,7 @@
             }
             matchDataLocal[key].push('');
             set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key])
-                .then(() => { renderPlayers(matchDataLocal[key], team); })
-                .catch((error) => { Swal.fire('Error', 'ไม่สามารถเพิ่มนักกีฬาได้', 'error'); });
+                .then(() => { renderPlayers(matchDataLocal[key], team); });
         };
 
         window.updatePlayer = (team, idx, val) => {
@@ -683,9 +731,7 @@
                 .then(() => { renderPlayers(matchDataLocal[key], team); });
         };
 
-        // ============================================
-        // [IMPROVED] Player List PDF - Beautiful Design
-        // ============================================
+        // Player List PDF
         window.printPlayerList = () => {
             const listY = matchDataLocal.playersY || [];
             const listB = matchDataLocal.playersB || [];
@@ -708,31 +754,25 @@
                     <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:65px; margin-bottom:8px;">
                     <h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2>
                     <h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"กระดุมทองเกมส์ 2568"</h3>
-                    <p style="margin:3px 0 0; font-size:10pt; color:#666;">โรงเรียนกระดุมทองวิทยา อำเภอกระดุมทอง จังหวัดศรีสะเกษ</p>
+                    <p style="margin:3px 0 0; font-size:10pt; color:#666;">โรงเรียนกระดุมทองวิทยา</p>
                 </div>
-
                 <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;">
                     <table style="width:100%; font-size:11pt;">
                         <tr>
-                            <td style="width:50%;"><strong>🏅 กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td>
-                            <td style="width:50%; text-align:right;"><strong>📅 วันที่:</strong> ${matchDataLocal.date || '-'}</td>
+                            <td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td>
+                            <td style="width:50%; text-align:right;"><strong>วันที่:</strong> ${matchDataLocal.date || '-'}</td>
                         </tr>
                         <tr>
-                            <td><strong>🏆 รุ่น/ประเภท:</strong> ${matchDataLocal.category}</td>
-                            <td style="text-align:right;"><strong>📍 สถานที่:</strong> ${matchDataLocal.location || '-'}</td>
+                            <td><strong>รุ่น/ประเภท:</strong> ${matchDataLocal.category}</td>
+                            <td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td>
                         </tr>
                     </table>
                 </div>
-
                 <table style="width:100%; border-collapse:collapse; font-size:10pt;">
                     <thead>
                         <tr>
-                            <th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">
-                                ⚽ ทีมสีเหลือง
-                            </th>
-                            <th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">
-                                ⚽ ทีมสีฟ้า
-                            </th>
+                            <th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีเหลือง</th>
+                            <th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีฟ้า</th>
                         </tr>
                         <tr style="background:#eee;">
                             <th style="border:1px solid #333; padding:5px; width:5%;">ที่</th>
@@ -741,11 +781,8 @@
                             <th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
+                    <tbody>${tableRows}</tbody>
                 </table>
-
                 <div style="margin-top:30px;">
                     <table style="width:100%;">
                         <tr>
@@ -762,22 +799,17 @@
                         </tr>
                     </table>
                 </div>
-
-                <div style="position:absolute; bottom:8mm; left:0; right:0; text-align:center; font-size:8pt; color:#aaa; border-top:1px solid #eee; padding-top:5px;">
-                    เอกสารนี้พิมพ์จากระบบบันทึกผลการแข่งขัน กระดุมทองเกมส์ 2568
-                </div>
             `;
 
             document.getElementById('playerListContent').innerHTML = html;
             const el = document.getElementById('playerListContent');
-            const opt = { 
+            html2pdf().set({ 
                 margin: [5, 5, 5, 5], 
-                filename: `PlayerList_${getSportName(matchDataLocal.sport)}_${matchDataLocal.category}.pdf`, 
+                filename: `PlayerList_${getSportName(matchDataLocal.sport)}.pdf`, 
                 image: { type: 'jpeg', quality: 0.98 }, 
                 html2canvas: { scale: 2, useCORS: true }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-            };
-            html2pdf().set(opt).from(el).save();
+            }).from(el).save();
         };
 
         // --- SAVE INFO ---
@@ -847,10 +879,19 @@
             update(ref(db, `matches/${currentMatchId}`), { scoreY: y, scoreB: b, details: matchDataLocal.details });
         };
         window.manualScore = (t, v) => {
-            let path = t==='Y'?'scoreY':'scoreB';
-            update(ref(db, `matches/${currentMatchId}/${path}`), Math.max(0, (matchDataLocal[path]||0)+v));
+            let key = t==='Y'?'scoreY':'scoreB';
+            let newVal = Math.max(0, (matchDataLocal[key]||0)+v);
+            matchDataLocal[key] = newVal;
+            document.getElementById(t==='Y'?'scoreDisplayY':'scoreDisplayB').innerText = newVal;
+            update(ref(db, `matches/${currentMatchId}`), { [key]: newVal });
         };
-        window.clearMatchData = () => { if(confirm('ล้างคะแนน?')) update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} }); };
+        window.clearMatchData = () => { 
+            if(confirm('ล้างคะแนน?')) {
+                update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} });
+                document.getElementById('scoreDisplayY').innerText = '0';
+                document.getElementById('scoreDisplayB').innerText = '0';
+            }
+        };
         window.finishMatch = () => {
             let y = matchDataLocal.scoreY || 0, b = matchDataLocal.scoreB || 0;
             update(ref(db, `matches/${currentMatchId}`), { status: 'done', winner: y>b?'yellow':(b>y?'blue':'draw') }).then(()=>showPage('dashboard'));
@@ -860,6 +901,8 @@
         window.previewReport = (id) => {
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
+                if(!m) { Swal.fire('Error', 'ไม่พบข้อมูล', 'error'); return; }
+                
                 let html = `
                     <div style="text-align:center; margin-bottom:15px; padding-bottom:10px; border-bottom:3px double #1a237e;">
                         <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:70px;">
@@ -868,23 +911,23 @@
                     </div>
                     <div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:15px;">
                         <table style="width:100%; font-size:11pt;">
-                            <tr><td><strong>🏅 กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>📅 วันที่:</strong> ${m.date}</td></tr>
-                            <tr><td><strong>🏆 รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>📍 สนาม:</strong> ${m.location || '-'}</td></tr>
+                            <tr><td><strong>กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${m.date}</td></tr>
+                            <tr><td><strong>รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>สนาม:</strong> ${m.location || '-'}</td></tr>
                         </table>
                     </div>
                     <div style="text-align:center; padding:25px 0; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:12px; margin-bottom:15px;">
                         <table style="width:100%; color:#fff;">
                             <tr>
-                                <td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">⚽ สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td>
+                                <td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td>
                                 <td style="width:20%; text-align:center;"><span style="font-size:20pt; opacity:0.7;">VS</span></td>
-                                <td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">⚽ สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td>
+                                <td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td>
                             </tr>
                         </table>
                     </div>
                     <div style="background:${m.winner==='yellow'?'linear-gradient(135deg,#fff8e1,#ffecb3)':(m.winner==='blue'?'linear-gradient(135deg,#e3f2fd,#bbdefb)':'#f5f5f5')}; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; border:3px solid ${m.winner==='yellow'?'#ffc107':(m.winner==='blue'?'#2196f3':'#999')};">
                         <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ผู้ชนะ: <strong>${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</strong></h3>
                     </div>
-                    ${m.note ? `<div style="margin-bottom:15px;"><strong>📝 หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px; background:#fafafa;">${m.note}</div></div>` : ''}
+                    ${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px; background:#fafafa;">${m.note}</div></div>` : ''}
                     <div style="margin-top:40px;">
                         <table style="width:100%;">
                             <tr>
@@ -893,9 +936,6 @@
                             </tr>
                         </table>
                     </div>
-                    <div style="position:absolute; bottom:8mm; left:0; right:0; text-align:center; font-size:8pt; color:#aaa;">
-                        พิมพ์จากระบบบันทึกผลการแข่งขัน กระดุมทองเกมส์ 2568
-                    </div>
                 `;
                 document.getElementById('reportContent').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
@@ -903,19 +943,22 @@
         };
 
         // ============================================
-        // [NEW] Summary Report - All Matches PDF
+        // [FIX] Summary Report - ใช้ allMatchesArray
         // ============================================
         window.previewSummaryReport = () => {
-            if(!allMatchesData || Object.keys(allMatchesData).length === 0) {
-                Swal.fire('ไม่พบข้อมูล', 'ยังไม่มีรายการแข่งขัน', 'info');
+            console.log('Preview Summary - allMatchesArray:', allMatchesArray);
+            
+            if(!allMatchesArray || allMatchesArray.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ไม่พบข้อมูล',
+                    text: 'ยังไม่มีรายการแข่งขัน กรุณาเพิ่มรายการก่อน'
+                });
                 return;
             }
 
-            let matches = Object.keys(allMatchesData).map(k => ({...allMatchesData[k], id:k}));
-            matches.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
-
             let wY = 0, wB = 0, draw = 0, pending = 0;
-            matches.forEach(m => {
+            allMatchesArray.forEach(m => {
                 if(m.status === 'done') {
                     if(m.winner === 'yellow') wY++;
                     else if(m.winner === 'blue') wB++;
@@ -925,7 +968,7 @@
                 }
             });
 
-            let tableRows = matches.map((m, idx) => {
+            let tableRows = allMatchesArray.map((m, idx) => {
                 let rowBg = m.winner === 'yellow' ? '#fffde7' : (m.winner === 'blue' ? '#e3f2fd' : '#fff');
                 let statusTxt = m.status === 'done' ? '✅' : '⏳';
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'🟡 เหลือง':(m.winner==='blue'?'🔵 ฟ้า':'➖')) : '-';
@@ -933,8 +976,8 @@
                     <tr style="background:${rowBg};">
                         <td style="border:1px solid #333; padding:5px; text-align:center;">${idx+1}</td>
                         <td style="border:1px solid #333; padding:5px; text-align:left;">${getSportName(m.sport)}</td>
-                        <td style="border:1px solid #333; padding:5px; text-align:center;">${m.category}</td>
-                        <td style="border:1px solid #333; padding:5px; text-align:center;">${m.date}<br><small>${m.time}</small></td>
+                        <td style="border:1px solid #333; padding:5px; text-align:center;">${m.category || '-'}</td>
+                        <td style="border:1px solid #333; padding:5px; text-align:center;">${m.date || '-'}<br><small>${m.time || ''}</small></td>
                         <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:12pt;">${m.scoreY || 0}</td>
                         <td style="border:1px solid #333; padding:5px; text-align:center; font-weight:bold; font-size:12pt;">${m.scoreB || 0}</td>
                         <td style="border:1px solid #333; padding:5px; text-align:center;">${winnerTxt}</td>
@@ -1006,23 +1049,25 @@
         // --- DOWNLOAD PDF HELPER ---
         window.downloadPDF = (elementId, filename) => {
             const el = document.getElementById(elementId);
-            const opt = { 
+            html2pdf().set({ 
                 margin: [5, 5, 5, 5], 
                 filename: filename, 
                 image: { type: 'jpeg', quality: 0.98 }, 
                 html2canvas: { scale: 2, useCORS: true }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-            };
-            html2pdf().set(opt).from(el).save();
+            }).from(el).save();
         };
 
-        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
-
-        // --- INITIALIZATION ---
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => { forceHideLoader(); }, 5000);
+            console.log('DOM loaded, initializing...');
+            setTimeout(forceHideLoader, 5000);
             loadMatches();
         });
+
+        // Backup call
         loadMatches();
     </script>
 </body>
