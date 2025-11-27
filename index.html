@@ -361,7 +361,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
         // --- IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG IF NEEDED ---
         const firebaseConfig = {
@@ -382,7 +382,13 @@
 
         // Force Hide Loader Function (Global)
         window.forceHideLoader = () => {
-            document.getElementById('loadingOverlay').style.display = 'none';
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
         }
 
         // --- GLOBAL FUNCTIONS ---
@@ -415,14 +421,11 @@
 
         // --- DASHBOARD ---
         window.loadMatches = () => {
-            // Safety: Force hide loader after 5 seconds if connection fails
-            setTimeout(forceHideLoader, 5000);
-
             const filterS = document.getElementById('filterSport').value;
             const filterW = document.getElementById('filterWinner').value;
             
             onValue(ref(db, 'matches'), (snap) => {
-                // Hide Loader
+                // [FIX #1] Hide Loader เมื่อได้รับข้อมูล
                 forceHideLoader();
 
                 const list = document.getElementById('matchList');
@@ -430,11 +433,15 @@
                 list.innerHTML = '';
                 const data = snap.val();
 
-                if(!data) { list.innerHTML = '<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล (เพิ่มรายการใหม่ได้เลย)</td></tr>'; return; }
+                if(!data) { 
+                    list.innerHTML = '<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล (เพิ่มรายการใหม่ได้เลย)</td></tr>'; 
+                    return; 
+                }
 
                 let matches = Object.keys(data).map(k => ({...data[k], id:k}));
                 matches.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
 
+                // Reset filter options และเพิ่มใหม่
                 if(filterSportSel.options.length === 1) {
                     [...new Set(matches.map(m=>m.sport))].forEach(s => {
                         filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
@@ -458,7 +465,7 @@
                         <tr>
                             <td>${m.time}<br>${badge}</td>
                             <td><strong>${getSportName(m.sport)}</strong><br><small>${m.category}</small></td>
-                            <td class="text-center"><span class="badge bg-light text-dark border">${m.scoreY} - ${m.scoreB}</span></td>
+                            <td class="text-center"><span class="badge bg-light text-dark border">${m.scoreY || 0} - ${m.scoreB || 0}</span></td>
                             <td class="text-center">${winnerTxt}</td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-dark" onclick="openMatch('${m.id}')"><i class="fas fa-edit"></i></button>
@@ -501,13 +508,20 @@
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
                 if(!m) return;
+                
+                // [FIX #3] Initialize arrays ก่อน assign
+                m.playersY = m.playersY || [];
+                m.playersB = m.playersB || [];
+                m.referees = m.referees || [''];
+                m.details = m.details || {};
+                
                 matchDataLocal = m;
                 
                 // Header & Info
                 document.getElementById('matchTitleDisplay').innerText = getSportName(m.sport);
                 document.getElementById('matchCatDisplay').innerText = m.category;
-                document.getElementById('scoreDisplayY').innerText = m.scoreY;
-                document.getElementById('scoreDisplayB').innerText = m.scoreB;
+                document.getElementById('scoreDisplayY').innerText = m.scoreY || 0;
+                document.getElementById('scoreDisplayB').innerText = m.scoreB || 0;
                 document.getElementById('matchNote').value = m.note || '';
                 document.getElementById('athleteSign').value = m.athleteSign || '';
                 
@@ -526,9 +540,7 @@
 
                 document.getElementById('signerLabel').innerText = (m.sport === 'cheer') ? "ประธานสีผู้รับรอง" : "ตัวแทนนักกีฬาผู้ชนะ";
 
-                // Players (Force Initialize Empty Arrays if undefined)
-                if(!m.playersY) m.playersY = [];
-                if(!m.playersB) m.playersB = [];
+                // Players
                 renderPlayers(m.playersY, 'Y');
                 renderPlayers(m.playersB, 'B');
 
@@ -537,46 +549,81 @@
             }, { onlyOnce: true });
         };
 
-        // --- PLAYERS (BUG FIX) ---
+        // --- PLAYERS [FIX #3] ---
         window.renderPlayers = (list, team) => {
             const div = document.getElementById(`players${team}`);
             div.innerHTML = '';
-            const safeList = list || []; 
+            const safeList = Array.isArray(list) ? list : []; 
             if(safeList.length === 0) {
-                div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ</small>';
+                div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ (กดปุ่ม + เพื่อเพิ่ม)</small>';
             } else {
                 safeList.forEach((p, i) => {
                     div.innerHTML += `
                         <div class="input-group input-group-sm mb-1">
-                            <input type="text" class="form-control" value="${p}" onchange="updatePlayer('${team}', ${i}, this.value)">
+                            <input type="text" class="form-control" value="${p || ''}" onchange="updatePlayer('${team}', ${i}, this.value)" placeholder="ชื่อนักกีฬาคนที่ ${i+1}">
                             <button class="btn btn-outline-danger" onclick="removePlayer('${team}', ${i})">×</button>
                         </div>`;
                 });
             }
         };
 
+        // [FIX #3] แก้ไขฟังก์ชัน addPlayerInput ให้ทำงานถูกต้อง
         window.addPlayerInput = (team) => {
-            // FIX: Initialize immediately if undefined
-            let list = team === 'Y' ? (matchDataLocal.playersY || []) : (matchDataLocal.playersB || []);
-            list.push(''); 
+            if (!currentMatchId) {
+                Swal.fire('Error', 'กรุณาเปิดรายการแข่งขันก่อน', 'error');
+                return;
+            }
+
+            // Initialize array ใน matchDataLocal ถ้ายังไม่มี
+            const key = team === 'Y' ? 'playersY' : 'playersB';
+            if (!Array.isArray(matchDataLocal[key])) {
+                matchDataLocal[key] = [];
+            }
             
-            // Save to DB immediately to sync state
-            update(ref(db, `matches/${currentMatchId}/players${team}`), list).then(() => {
-                matchDataLocal[`players${team}`] = list; // Update local
-                renderPlayers(list, team);
-            });
+            // เพิ่มรายการใหม่
+            matchDataLocal[key].push('');
+            
+            // บันทึกลง Firebase โดยใช้ set แทน update
+            set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key])
+                .then(() => {
+                    renderPlayers(matchDataLocal[key], team);
+                    console.log(`Added player to ${key}:`, matchDataLocal[key]);
+                })
+                .catch((error) => {
+                    console.error('Error adding player:', error);
+                    Swal.fire('Error', 'ไม่สามารถเพิ่มนักกีฬาได้', 'error');
+                });
         };
 
         window.updatePlayer = (team, idx, val) => {
-            update(ref(db, `matches/${currentMatchId}/players${team}/${idx}`), val);
+            const key = team === 'Y' ? 'playersY' : 'playersB';
+            if (!Array.isArray(matchDataLocal[key])) {
+                matchDataLocal[key] = [];
+            }
+            matchDataLocal[key][idx] = val;
+            
+            set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key])
+                .then(() => {
+                    console.log(`Updated player ${idx} in ${key}:`, val);
+                })
+                .catch((error) => {
+                    console.error('Error updating player:', error);
+                });
         };
 
         window.removePlayer = (team, idx) => {
-            let list = team === 'Y' ? matchDataLocal.playersY : matchDataLocal.playersB;
-            list.splice(idx, 1);
-            update(ref(db, `matches/${currentMatchId}/players${team}`), list).then(() => {
-                renderPlayers(list, team);
-            });
+            const key = team === 'Y' ? 'playersY' : 'playersB';
+            if (!Array.isArray(matchDataLocal[key])) return;
+            
+            matchDataLocal[key].splice(idx, 1);
+            
+            set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key])
+                .then(() => {
+                    renderPlayers(matchDataLocal[key], team);
+                })
+                .catch((error) => {
+                    console.error('Error removing player:', error);
+                });
         };
 
         window.printPlayerList = () => {
@@ -709,6 +756,24 @@
         };
 
         window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
+
+        // ============================================
+        // [FIX #1 & #2] INITIALIZATION - เรียก loadMatches() ตอนเริ่มต้น
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, initializing...');
+            
+            // Timeout สำรองเผื่อ Firebase ช้า
+            setTimeout(() => {
+                forceHideLoader();
+            }, 5000);
+            
+            // เรียกโหลดข้อมูลทันที
+            loadMatches();
+        });
+
+        // เรียก loadMatches() ทันทีเมื่อ script ทำงาน (backup)
+        loadMatches();
     </script>
 </body>
 </html>
