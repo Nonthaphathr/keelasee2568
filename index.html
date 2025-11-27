@@ -36,7 +36,7 @@
         /* Loading Screen */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -92,6 +92,7 @@
         <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="spinner-logo">
         <h4 class="text-secondary fw-bold">กำลังโหลดข้อมูล...</h4>
         <small class="text-muted">กระดุมทองเกมส์ 2568</small>
+        <button class="btn btn-sm btn-outline-secondary mt-3" onclick="forceHideLoader()">กดตรงนี้หากรอนานเกินไป</button>
     </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -362,6 +363,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
+        // --- IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG IF NEEDED ---
         const firebaseConfig = {
             apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
             authDomain: "kradumthong-esports.firebaseapp.com",
@@ -377,6 +379,11 @@
         
         let currentMatchId = null;
         let matchDataLocal = {};
+
+        // Force Hide Loader Function (Global)
+        window.forceHideLoader = () => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
 
         // --- GLOBAL FUNCTIONS ---
         window.showPage = (id) => {
@@ -408,23 +415,22 @@
 
         // --- DASHBOARD ---
         window.loadMatches = () => {
-            // Show Loader only on first load
-            const loader = document.getElementById('loadingOverlay');
-            
+            // Safety: Force hide loader after 5 seconds if connection fails
+            setTimeout(forceHideLoader, 5000);
+
             const filterS = document.getElementById('filterSport').value;
             const filterW = document.getElementById('filterWinner').value;
             
             onValue(ref(db, 'matches'), (snap) => {
-                // Hide Loader when data arrives
-                if(loader) loader.style.opacity = '0'; 
-                setTimeout(() => { if(loader) loader.style.display = 'none'; }, 500);
+                // Hide Loader
+                forceHideLoader();
 
                 const list = document.getElementById('matchList');
                 const filterSportSel = document.getElementById('filterSport');
                 list.innerHTML = '';
                 const data = snap.val();
 
-                if(!data) { list.innerHTML = '<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล</td></tr>'; return; }
+                if(!data) { list.innerHTML = '<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล (เพิ่มรายการใหม่ได้เลย)</td></tr>'; return; }
 
                 let matches = Object.keys(data).map(k => ({...data[k], id:k}));
                 matches.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
@@ -464,6 +470,10 @@
                 });
                 document.getElementById('sumWinY').innerText = wY;
                 document.getElementById('sumWinB').innerText = wB;
+            }, (error) => {
+                console.error(error);
+                forceHideLoader();
+                Swal.fire('Error', 'เชื่อมต่อ Firebase ไม่ได้ ตรวจสอบ Config', 'error');
             });
         };
 
@@ -531,7 +541,6 @@
         window.renderPlayers = (list, team) => {
             const div = document.getElementById(`players${team}`);
             div.innerHTML = '';
-            // Handle case where list might be null/undefined initially
             const safeList = list || []; 
             if(safeList.length === 0) {
                 div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ</small>';
@@ -597,7 +606,6 @@
 
         // --- SAVE INFO BUTTON ---
         window.saveMatchInfo = () => {
-            // Collect Referees
             const refs = [];
             const refInputs = document.querySelectorAll('[id^="refInput_"]');
             refInputs.forEach(input => refs.push(input.value));
