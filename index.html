@@ -180,7 +180,6 @@
         input, select, textarea { font-size: 16px !important; }
         @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
         
-        /* [NEW] Footer Style */
         .credit-footer {
             text-align: center;
             font-size: 0.85rem;
@@ -217,7 +216,7 @@
                     <li class="nav-item"><button class="btn btn-sm btn-outline-light border-0 w-100" onclick="showQRCode()"><i class="fas fa-qrcode me-1"></i> QR ระบบ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0 w-100" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light w-100" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
-                    <li class="nav-item"><button class="btn btn-sm btn-add-match w-100" onclick="showPage('setup')"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
+                    <li class="nav-item"><button class="btn btn-sm btn-add-match w-100" onclick="prepareAddMatch()"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
                 </ul>
             </div>
         </div>
@@ -282,7 +281,7 @@
 
         <div id="page-setup" class="page-section d-none">
             <div class="glass-card p-3 p-md-4 mx-auto" style="max-width: 700px;">
-                <h4 class="mb-3 border-bottom pb-2"><i class="fas fa-calendar-plus"></i> เพิ่มรายการแข่งขัน</h4>
+                <h4 class="mb-3 border-bottom pb-2" id="setupTitle"><i class="fas fa-calendar-plus"></i> เพิ่มรายการแข่งขัน</h4>
                 <form id="setupForm">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -318,7 +317,7 @@
                         <div class="col-12 mt-4">
                             <div class="d-flex gap-2 justify-content-end">
                                 <button type="button" class="btn btn-light" onclick="showPage('dashboard')">ยกเลิก</button>
-                                <button type="submit" class="btn btn-primary px-4">บันทึก</button>
+                                <button type="submit" class="btn btn-primary px-4" id="setupSubmitBtn">บันทึก</button>
                             </div>
                         </div>
                     </div>
@@ -488,8 +487,10 @@
         let matchDataLocal = {};
         let allMatchesData = {};
         let allMatchesArray = [];
+        
+        // [NEW] ตัวแปรตรวจสอบสถานะการแก้ไข
+        let editingMatchId = null;
 
-        // [NEW] Helper: Get Thai Date String (Manual calculation to ensure Buddhist Year)
         window.getThaiDate = () => {
             const date = new Date();
             const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -512,8 +513,38 @@
             document.getElementById('page-' + id).classList.remove('d-none');
             if(id === 'dashboard') {
                 renderMatchList();
+                // Reset edit state when going back to dashboard
+                editingMatchId = null; 
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // [NEW] ฟังก์ชั่นเตรียมหน้าเพิ่มรายการ (เคลียร์ค่าเก่า)
+        window.prepareAddMatch = () => {
+            editingMatchId = null;
+            document.getElementById('setupForm').reset();
+            document.getElementById('setupTitle').innerHTML = '<i class="fas fa-calendar-plus"></i> เพิ่มรายการแข่งขัน';
+            document.getElementById('setupSubmitBtn').innerText = 'บันทึก';
+            document.getElementById('matchDate').value = '2025-12-03';
+            showPage('setup');
+        }
+
+        // [NEW] ฟังก์ชั่นโหลดข้อมูลมาแก้ไข
+        window.editMatchDetails = (id) => {
+            const m = allMatchesArray.find(x => x.id === id);
+            if(!m) return;
+
+            editingMatchId = id;
+            document.getElementById('sportType').value = m.sport;
+            document.getElementById('category').value = m.category;
+            document.getElementById('matchDate').value = m.date;
+            document.getElementById('matchTime').value = m.time;
+            document.getElementById('location').value = m.location || '';
+            
+            document.getElementById('setupTitle').innerHTML = '<i class="fas fa-edit"></i> แก้ไขรายละเอียด';
+            document.getElementById('setupSubmitBtn').innerText = 'บันทึกการแก้ไข';
+            
+            showPage('setup');
         };
 
         window.showQRCode = () => {
@@ -527,6 +558,7 @@
                 title: 'คู่มือการใช้งาน',
                 html: `<ul class="text-start small">
                     <li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่</li>
+                    <li><b>แก้ไขรายการ:</b> กดปุ่มสีฟ้า > แก้ไขรายละเอียด</li>
                     <li><b>ลงทะเบียน:</b> แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา</li>
                     <li><b>ลงคะแนน:</b> กดแต้มระบบจะเซฟอัตโนมัติ</li>
                     <li><b>สรุปผล:</b> กดปุ่ม PDF เพื่อพิมพ์</li>
@@ -629,8 +661,10 @@
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#" onclick="copyMatchText('${m.id}', 'schedule')">คัดลอกกำหนดการ</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="copyMatchText('${m.id}', 'result')">คัดลอกผลการแข่งขัน</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="editMatchDetails('${m.id}')">แก้ไขรายละเอียด</a></li>
                                 </ul>
-                                <button class="btn btn-outline-dark" onclick="openMatch('${m.id}')" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-outline-dark" onclick="openMatch('${m.id}')" title="ลงคะแนน/รายชื่อ"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-outline-danger" onclick="deleteMatch('${m.id}')" title="ลบ"><i class="fas fa-trash"></i></button>
                                 ${m.status === 'done' ? `<button class="btn btn-danger" onclick="previewReport('${m.id}')" title="พิมพ์"><i class="fas fa-print"></i></button>` : ''}
                             </div>
@@ -680,21 +714,35 @@
                 return;
             }
             
-            let refs = sport === 'cheer' ? ['','',''] : ['']; 
-            
-            push(ref(db, 'matches'), {
-                sport, category, date: matchDate, time: matchTime, location: location || '',
-                status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
-                details: {}, referees: refs, athleteSign: '', note: '', playersY: [], playersB: [],
-                createdAt: new Date().toISOString()
-            }).then(() => {
-                Swal.fire({ icon: 'success', title: 'เพิ่มรายการเรียบร้อย', timer: 1500, showConfirmButton: false });
-                document.getElementById('setupForm').reset();
-                document.getElementById('matchDate').value = '2025-12-03';
-                showPage('dashboard');
-            }).catch((error) => {
-                Swal.fire('Error', 'ไม่สามารถเพิ่มรายการได้', 'error');
-            });
+            if(editingMatchId) {
+                // [MOD] กรณีแก้ไขรายการ (อัปเดตเฉพาะข้อมูล Metadata)
+                update(ref(db, `matches/${editingMatchId}`), {
+                    sport, category, date: matchDate, time: matchTime, location: location || ''
+                }).then(() => {
+                    Swal.fire({ icon: 'success', title: 'บันทึกการแก้ไขเรียบร้อย', timer: 1500, showConfirmButton: false });
+                    editingMatchId = null;
+                    document.getElementById('setupForm').reset();
+                    showPage('dashboard');
+                }).catch((error) => {
+                    Swal.fire('Error', 'ไม่สามารถแก้ไขได้', 'error');
+                });
+            } else {
+                // กรณีเพิ่มใหม่ (Create New)
+                let refs = sport === 'cheer' ? ['','',''] : ['']; 
+                push(ref(db, 'matches'), {
+                    sport, category, date: matchDate, time: matchTime, location: location || '',
+                    status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
+                    details: {}, referees: refs, athleteSign: '', note: '', playersY: [], playersB: [],
+                    createdAt: new Date().toISOString()
+                }).then(() => {
+                    Swal.fire({ icon: 'success', title: 'เพิ่มรายการเรียบร้อย', timer: 1500, showConfirmButton: false });
+                    document.getElementById('setupForm').reset();
+                    document.getElementById('matchDate').value = '2025-12-03';
+                    showPage('dashboard');
+                }).catch((error) => {
+                    Swal.fire('Error', 'ไม่สามารถเพิ่มรายการได้', 'error');
+                });
+            }
         });
 
         window.openMatch = (id) => {
@@ -989,7 +1037,6 @@
                 dateTitle = `สรุปผลการแข่งขัน ประจำวันที่ ${filterD}`;
             }
 
-            // [NEW] Add Thai Date timestamp to copied text
             let text = `📢 ${dateTitle}\n(ข้อมูล ณ วันที่ ${getThaiDate()})\n🏆 กีฬาภายใน "กระดุมทองเกมส์ 2568"\n----------------------------\n`;
             let wY=0, wB=0;
 
