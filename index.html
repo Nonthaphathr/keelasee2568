@@ -694,7 +694,6 @@
 
         window.applyFilters = () => { renderMatchList(); };
 
-        // [MOD] เพิ่มรหัสผ่านก่อนลบ
         window.deleteMatch = async (id) => {
             const { value: pass } = await Swal.fire({
                 title: 'ยืนยันการลบรายการ?',
@@ -931,6 +930,22 @@
             } else if(m.sport === 'esports') {
                 html = `<h6 class="border-bottom pb-2 mb-2">ผู้ชนะรายเซต</h6>`;
                 for(let i=1; i<=3; i++) { let w = m.details?.[`set${i}`] || 'none'; html += `<div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded"><span class="fw-bold small">Set ${i}</span><div class="btn-group btn-group-sm"><input type="radio" class="btn-check" name="s${i}" id="s${i}y" ${w==='yellow'?'checked':''} onchange="updateSetWin(${i}, 'yellow')"><label class="btn btn-outline-warning" for="s${i}y">🟡</label><input type="radio" class="btn-check" name="s${i}" id="s${i}n" ${w==='none'?'checked':''} onchange="updateSetWin(${i}, 'none')"><label class="btn btn-outline-secondary" for="s${i}n">-</label><input type="radio" class="btn-check" name="s${i}" id="s${i}b" ${w==='blue'?'checked':''} onchange="updateSetWin(${i}, 'blue')"><label class="btn btn-outline-primary" for="s${i}b">🔵</label></div></div>`; }
+            } else if(['athletics', 'folksport'].includes(m.sport)) {
+                // [NEW] Simple Winner Selection
+                let isY = m.scoreY > m.scoreB;
+                let isB = m.scoreB > m.scoreY;
+                html = `
+                    <div class="text-center">
+                        <h6 class="border-bottom pb-2 mb-3">เลือกผู้ชนะ</h6>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="simpleWin" id="winY" autocomplete="off" ${isY ? 'checked' : ''} onchange="setSimpleWinner('yellow')">
+                            <label class="btn btn-outline-warning py-3" for="winY"><i class="fas fa-trophy me-2"></i>สีเหลืองชนะ</label>
+
+                            <input type="radio" class="btn-check" name="simpleWin" id="winB" autocomplete="off" ${isB ? 'checked' : ''} onchange="setSimpleWinner('blue')">
+                            <label class="btn btn-outline-info py-3" for="winB"><i class="fas fa-trophy me-2"></i>สีฟ้าชนะ</label>
+                        </div>
+                    </div>
+                `;
             } else {
                 html = `<div class="row text-center g-2"><div class="col-6"><button class="btn btn-warning w-100 py-3 fw-bold" onclick="manualScore('Y', 1)">+1 เหลือง</button></div><div class="col-6"><button class="btn btn-info w-100 py-3 fw-bold" onclick="manualScore('B', 1)">+1 ฟ้า</button></div><div class="col-6"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('Y', -1)">-1</button></div><div class="col-6"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('B', -1)">-1</button></div></div>`;
             }
@@ -954,6 +969,19 @@
                 Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
             }
         };
+
+        // [NEW] Simple Winner Set
+        window.setSimpleWinner = (team) => {
+            let updates = {};
+            if (team === 'yellow') {
+                updates = { scoreY: 1, scoreB: 0 };
+            } else {
+                updates = { scoreY: 0, scoreB: 1 };
+            }
+            document.getElementById('scoreDisplayY').innerText = updates.scoreY;
+            document.getElementById('scoreDisplayB').innerText = updates.scoreB;
+            update(ref(db, `matches/${currentMatchId}`), updates);
+        }
 
         window.updateCheerScore = (j, t, v) => {
             if(!matchDataLocal.details) matchDataLocal.details = {};
@@ -992,11 +1020,23 @@
             }
         };
         
-        // [MOD] เพิ่มแจ้งเตือนก่อนจบ
+        // [MOD] Finish Match Logic (Allow 2-0 wins)
         window.finishMatch = () => {
+            let m = matchDataLocal;
+            let warningText = "โปรดตรวจสอบให้แน่ใจว่าลงผลการแข่งขันครบถ้วนทุก set แล้ว หากครบแล้ว กดยืนยัน";
+            
+            // Check if best of 3 sports already have a winner (2 sets)
+            if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
+                if (m.scoreY === 2 || m.scoreB === 2) {
+                    warningText = "ได้ผู้ชนะ 2 ใน 3 เซตแล้ว ยืนยันจบการแข่งขัน?";
+                }
+            } else if(['athletics', 'folksport'].includes(m.sport)) {
+                 warningText = "ยืนยันผลการตัดสิน?";
+            }
+
             Swal.fire({
                 title: 'ยืนยันจบการแข่งขัน',
-                text: "โปรดตรวจสอบให้แน่ใจว่าลงผลการแข่งขันครบถ้วนทุก set แล้ว หากครบแล้ว กดยืนยัน",
+                text: warningText,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#198754',
