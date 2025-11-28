@@ -35,7 +35,6 @@
             background-size: cover;
             min-height: 100vh;
             padding-bottom: 60px;
-            /* [FIX] ป้องกันการ overflow บนมือถือ */
             overflow-x: hidden;
         }
 
@@ -78,7 +77,6 @@
         .bg-done { background: #198754; color: white; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* ปุ่มเพิ่มรายการเน้นพิเศษ */
         .btn-add-match {
             background: linear-gradient(135deg, #ffc107 0%, #ff9800 50%, #ffc107 100%);
             background-size: 200% 200%;
@@ -134,11 +132,6 @@
         
         #qrImage { max-width: 100%; height: auto; border: 10px solid white; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
 
-        /* ============================================ */
-        /* [NEW] Mobile Responsive - ตารางไม่พับ */
-        /* ============================================ */
-        
-        /* ตารางหลัก - ไม่พับบนมือถือ */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -149,148 +142,52 @@
             padding: 8px 10px;
         }
         
-        /* [Mobile] ปรับขนาด font และ spacing */
         @media (max-width: 768px) {
-            .container {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-            
-            .navbar-brand span.fs-5 {
-                font-size: 1rem !important;
-            }
-            
-            .navbar-brand img {
-                height: 40px;
-            }
-            
-            .glass-card {
-                padding: 12px !important;
-                border-radius: 12px;
-            }
-            
-            /* Score cards */
-            .display-5 {
-                font-size: 2rem !important;
-            }
-            
-            /* Filter bar */
-            .d-flex.flex-wrap.gap-2 {
-                gap: 6px !important;
-            }
-            
-            .form-select-sm {
-                font-size: 0.8rem;
-                padding: 4px 8px;
-            }
-            
-            .btn-sm {
-                font-size: 0.75rem;
-                padding: 5px 10px;
-            }
-            
-            /* Table styling for mobile */
-            .table {
-                font-size: 0.85rem;
-            }
-            
-            .table th {
-                font-size: 0.75rem;
-                padding: 6px 8px !important;
-            }
-            
-            .table td {
-                padding: 6px 8px !important;
-            }
-            
-            .status-badge {
-                padding: 3px 8px;
-                font-size: 0.7em;
-            }
-            
-            /* Match page */
-            .display-3 {
-                font-size: 2.5rem !important;
-            }
-            
-            /* Navbar buttons */
-            .navbar-nav .btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-            
-            /* Modal adjustments */
-            .modal-dialog {
-                margin: 10px;
-            }
-            
-            .report-preview-page {
-                width: 100%;
-                min-height: auto;
-                padding: 5mm;
-                font-size: 10pt;
-            }
+            .container { padding-left: 10px; padding-right: 10px; }
+            .navbar-brand span.fs-5 { font-size: 1rem !important; }
+            .navbar-brand img { height: 40px; }
+            .glass-card { padding: 12px !important; border-radius: 12px; }
+            .display-5 { font-size: 2rem !important; }
+            .d-flex.flex-wrap.gap-2 { gap: 6px !important; }
+            .form-select-sm { font-size: 0.8rem; padding: 4px 8px; }
+            .btn-sm { font-size: 0.75rem; padding: 5px 10px; }
+            .table { font-size: 0.85rem; }
+            .table th { font-size: 0.75rem; padding: 6px 8px !important; }
+            .table td { padding: 6px 8px !important; }
+            .status-badge { padding: 3px 8px; font-size: 0.7em; }
+            .display-3 { font-size: 2.5rem !important; }
+            .navbar-nav .btn { padding: 6px 10px; font-size: 0.8rem; }
+            .modal-dialog { margin: 10px; }
+            .report-preview-page { width: 100%; min-height: auto; padding: 5mm; font-size: 10pt; }
         }
         
-        /* [Extra Small] สำหรับ iPhone SE และจอเล็ก */
         @media (max-width: 375px) {
-            .navbar-brand span.fs-5 {
-                font-size: 0.85rem !important;
-            }
-            
-            .navbar-brand small {
-                display: none;
-            }
-            
-            .display-5 {
-                font-size: 1.75rem !important;
-            }
-            
-            .table {
-                font-size: 0.8rem;
-            }
-            
-            h4 {
-                font-size: 1.1rem;
-            }
+            .navbar-brand span.fs-5 { font-size: 0.85rem !important; }
+            .navbar-brand small { display: none; }
+            .display-5 { font-size: 1.75rem !important; }
+            .table { font-size: 0.8rem; }
+            h4 { font-size: 1.1rem; }
         }
         
-        /* [Landscape] มือถือแนวนอน */
         @media (max-height: 500px) and (orientation: landscape) {
-            .navbar {
-                padding: 5px 0;
-            }
-            
-            .navbar-brand img {
-                height: 35px;
-            }
-            
-            .py-4 {
-                padding-top: 1rem !important;
-                padding-bottom: 1rem !important;
-            }
+            .navbar { padding: 5px 0; }
+            .navbar-brand img { height: 35px; }
+            .py-4 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
         }
         
-        /* Touch-friendly buttons */
-        .btn {
-            min-height: 38px;
-            touch-action: manipulation;
-        }
+        .btn { min-height: 38px; touch-action: manipulation; }
+        html { scroll-behavior: smooth; }
+        input, select, textarea { font-size: 16px !important; }
+        @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
         
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Fix iOS input zoom */
-        input, select, textarea {
-            font-size: 16px !important;
-        }
-        
-        @media (max-width: 768px) {
-            input, select, textarea {
-                font-size: 16px !important;
-            }
+        /* [NEW] Footer Style */
+        .credit-footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
         }
     </style>
 </head>
@@ -510,6 +407,10 @@
                 </div>
             </div>
         </div>
+        
+        <div class="credit-footer">
+            พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง
+        </div>
 
     </div>
 
@@ -588,6 +489,16 @@
         let allMatchesData = {};
         let allMatchesArray = [];
 
+        // [NEW] Helper: Get Thai Date String (Manual calculation to ensure Buddhist Year)
+        window.getThaiDate = () => {
+            const date = new Date();
+            const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear() + 543;
+            return `${day} ${month} ${year}`;
+        }
+
         window.forceHideLoader = () => {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
@@ -602,7 +513,6 @@
             if(id === 'dashboard') {
                 renderMatchList();
             }
-            // Scroll to top on page change
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
@@ -650,7 +560,6 @@
         }
 
         function updateFilterOptions() {
-            // Sport Filter
             const filterSportSel = document.getElementById('filterSport');
             const currentSport = filterSportSel.value;
             filterSportSel.innerHTML = '<option value="all">ทุกกีฬา</option>';
@@ -662,7 +571,6 @@
                 filterSportSel.value = currentSport;
             }
 
-            // [NEW] Date Filter
             const filterDateSel = document.getElementById('filterDate');
             const currentDate = filterDateSel.value;
             filterDateSel.innerHTML = '<option value="all">ทุกวัน</option>';
@@ -678,7 +586,7 @@
         window.renderMatchList = () => {
             const filterS = document.getElementById('filterSport').value;
             const filterW = document.getElementById('filterWinner').value;
-            const filterD = document.getElementById('filterDate').value; // [NEW] รับค่าตัวกรองวันที่
+            const filterD = document.getElementById('filterDate').value;
             const list = document.getElementById('matchList');
             
             list.innerHTML = '';
@@ -699,18 +607,16 @@
                     if(m.winner === 'blue') wB++;
                 }
                 
-                // [FIX] Apply Filter Logic
                 if(filterS !== 'all' && m.sport !== filterS) return;
                 if(filterW === 'yellow' && m.winner !== 'yellow') return;
                 if(filterW === 'blue' && m.winner !== 'blue') return;
-                if(filterD !== 'all' && m.date !== filterD) return; // [NEW] กรองวันที่
+                if(filterD !== 'all' && m.date !== filterD) return;
 
                 displayCount++;
                 
                 let badge = m.status === 'done' ? '<span class="status-badge bg-done">จบ</span>' : '<span class="status-badge bg-wait">รอ</span>';
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'<span class="text-warning fw-bold">🟡</span>':(m.winner==='blue'?'<span class="text-primary fw-bold">🔵</span>':'➖')) : '-';
 
-                // [NEW] เพิ่มปุ่มคัดลอกใน Dropdown
                 list.innerHTML += `
                     <tr>
                         <td>${m.time || '-'}<br>${badge}</td>
@@ -896,6 +802,7 @@
                     <tbody>${tableRows}</tbody>
                 </table>
                 <div style="margin-top:30px;"><table style="width:100%;"><tr><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีเหลือง</p></td><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีฟ้า</p></td></tr></table></div>
+                <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
             `;
 
             document.getElementById('playerListContent').innerHTML = html;
@@ -907,7 +814,7 @@
             document.querySelectorAll('[id^="refInput_"]').forEach(input => refs.push(input.value));
             update(ref(db, `matches/${currentMatchId}`), { referees: refs, athleteSign: document.getElementById('athleteSign').value, note: document.getElementById('matchNote').value }).then(() => {
                 Swal.fire({ icon: 'success', title: 'บันทึกเรียบร้อย', timer: 1200, showConfirmButton: false });
-                if(matchDataLocal.sport === 'cheer') renderScoreControls({...matchDataLocal, referees: refs}); // Refresh UI for referee names
+                if(matchDataLocal.sport === 'cheer') renderScoreControls({...matchDataLocal, referees: refs});
             });
         };
 
@@ -915,16 +822,13 @@
             const div = document.getElementById('dynamicScoreControls');
             let html = '';
             if(m.sport === 'cheer') {
-                // [NEW] แสดงชื่อกรรมการเหนือช่องกรอกคะแนน
                 html = `<h6 class="border-bottom pb-2 mb-2">คะแนนกรรมการ 3 ท่าน</h6>
                         <div class="row g-2 text-center mb-1">
                             <div class="col-6 offset-6 d-flex"><div class="w-50"><strong class="text-warning small">เหลือง</strong></div><div class="w-50"><strong class="text-info small">ฟ้า</strong></div></div>
                         </div>`;
                 
                 for(let i=1; i<=3; i++) { 
-                    // ดึงชื่อกรรมการ ถ้าไม่มีให้ใช้ Default
                     let refName = (m.referees && m.referees[i-1]) ? m.referees[i-1] : `กรรมการท่านที่ ${i}`;
-                    
                     html += `
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-6 text-start">
@@ -1013,6 +917,7 @@
                     </div>
                     ${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px;">${m.note}</div></div>` : ''}
                     <div style="margin-top:40px;"><table style="width:100%;"><tr>${(m.referees||['']).map((r,i) => r ? `<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${r})<br>กรรมการ ${i+1}</small></td>` : '').join('')}<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></td></tr></table></div>
+                    <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
                 `;
                 document.getElementById('reportContent').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
@@ -1057,6 +962,7 @@
                     <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3>
                     <p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p>
                 </div>
+                <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
                 <div style="position:absolute; bottom:5mm; left:0; right:0; text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div>
             `;
 
@@ -1068,14 +974,12 @@
             html2pdf().set({ margin: [5,5,5,5], filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(document.getElementById(elementId)).save();
         };
 
-        // [NEW] ฟังก์ชั่น Copy ข้อความสำหรับปุ่มหน้าหลัก
         window.copyDailyReport = () => {
             if(!allMatchesArray || allMatchesArray.length === 0) {
                  Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูล', text: 'ยังไม่มีข้อมูลการแข่งขัน' });
                  return;
             }
             
-            // กรองตามวันที่เลือกใน Filter
             const filterD = document.getElementById('filterDate').value;
             let targetMatches = allMatchesArray;
             let dateTitle = "สรุปผลการแข่งขัน";
@@ -1085,7 +989,8 @@
                 dateTitle = `สรุปผลการแข่งขัน ประจำวันที่ ${filterD}`;
             }
 
-            let text = `📢 ${dateTitle}\n🏆 กีฬาภายใน "กระดุมทองเกมส์ 2568"\n----------------------------\n`;
+            // [NEW] Add Thai Date timestamp to copied text
+            let text = `📢 ${dateTitle}\n(ข้อมูล ณ วันที่ ${getThaiDate()})\n🏆 กีฬาภายใน "กระดุมทองเกมส์ 2568"\n----------------------------\n`;
             let wY=0, wB=0;
 
             targetMatches.forEach(m => {
@@ -1097,14 +1002,13 @@
             });
             
             if(filterD === 'all') {
-                 text += `----------------------------\n📊 สรุปเหรียญรวม\n🥇 สีเหลือง: ${wY} เหรียญ\n🥇 สีฟ้า: ${wB} เหรียญ`;
+                 text += `----------------------------\n📊 สรุปเหรียญรวม\n🥇 สีเหลือง: ${wY} เหรียญ\n🥇 สีฟ้า: ${wB} เหรียญ\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#`;
             }
 
             text += `\n\n#กระดุมทองเกมส์2568`;
             copyToClipboard(text);
         };
 
-        // [NEW] ฟังก์ชั่น Copy รายการเดี่ยว
         window.copyMatchText = (id, type) => {
             const m = allMatchesArray.find(x => x.id === id);
             if(!m) return;
@@ -1114,7 +1018,7 @@
                 text = `📅 กำหนดการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n⏰ เวลา: ${m.time} น. (วันที่ ${m.date})\n📍 สนาม: ${m.location || '-'}\n\n#กระดุมทองเกมส์2568`;
             } else {
                 let wTxt = m.status !== 'done' ? 'ยังไม่แข่ง' : (m.winner==='yellow'?'สีเหลืองชนะ':(m.winner==='blue'?'สีฟ้าชนะ':'เสมอ'));
-                text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\n------------------\n#กระดุมทองเกมส์2568`;
+                text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#\n------------------\n#กระดุมทองเกมส์2568`;
             }
             copyToClipboard(text);
         };
