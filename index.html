@@ -294,7 +294,7 @@
                                 <option value="sepaktakraw">เซปักตะกร้อ</option>
                                 <option value="esports">E-Sports ROV</option>
                                 <option value="petanque">เปตอง</option>
-                                <option value="folksport">กีฬาพื้นบ้าน</option>
+                                <option value="athletics">กรีฑา</option> <option value="folksport">กีฬาพื้นบ้าน</option>
                                 <option value="cheer">ประกวดกองเชียร์ฯ</option>
                             </select>
                         </div>
@@ -488,7 +488,6 @@
         let allMatchesData = {};
         let allMatchesArray = [];
         let editingMatchId = null;
-        // [NEW] สถานะการล็อกคะแนน
         let isMatchUnlocked = false;
 
         window.getThaiDate = () => {
@@ -564,7 +563,8 @@
             });
         };
 
-        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
+        // [MOD] เพิ่ม "กรีฑา"
+        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','athletics':'กรีฑา','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
 
         function loadMatches() {
             onValue(ref(db, 'matches'), (snap) => {
@@ -646,14 +646,11 @@
                 let badge = m.status === 'done' ? '<span class="status-badge bg-done">จบ</span>' : '<span class="status-badge bg-wait">รอ</span>';
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'<span class="text-warning fw-bold">🟡</span>':(m.winner==='blue'?'<span class="text-primary fw-bold">🔵</span>':'➖')) : '-';
 
-                // [NEW] Status Indicators
-                // เช็คกรรมการ: มีอย่างน้อย 1 คนที่ไม่ใช่ค่าว่าง
                 const hasRefs = m.referees && m.referees.some(r => r.trim() !== '');
                 const refIcon = hasRefs ? 
                     '<i class="fas fa-whistle text-success me-1" title="มีกรรมการแล้ว"></i>' : 
                     '<i class="fas fa-whistle text-secondary opacity-25 me-1" title="ยังไม่มีกรรมการ"></i>';
 
-                // เช็คนักกีฬา: มีชื่อนักกีฬาทีมใดทีมหนึ่ง
                 const hasPlayers = (m.playersY && m.playersY.some(p=>p.trim()!=='')) || (m.playersB && m.playersB.some(p=>p.trim()!==''));
                 const playerIcon = hasPlayers ? 
                     '<i class="fas fa-users text-success" title="มีรายชื่อแล้ว"></i>' : 
@@ -740,7 +737,8 @@
                     Swal.fire('Error', 'ไม่สามารถแก้ไขได้', 'error');
                 });
             } else {
-                let refs = sport === 'cheer' ? ['','',''] : ['']; 
+                // [MOD] เชียร์ 5 คน
+                let refs = sport === 'cheer' ? ['','','','',''] : ['']; 
                 push(ref(db, 'matches'), {
                     sport, category, date: matchDate, time: matchTime, location: location || '',
                     status: 'wait', scoreY: 0, scoreB: 0, winner: 'none',
@@ -759,7 +757,7 @@
 
         window.openMatch = (id) => {
             currentMatchId = id;
-            isMatchUnlocked = false; // [NEW] Reset unlock state
+            isMatchUnlocked = false;
             
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
@@ -781,7 +779,8 @@
                 
                 const refDiv = document.getElementById('refereeInputs');
                 refDiv.innerHTML = '';
-                const refCount = (m.sport === 'cheer') ? 3 : 1;
+                // [MOD] เชียร์ 5 คน
+                const refCount = (m.sport === 'cheer') ? 5 : 1;
                 let currentRefs = m.referees || [];
                 while(currentRefs.length < refCount) currentRefs.push('');
                 
@@ -883,7 +882,6 @@
         function renderScoreControls(m) {
             const div = document.getElementById('dynamicScoreControls');
             
-            // [NEW] ตรวจสอบสถานะล็อก ถ้ายังไม่ปลดล็อก และยังแข่งไม่จบ ให้แสดงปุ่มปลดล็อกแทน
             if (!isMatchUnlocked && m.status !== 'done') {
                 div.innerHTML = `
                     <div class="text-center py-4 bg-light rounded border border-warning border-dashed">
@@ -895,22 +893,21 @@
                         </button>
                     </div>
                 `;
-                // ซ่อนปุ่มจบการแข่งขันด้วย ถ้ายังไม่ปลดล็อก
                 document.querySelector('button[onclick="finishMatch()"]').style.display = 'none';
                 return;
             } else {
-                // แสดงปุ่มจบการแข่งขัน
                 document.querySelector('button[onclick="finishMatch()"]').style.display = 'block';
             }
 
             let html = '';
             if(m.sport === 'cheer') {
-                html = `<h6 class="border-bottom pb-2 mb-2">คะแนนกรรมการ 3 ท่าน</h6>
+                // [MOD] เชียร์ 5 คน
+                html = `<h6 class="border-bottom pb-2 mb-2">คะแนนกรรมการ 5 ท่าน</h6>
                         <div class="row g-2 text-center mb-1">
                             <div class="col-6 offset-6 d-flex"><div class="w-50"><strong class="text-warning small">เหลือง</strong></div><div class="w-50"><strong class="text-info small">ฟ้า</strong></div></div>
                         </div>`;
                 
-                for(let i=1; i<=3; i++) { 
+                for(let i=1; i<=5; i++) { 
                     let refName = (m.referees && m.referees[i-1]) ? m.referees[i-1] : `กรรมการท่านที่ ${i}`;
                     html += `
                         <div class="row g-2 align-items-center mb-2">
@@ -937,7 +934,6 @@
             div.innerHTML = html;
         }
 
-        // [NEW] ฟังก์ชั่นปลดล็อกคะแนน
         window.unlockScore = async () => {
             const { value: pass } = await Swal.fire({
                 title: 'ใส่รหัสผ่านกรรมการ',
@@ -960,7 +956,8 @@
             if(!matchDataLocal.details) matchDataLocal.details = {};
             matchDataLocal.details[`j${j}${t}`] = parseInt(v) || 0;
             update(ref(db, `matches/${currentMatchId}/details`), matchDataLocal.details).then(() => {
-                let y=0,b=0; for(let i=1;i<=3;i++){ y+=(matchDataLocal.details[`j${i}y`]||0); b+=(matchDataLocal.details[`j${i}b`]||0); }
+                // [MOD] คำนวณรวม 5 คน
+                let y=0,b=0; for(let i=1;i<=5;i++){ y+=(matchDataLocal.details[`j${i}y`]||0); b+=(matchDataLocal.details[`j${i}b`]||0); }
                 update(ref(db, `matches/${currentMatchId}`), { scoreY: y, scoreB: b });
             });
         };
@@ -1044,7 +1041,6 @@
                 return `<tr style="background:${rowBg};"><td style="border:1px solid #333; padding:4px; text-align:center;">${idx+1}</td><td style="border:1px solid #333; padding:4px; text-align:left; font-size:9pt;">${getSportName(m.sport)}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.category || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.date || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreY || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreB || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${winnerTxt}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${statusTxt}</td></tr>`;
             }).join('');
 
-            // [FIX] ปรับโครงสร้าง HTML สำหรับ PDF สรุปผลไม่ให้เบียดกัน
             const html = `
                 <div style="text-align:center; margin-bottom:12px; padding:12px; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:10px; color:#fff;">
                     <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:50px; margin-bottom:5px;">
@@ -1057,18 +1053,16 @@
                     <div style="flex:1; background:#f5f5f5; padding:10px; border-radius:8px; text-align:center; border:2px solid #9e9e9e;"><div style="font-size:24pt; font-weight:bold; color:#616161;">${draw}</div><div style="font-size:9pt; font-weight:600;">🤝 เสมอ</div></div>
                     <div style="flex:1; background:#fff3e0; padding:10px; border-radius:8px; text-align:center; border:2px solid #ff9800;"><div style="font-size:24pt; font-weight:bold; color:#e65100;">${pending}</div><div style="font-size:9pt; font-weight:600;">⏳ รอแข่ง</div></div>
                 </div>
-                <table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px;">
+                <table style="width:100%; border-collapse:collapse; font-size:8pt;">
                     <thead><tr><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:4%;">#</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:20%; text-align:left;">กีฬา</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">รุ่น</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">วันที่</th><th style="background:#ffc107; color:#000; border:1px solid #333; padding:5px; width:8%;">🟡</th><th style="background:#2196f3; color:#fff; border:1px solid #333; padding:5px; width:8%;">🔵</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:10%;">ชนะ</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:6%;">สถานะ</th></tr></thead>
                     <tbody>${tableRows}</tbody>
                 </table>
-                <div style="page-break-inside: avoid;">
-                    <div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};">
-                        <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3>
-                        <p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p>
-                    </div>
-                    <div style="text-align:center; font-size:8pt; margin-top:15px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
-                    <div style="text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div>
+                <div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};">
+                    <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3>
+                    <p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p>
                 </div>
+                <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
+                <div style="position:absolute; bottom:5mm; left:0; right:0; text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div>
             `;
 
             document.getElementById('summaryContent').innerHTML = html;
