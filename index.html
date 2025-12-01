@@ -112,19 +112,19 @@
         @keyframes btn-glow { 0%, 100% { box-shadow: 0 4px 15px rgba(255, 193, 7, 0.5); } 50% { box-shadow: 0 4px 25px rgba(255, 193, 7, 0.9); } }
 
         /* Report Paper Styles */
-        .report-preview-page {
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 20mm 25mm;
-            color: #000;
-            position: relative;
-            font-family: 'Kanit', sans-serif;
-            box-sizing: border-box;
-            line-height: 1.5;
-            font-size: 14pt;
-        }
+       .report-preview-page {
+    background: white;
+    width: 210mm;
+    min-height: auto; /* เปลี่ยนจาก 297mm */
+    margin: 0 auto;
+    padding: 20mm 25mm;
+    color: #000;
+    position: relative;
+    font-family: 'Kanit', sans-serif;
+    box-sizing: border-box;
+    line-height: 1.5;
+    font-size: 14pt;
+}
         .report-preview-page * {
             text-shadow: none !important;
             -webkit-text-stroke: 0 !important;
@@ -459,12 +459,15 @@
                     <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>รายงานผล</h5>
                     <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body bg-secondary d-flex justify-content-center overflow-auto p-2" style="max-height: 70vh;">
+               <!-- สำหรับ reportModal -->
+<div class="modal-body bg-secondary p-2" style="overflow-y: auto;">
+    <div id="reportContent" class="report-preview-page" style="margin: 10px auto;"></div>
+</div>
                     <div id="reportContent" class="report-preview-page"></div>
                 </div>
                 <div class="modal-footer py-2">
                     <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
-                    <button class="btn btn-danger btn-sm" onclick="downloadPDF('reportContent', 'Match_Report.pdf')"><i class="fas fa-download me-1"></i> ดาวน์โหลด</button>
+<button class="btn btn-primary btn-sm" onclick="printDocument('reportContent')"><i class="fas fa-print me-1"></i> พิมพ์</button>
                 </div>
             </div>
         </div>
@@ -477,12 +480,15 @@
                     <h5 class="modal-title"><i class="fas fa-trophy me-2"></i>สรุปผลการแข่งขัน</h5>
                     <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body bg-secondary d-flex justify-content-center overflow-auto p-2" style="max-height: 70vh;">
+               <!-- สำหรับ summaryModal -->
+<div class="modal-body bg-secondary p-2" style="overflow-y: auto;">
+    <div id="summaryContent" class="report-preview-page" style="margin: 10px auto;"></div>
+</div>
                     <div id="summaryContent" class="report-preview-page"></div>
                 </div>
                 <div class="modal-footer py-2">
                     <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
-                    <button class="btn btn-danger btn-sm" onclick="downloadPDF('summaryContent', 'Summary_Report.pdf')"><i class="fas fa-download me-1"></i> ดาวน์โหลด</button>
+<button class="btn btn-primary btn-sm" onclick="printDocument('summaryContent')"><i class="fas fa-print me-1"></i> พิมพ์</button>
                 </div>
             </div>
         </div>
@@ -538,12 +544,15 @@
                     <h5 class="modal-title">ตัวอย่างเอกสาร</h5>
                     <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body bg-secondary d-flex justify-content-center overflow-auto p-2" style="max-height: 70vh;">
+               <!-- สำหรับ speechPreviewModal -->
+<div class="modal-body bg-secondary p-2" style="overflow-y: auto;">
+    <div id="speechContent" class="report-preview-page" style="margin: 10px auto;"></div>
+</div>
                     <div id="speechContent" class="report-preview-page"></div>
                 </div>
                 <div class="modal-footer py-2">
                     <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
-                    <button class="btn btn-danger btn-sm" onclick="downloadPDF('speechContent', 'Closing_Speech.pdf')"><i class="fas fa-download me-1"></i> ดาวน์โหลด</button>
+<button class="btn btn-primary btn-sm" onclick="printDocument('speechContent')"><i class="fas fa-print me-1"></i> พิมพ์</button>
                 </div>
             </div>
         </div>
@@ -719,41 +728,34 @@
             const sportListText = sportsInEvent.map(s => getSportName(s)).join(' ');
             
             // สร้างรายการถ้วยรางวัล
-            let awardList = [];
-            let awardNumber = 1;
-            
-            sportsInEvent.forEach(sportKey => {
-                const awardType = awardTypes[sportKey] || 'separate';
-                
-                if (awardType === 'combined') {
-                    // นับคะแนนรวม
-                    const winner = calculateCombinedScore(sportKey);
-                    awardList.push({
-                        number: awardNumber++,
-                        title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)}`,
-                        winner: winner
-                    });
-                } else {
-                    // แยกรายการ
-                    const awards = generateSeparateAwards(sportKey);
-                    awards.forEach(award => {
-                        awardList.push({
-                            number: awardNumber++,
-                            title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} ${award.category}`,
-                            winner: award.winner
-                        });
-                    });
-                }
+let awardList = [];
+let awardNumber = 1;
+
+sportsInEvent.forEach(sportKey => {
+    // อ่านค่าจาก radio button
+    const selectedRadio = document.querySelector(`input[name="award_${sportKey}"]:checked`);
+    const awardType = selectedRadio ? selectedRadio.value : 'separate';
+    
+    if (awardType === 'combined') {
+        // นับคะแนนรวม - มอบถ้วยเดียว
+        const winner = calculateCombinedScore(sportKey);
+        awardList.push({
+            number: awardNumber++,
+            title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} (คะแนนรวม)`,
+            winner: winner
+        });
+    } else {
+        // แยกรายการ - มอบถ้วยแต่ละรุ่น
+        const awards = generateSeparateAwards(sportKey);
+        awards.forEach(award => {
+            awardList.push({
+                number: awardNumber++,
+                title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} ${award.category}`,
+                winner: award.winner
             });
-            
-            // คำนวณรางวัลรวม
-            let totalY = 0, totalB = 0;
-            allMatchesArray.forEach(m => {
-                if(m.status === 'done') {
-                    if(m.winner === 'yellow') totalY++;
-                    else if(m.winner === 'blue') totalB++;
-                }
-            });
+        });
+    }
+});
             
             const w_overall = totalY > totalB ? 'สีเหลือง' : (totalB > totalY ? 'สีฟ้า' : 'เสมอกัน');
             const score_overall = Math.max(totalY, totalB);
@@ -1444,10 +1446,53 @@
             new bootstrap.Modal(document.getElementById('summaryModal')).show();
         };
 
-        window.downloadPDF = (elementId, filename) => {
-            html2pdf().set({ margin: [5,5,5,5], filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(document.getElementById(elementId)).save();
-        };
-
+       window.printDocument = (elementId) => {
+    const element = document.getElementById(elementId);
+    const originalContents = document.body.innerHTML;
+    const printContents = element.innerHTML;
+    
+    // สร้างหน้าต่างพิมพ์
+    const printWindow = window.open('', '', 'width=800,height=600');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>พิมพ์เอกสาร - กระดุมทองเกมส์ 2568</title>
+            <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+            <style>
+                @page {
+                    size: A4;
+                    margin: 20mm 25mm;
+                }
+                body {
+                    font-family: 'Kanit', sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: white;
+                }
+                @media print {
+                    body {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            ${printContents}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    
+    // รอโหลดเสร็จแล้วพิมพ์
+    printWindow.onload = function() {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    };
+};
         window.copyDailyReport = () => {
             if(!allMatchesArray || allMatchesArray.length === 0) {
                  Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูล', text: 'ยังไม่มีข้อมูลการแข่งขัน' });
