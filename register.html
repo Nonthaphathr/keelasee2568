@@ -97,7 +97,7 @@
         }
         
         .done-match .sport-badge {
-            background: linear-gradient(45deg, #56ab2f, #a8e063); /* Green for done */
+            background: linear-gradient(45deg, #56ab2f, #a8e063);
             box-shadow: none;
         }
 
@@ -110,6 +110,32 @@
             margin-bottom: 20px;
             position: relative;
             z-index: 20;
+        }
+
+        /* Date Header Section */
+        .date-divider {
+            position: relative;
+            text-align: center;
+            margin: 30px 0 20px 0;
+            z-index: 1;
+        }
+        .date-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0; right: 0;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+        .date-badge {
+            background: #343a40;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 2px solid white;
         }
 
         /* Modal Styling */
@@ -176,7 +202,7 @@
                     <label class="small text-muted mb-1 fw-bold"><i class="fas fa-filter me-1"></i> ชนิดกีฬา</label>
                     <select id="filterSport" class="form-select border-0 bg-light fw-bold text-dark shadow-none py-2" onchange="renderMatches()">
                         <option value="all">ทั้งหมด</option>
-                        </select>
+                    </select>
                 </div>
                 <div class="col-6">
                     <label class="small text-muted mb-1 fw-bold"><i class="fas fa-tasks me-1"></i> สถานะ</label>
@@ -274,9 +300,21 @@
 
         window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','athletics':'กรีฑา','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
 
+        // ฟังก์ชันแปลงวันที่เป็นภาษาไทย (เช่น 2025-12-03 -> 3 ธันวาคม 2568)
+        function formatThaiDate(dateStr) {
+            if(!dateStr) return 'ไม่ระบุวันที่';
+            const date = new Date(dateStr);
+            const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear() + 543;
+            return `${day} ${month} ${year}`;
+        }
+
         onValue(ref(db, 'matches'), (snap) => {
             const data = snap.val();
             if (data) {
+                // เรียงตามวันที่ก่อน แล้วค่อยตามเวลา
                 allMatches = Object.keys(data).map(k => ({...data[k], id: k}))
                                      .sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
                 
@@ -295,14 +333,11 @@
         function updateFilterDropdown() {
             const select = document.getElementById('filterSport');
             const currentVal = select.value;
-            
             const sports = [...new Set(allMatches.map(m => m.sport))];
-            
             select.innerHTML = '<option value="all">ทั้งหมด</option>';
             sports.forEach(s => {
                 select.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
             });
-
             select.value = currentVal;
         }
 
@@ -313,18 +348,10 @@
             container.innerHTML = '';
 
             const filtered = allMatches.filter(m => {
-                // กรองชนิดกีฬา
                 const matchSport = (filterSport === 'all' || m.sport === filterSport);
-                
-                // กรองสถานะ
                 let matchStatus = true;
-                if (filterStatus === 'wait') {
-                    matchStatus = (m.status !== 'done');
-                } else if (filterStatus === 'done') {
-                    matchStatus = (m.status === 'done');
-                }
-                // ถ้า filterStatus === 'all' ก็ให้เป็น true เสมอ
-
+                if (filterStatus === 'wait') matchStatus = (m.status !== 'done');
+                else if (filterStatus === 'done') matchStatus = (m.status === 'done');
                 return matchSport && matchStatus;
             });
 
@@ -337,11 +364,27 @@
                 return;
             }
 
+            // ตัวแปรสำหรับเช็ควันที่เพื่อสร้าง Header
+            let lastDate = '';
+
             filtered.forEach((m, index) => {
                 const countY = (m.playersY || []).filter(x=>x).length;
                 const countB = (m.playersB || []).filter(x=>x).length;
                 const delay = index * 0.05;
                 const isDone = m.status === 'done';
+
+                // --- ส่วนที่เพิ่มเข้ามา: เช็คและแสดง Header วันที่ ---
+                if (m.date !== lastDate) {
+                    lastDate = m.date;
+                    container.innerHTML += `
+                        <div class="date-divider animate__animated animate__fadeIn">
+                            <span class="date-badge">
+                                <i class="far fa-calendar-alt me-2 text-warning"></i> ${formatThaiDate(m.date)}
+                            </span>
+                        </div>
+                    `;
+                }
+                // ----------------------------------------------
 
                 const statusBadge = isDone 
                     ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i>จบแล้ว</span>' 
