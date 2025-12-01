@@ -254,6 +254,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto gap-2 py-2 py-lg-0">
                     <li class="nav-item"><button class="btn btn-sm btn-outline-light border-0 w-100" onclick="showQRCode()"><i class="fas fa-qrcode me-1"></i> QR ระบบ</button></li>
+                    <li class="nav-item">
+                        <a href="register.html" target="_blank" class="btn btn-sm btn-outline-warning border-0 w-100 text-start text-lg-center">
+                            <i class="fas fa-user-edit me-1"></i> ระบบลงทะเบียน
+                        </a>
+                    </li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0 w-100" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light w-100" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-add-match w-100" onclick="prepareAddMatch()"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
@@ -296,7 +301,17 @@
                     </select>
                     
                     <div class="ms-auto d-flex gap-2">
-                        <button class="btn btn-sm btn-primary" onclick="prepareClosingSpeech()"><i class="fas fa-scroll me-1"></i><span class="d-none d-sm-inline">คำกล่าวรายงาน (พิธีปิด)</span></button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-clipboard-list me-1"></i> คัดลอกข้อมูล
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="previewCopy('schedule')"><i class="far fa-calendar-alt me-2"></i>กำหนดการแข่งขัน (ตามวันที่เลือก)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="previewCopy('result')"><i class="fas fa-trophy me-2"></i>ผลการแข่งขัน (ตามวันที่เลือก)</a></li>
+                            </ul>
+                        </div>
+
+                        <button class="btn btn-sm btn-primary" onclick="prepareClosingSpeech()"><i class="fas fa-scroll me-1"></i><span class="d-none d-sm-inline">คำกล่าวรายงาน</span></button>
                         <button class="btn btn-sm btn-danger" onclick="previewSummaryReport()"><i class="fas fa-file-pdf me-1"></i><span class="d-none d-sm-inline">สรุปผล(PDF)</span></button>
                     </div>
                 </div>
@@ -454,13 +469,28 @@
     </div>
 
     <div class="modal fade" id="qrModal" tabindex="-1">
-        <div class="modal-dialog modal-sm text-center modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header"><h5 class="modal-title">QR Code เข้าระบบ</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
-                    <p class="small text-muted">สแกนเพื่อช่วยบันทึกคะแนน</p>
-                    <img id="qrImage" src="" alt="QR Code" class="img-fluid mb-3">
-                    <p class="small fw-bold">กระดุมทองเกมส์ 2568</p>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="copyPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="previewTitle">ตัวอย่างข้อความ</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <textarea id="copyPreviewText" class="form-control border-0 p-3" rows="12" style="font-size: 0.9rem; background: #fafafa;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" onclick="copyFromPreview()"><i class="fas fa-copy me-1"></i> คัดลอกข้อความ</button>
                 </div>
             </div>
         </div>
@@ -600,7 +630,13 @@
             return `${day} ${month} ${year}`;
         }
         
-        // ฟังก์ชันพิมพ์เอกสาร
+        // ฟังก์ชันแปลงวันที่รูปแบบ YYYY-MM-DD เป็นไทยอย่างง่าย
+        function formatDateThai(dateStr) {
+            if(!dateStr) return '';
+            const d = new Date(dateStr);
+            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}`;
+        }
+        
         window.printDocument = (elementId) => {
             const element = document.getElementById(elementId);
             const printWindow = window.open('', '', 'width=900,height=700');
@@ -613,67 +649,130 @@
                     <title>พิมพ์เอกสาร - กระดุมทองเกมส์ 2568</title>
                     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
                     <style>
-                        @page {
-                            size: A4;
-                            margin: 20mm 25mm;
-                        }
-                        body {
-                            font-family: 'Kanit', sans-serif;
-                            margin: 0;
-                            padding: 0;
-                            background: white;
-                            line-height: 1.5;
-                        }
-                        @media print {
-                            body {
-                                -webkit-print-color-adjust: exact;
-                                print-color-adjust: exact;
-                            }
-                        }
-                        .speech-line {
-                            text-align: justify;
-                            text-justify: inter-word;
-                            margin-bottom: 8px;
-                            line-height: 1.6;
-                        }
-                        .speech-indent {
-                            text-indent: 2.5cm;
-                        }
+                        @page { size: A4; margin: 20mm 25mm; }
+                        body { font-family: 'Kanit', sans-serif; margin: 0; padding: 0; background: white; line-height: 1.5; }
+                        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                        .speech-line { text-align: justify; text-justify: inter-word; margin-bottom: 8px; line-height: 1.6; }
+                        .speech-indent { text-indent: 2.5cm; }
                     </style>
                 </head>
-                <body>
-                    ${element.innerHTML}
-                </body>
+                <body>${element.innerHTML}</body>
                 </html>
             `);
             
             printWindow.document.close();
-            
-            setTimeout(() => {
-                printWindow.focus();
-                printWindow.print();
-                printWindow.close();
-            }, 500);
+            setTimeout(() => { printWindow.focus(); printWindow.print(); printWindow.close(); }, 500);
         };
         
-        // --- NEW FUNCTION: Prepare Closing Speech ---
+        // --- ส่วนที่ปรับปรุง: ฟังก์ชัน QR Code แบบ 2 Columns ---
+        window.showQRCode = () => {
+            const currentUrl = window.location.href;
+            // สร้าง URL หน้า register (สมมติว่าอยู่ path เดียวกัน)
+            const path = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+            const registerUrl = `${path}/register.html`;
+
+            const html = `
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded bg-light h-100">
+                            <h6 class="fw-bold text-primary mb-2">1. ระบบจัดการ (สำหรับครู/กรรมการ)</h6>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}" class="img-fluid mb-2 border bg-white p-1">
+                            <p class="small text-muted mb-0">ใช้บันทึกผลและจัดการการแข่งขัน</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded bg-white h-100 shadow-sm border-warning">
+                            <h6 class="fw-bold text-warning-emphasis mb-2">2. จุดลงทะเบียนนักกีฬา</h6>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(registerUrl)}" class="img-fluid mb-2 border bg-white p-1">
+                            <p class="small text-muted mb-2">ให้นักเรียนสแกนเพื่อกรอกชื่อ</p>
+                            <a href="${registerUrl}" target="_blank" class="btn btn-sm btn-outline-dark w-100">เปิดหน้าลงทะเบียน</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // ปรับขนาด Modal ให้ใหญ่ขึ้นชั่วคราว
+            const modalDialog = document.querySelector('#qrModal .modal-dialog');
+            modalDialog.classList.remove('modal-sm');
+            modalDialog.classList.add('modal-lg');
+            
+            document.querySelector('#qrModal .modal-body').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('qrModal')).show();
+        };
+
+        // --- ส่วนที่เพิ่มใหม่: ระบบ Preview Copy ---
+        window.previewCopy = (type) => {
+            const filterD = document.getElementById('filterDate').value;
+            let text = "";
+            let targetMatches = allMatchesArray;
+            let dateLabel = "ทั้งหมด";
+
+            if (filterD !== 'all') {
+                targetMatches = allMatchesArray.filter(m => m.date === filterD);
+                dateLabel = `วันที่ ${formatDateThai(filterD)}`;
+            }
+
+            if (targetMatches.length === 0) {
+                Swal.fire({ icon: 'info', title: 'ไม่พบข้อมูล', text: 'ไม่มีรายการแข่งขันในช่วงเวลาที่เลือก' });
+                return;
+            }
+
+            if (type === 'schedule') {
+                document.getElementById('previewTitle').innerHTML = '<i class="far fa-calendar-alt me-2"></i> ตัวอย่างกำหนดการ';
+                text = `📅 กำหนดการแข่งขันกีฬาภายใน\n📍 ประจำ${dateLabel}\n----------------------------\n`;
+                targetMatches.forEach(m => {
+                    let statusIcon = m.status === 'done' ? '✅' : '⏰';
+                    text += `${statusIcon} ${m.time} น. : ${getSportName(m.sport)}\n   👉 ${m.category} (สนาม: ${m.location||'-'})\n\n`;
+                });
+            } else if (type === 'result') {
+                document.getElementById('previewTitle').innerHTML = '<i class="fas fa-trophy me-2"></i> ตัวอย่างผลการแข่งขัน';
+                text = `📢 สรุปผลการแข่งขันกีฬาภายใน\n📍 ประจำ${dateLabel}\n----------------------------\n`;
+                let hasResult = false;
+                targetMatches.forEach(m => {
+                    if(m.status === 'done') {
+                        hasResult = true;
+                        let icon = m.winner === 'yellow' ? '🟡' : (m.winner === 'blue' ? '🔵' : '🤝');
+                        text += `✅ ${getSportName(m.sport)} (${m.category})\n   🟡 เหลือง ${m.scoreY} - ${m.scoreB} ฟ้า 🔵 | ${icon}\n\n`;
+                    }
+                });
+                if(!hasResult) text += "(ยังไม่มีการบันทึกผลการแข่งขัน)\n";
+                
+                // สรุปเหรียญรวมเฉพาะวันที่เลือก (ถ้าเลือกวัน) หรือทั้งหมด
+                if (filterD === 'all') {
+                    let wY = 0, wB = 0;
+                    allMatchesArray.forEach(m => { if(m.status === 'done') { if(m.winner==='yellow') wY++; else if(m.winner==='blue') wB++; } });
+                    text += `----------------------------\n📊 สรุปเหรียญรวม (ทั้งหมด)\n🥇 สีเหลือง: ${wY} เหรียญ\n🥇 สีฟ้า: ${wB} เหรียญ\n`;
+                }
+            }
+
+            text += `----------------------------\n#กระดุมทองเกมส์2568`;
+            
+            document.getElementById('copyPreviewText').value = text;
+            new bootstrap.Modal(document.getElementById('copyPreviewModal')).show();
+        };
+
+        window.copyFromPreview = () => {
+            const copyText = document.getElementById("copyPreviewText");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                Swal.fire({ icon: 'success', title: 'คัดลอกแล้ว', timer: 1000, showConfirmButton: false });
+                bootstrap.Modal.getInstance(document.getElementById('copyPreviewModal')).hide();
+            });
+        };
+
+        // --- (ฟังก์ชันเดิมอื่นๆ คงไว้ตามปกติ) ---
         window.prepareClosingSpeech = () => {
-            // สร้างรายการกีฬาที่มีในระบบ
             const sportsMap = {};
             allMatchesArray.forEach(m => {
                 if (!sportsMap[m.sport]) {
-                    sportsMap[m.sport] = {
-                        name: getSportName(m.sport),
-                        key: m.sport,
-                        categories: []
-                    };
+                    sportsMap[m.sport] = { name: getSportName(m.sport), key: m.sport, categories: [] };
                 }
                 if (!sportsMap[m.sport].categories.includes(m.category)) {
                     sportsMap[m.sport].categories.push(m.category);
                 }
             });
             
-            // สร้าง HTML สำหรับเลือกประเภทรางวัล
             const container = document.getElementById('awardTypeContainer');
             if (Object.keys(sportsMap).length === 0) {
                 container.innerHTML = '<p class="text-center text-muted">ยังไม่มีรายการแข่งขันในระบบ</p>';
@@ -684,139 +783,81 @@
                         <div class="award-type-item">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold text-dark">
-                                        <i class="fas fa-trophy text-warning me-1"></i>
-                                        ${sport.name}
-                                    </h6>
-                                    <small class="text-muted">
-                                        ${sport.categories.join(', ')}
-                                    </small>
+                                    <h6 class="mb-1 fw-bold text-dark"><i class="fas fa-trophy text-warning me-1"></i> ${sport.name}</h6>
+                                    <small class="text-muted">${sport.categories.join(', ')}</small>
                                 </div>
                                 <div class="form-check form-check-inline ms-3">
                                     <input class="form-check-input" type="radio" name="award_${sport.key}" id="${sport.key}_separate" value="separate" checked>
-                                    <label class="form-check-label small" for="${sport.key}_separate">
-                                        แยกรายการ
-                                    </label>
+                                    <label class="form-check-label small" for="${sport.key}_separate">แยกรายการ</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="award_${sport.key}" id="${sport.key}_combined" value="combined">
-                                    <label class="form-check-label small" for="${sport.key}_combined">
-                                        คะแนนรวม
-                                    </label>
+                                    <label class="form-check-label small" for="${sport.key}_combined">คะแนนรวม</label>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
                 container.innerHTML = html;
             }
-            
             new bootstrap.Modal(document.getElementById('closingSpeechModal')).show();
         };
 
-        // ฟังก์ชันคำนวณผู้ชนะแบบนับคะแนนรวม (Win=3, Loss=0)
         function calculateCombinedScore(sportType) {
-            let scoreY = 0;
-            let scoreB = 0;
-            
+            let scoreY = 0, scoreB = 0;
             const matches = allMatchesArray.filter(m => m.sport === sportType && m.status === 'done');
-            
-            matches.forEach(m => {
-                if (m.winner === 'yellow') scoreY += 3;
-                else if (m.winner === 'blue') scoreB += 3;
-            });
-
+            matches.forEach(m => { if (m.winner === 'yellow') scoreY += 3; else if (m.winner === 'blue') scoreB += 3; });
             if (scoreY > scoreB) return `สีเหลือง (${scoreY} คะแนน)`;
             if (scoreB > scoreY) return `สีฟ้า (${scoreB} คะแนน)`;
             if (scoreY === 0 && scoreB === 0) return '...............';
             return 'เสมอกัน';
         }
 
-        // ฟังก์ชันคำนวณผู้ชนะแบบนับเหรียญทอง
         function calculateGoldWinner(sportType, categoryFilter = null) {
-            let winY = 0;
-            let winB = 0;
-
+            let winY = 0, winB = 0;
             const matches = allMatchesArray.filter(m => {
                 if (m.sport !== sportType || m.status !== 'done') return false;
-                if (categoryFilter) {
-                    return m.category.toLowerCase().includes(categoryFilter.toLowerCase());
-                }
+                if (categoryFilter) return m.category.toLowerCase().includes(categoryFilter.toLowerCase());
                 return true;
             });
-
-            matches.forEach(m => {
-                if (m.winner === 'yellow') winY++;
-                else if (m.winner === 'blue') winB++;
-            });
-
+            matches.forEach(m => { if (m.winner === 'yellow') winY++; else if (m.winner === 'blue') winB++; });
             if (winY > winB) return 'สีเหลือง';
             if (winB > winY) return 'สีฟ้า';
             if (winY === 0 && winB === 0) return '...............';
             return 'เสมอกัน';
         }
         
-        // ฟังก์ชันสร้างรายการกีฬาแบบแยกรายการ
         function generateSeparateAwards(sportKey) {
             const sport = allMatchesArray.filter(m => m.sport === sportKey);
             const categories = [...new Set(sport.map(m => m.category))];
-            
             return categories.map(cat => {
-                const winner = calculateGoldWinner(sportKey, cat);
-                return {
-                    category: cat,
-                    winner: winner
-                };
+                return { category: cat, winner: calculateGoldWinner(sportKey, cat) };
             });
         }
         
-        // --- NEW FUNCTION: Generate and Render Closing Speech PDF ---
         window.generateClosingSpeech = () => {
             const reporter = document.getElementById('speechReporter').value;
             const chairman = document.getElementById('speechChairman').value || '..................................................................';
-            
-            // สร้างรายการกีฬาที่จัดแข่งขัน
             const sportsInEvent = [...new Set(allMatchesArray.map(m => m.sport))];
             const sportListText = sportsInEvent.map(s => getSportName(s)).join(' ');
             
-            // สร้างรายการถ้วยรางวัล
             let awardList = [];
             let awardNumber = 1;
 
             sportsInEvent.forEach(sportKey => {
-                // อ่านค่าจาก radio button
                 const selectedRadio = document.querySelector(`input[name="award_${sportKey}"]:checked`);
                 const awardType = selectedRadio ? selectedRadio.value : 'separate';
-                
                 if (awardType === 'combined') {
-                    // นับคะแนนรวม - มอบถ้วยเดียว
-                    const winner = calculateCombinedScore(sportKey);
-                    awardList.push({
-                        number: awardNumber++,
-                        title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} (คะแนนรวม)`,
-                        winner: winner
-                    });
+                    awardList.push({ number: awardNumber++, title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} (คะแนนรวม)`, winner: calculateCombinedScore(sportKey) });
                 } else {
-                    // แยกรายการ - มอบถ้วยแต่ละรุ่น
                     const awards = generateSeparateAwards(sportKey);
                     awards.forEach(award => {
-                        awardList.push({
-                            number: awardNumber++,
-                            title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} ${award.category}`,
-                            winner: award.winner
-                        });
+                        awardList.push({ number: awardNumber++, title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} ${award.category}`, winner: award.winner });
                     });
                 }
             });
             
-            // คำนวณรางวัลรวม
             let totalY = 0, totalB = 0;
-            allMatchesArray.forEach(m => {
-                if(m.status === 'done') {
-                    if(m.winner === 'yellow') totalY++;
-                    else if(m.winner === 'blue') totalB++;
-                }
-            });
+            allMatchesArray.forEach(m => { if(m.status === 'done') { if(m.winner === 'yellow') totalY++; else if(m.winner === 'blue') totalB++; } });
             
             const w_overall = totalY > totalB ? 'สีเหลือง' : (totalB > totalY ? 'สีฟ้า' : 'เสมอกัน');
             const score_overall = Math.max(totalY, totalB);
@@ -829,57 +870,25 @@
                         <h4 style="margin: 0; font-weight: bold; font-size: 16pt;">คำกล่าวรายงานต่อประธานในพิธีปิดกิจกรรมกีฬาภายใน</h4>
                         <h4 style="margin: 3px 0 0; font-weight: bold; font-size: 14pt;">"กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖...</h4>
                     </div>
-                    
-                  <div style="margin-bottom: 12px; font-size: 13pt;">
-                    <strong>กราบเรียน</strong> ${chairman}
-                    </div>
-                    
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
-                        กระผม/ดิฉัน ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียนโรงเรียนกระดุมทองวิทยา 
-                        ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... 
-                        ซึ่งกำลังจะเสร็จสิ้นในวันนี้
-                    </div>
-                    
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
-                        การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ สีเหลือง และสีฟ้า ได้ดำเนินการแข่งขันกีฬาหลายประเภท 
-                        ได้แก่ ${sportListText} 
-                        การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ 
-                        ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียนโรงเรียนกระดุมทองวิทยาทุกคน
-                    </div>
-                    
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
-                        บัดนี้ การแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... ได้ถึงบทสรุปลงแล้ว 
-                        กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้
-                    </div>
-
+                    <div style="margin-bottom: 12px; font-size: 13pt;"><strong>กราบเรียน</strong> ${chairman}</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">กระผม/ดิฉัน ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียนโรงเรียนกระดุมทองวิทยา ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... ซึ่งกำลังจะเสร็จสิ้นในวันนี้</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ สีเหลือง และสีฟ้า ได้ดำเนินการแข่งขันกีฬาหลายประเภท ได้แก่ ${sportListText} การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียนโรงเรียนกระดุมทองวิทยาทุกคน</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">บัดนี้ การแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... ได้ถึงบทสรุปลงแล้ว กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้</div>
                     <div style="margin-top: 12px; margin-bottom: 12px; font-size: 13pt;">
                         <strong>รางวัลการแข่งขันแต่ละประเภท</strong>
-                        <ol style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
-                            ${awardList.map(award => 
-                                `<li>${award.title} ได้แก่ <strong>${award.winner}</strong></li>`
-                            ).join('')}
-                        </ol>
-                        
+                        <ol style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">${awardList.map(award => `<li>${award.title} ได้แก่ <strong>${award.winner}</strong></li>`).join('')}</ol>
                         <strong style="margin-top: 15px; display: block;">รางวัลชนะเลิศรวมกีฬา</strong>
                         <ol start="${awardNumber}" style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
                             <li>ถ้วยชนะเลิศการแข่งขันกีฬาภายในโรงเรียน คะแนนรวม ได้แก่ <strong>${w_overall}</strong> (รวม ${score_overall} ถ้วยรางวัล)</li>
                             <li>ถ้วยรองชนะเลิศอันดับ ๑ ได้แก่ <strong>${w_runnerup}</strong></li>
                         </ol>
                     </div>
-
-                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">
-                        และลำดับต่อไป กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ 
-                        และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖...
-                    </div>
-                    
-                    <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">
-                        ขอกราบเรียนเชิญครับ/ค่ะ
-                    </div>
+                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">และลำดับต่อไป กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖...</div>
+                    <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">ขอกราบเรียนเชิญครับ/ค่ะ</div>
                 </div>
             `;
             
             document.getElementById('speechContent').innerHTML = html;
-            // Hide Input Modal and Show Preview
             bootstrap.Modal.getInstance(document.getElementById('closingSpeechModal')).hide();
             new bootstrap.Modal(document.getElementById('speechPreviewModal')).show();
         };
@@ -914,36 +923,21 @@
         window.editMatchDetails = (id) => {
             const m = allMatchesArray.find(x => x.id === id);
             if(!m) return;
-
             editingMatchId = id;
             document.getElementById('sportType').value = m.sport;
             document.getElementById('category').value = m.category;
             document.getElementById('matchDate').value = m.date;
             document.getElementById('matchTime').value = m.time;
             document.getElementById('location').value = m.location || '';
-            
             document.getElementById('setupTitle').innerHTML = '<i class="fas fa-edit"></i> แก้ไขรายละเอียด';
             document.getElementById('setupSubmitBtn').innerText = 'บันทึกการแก้ไข';
-            
             showPage('setup');
-        };
-
-        window.showQRCode = () => {
-            const url = window.location.href;
-            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
-            new bootstrap.Modal(document.getElementById('qrModal')).show();
         };
 
         window.showManual = () => {
             Swal.fire({
                 title: 'คู่มือการใช้งาน',
-                html: `<ul class="text-start small">
-                    <li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่</li>
-                    <li><b>แก้ไขรายการ:</b> กดปุ่มสีฟ้า > แก้ไขรายละเอียด</li>
-                    <li><b>ลงทะเบียน:</b> แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา</li>
-                    <li><b>ลงคะแนน:</b> กดปุ่มปลดล็อก > ใส่รหัส "KTW1234"</li>
-                    <li><b>สรุปผล:</b> กดปุ่ม PDF เพื่อพิมพ์</li>
-                </ul>`,
+                html: `<ul class="text-start small"><li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่</li><li><b>แก้ไขรายการ:</b> กดปุ่มสีฟ้า > แก้ไขรายละเอียด</li><li><b>ลงทะเบียน:</b> แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา</li><li><b>ลงคะแนน:</b> กดปุ่มปลดล็อก > ใส่รหัส "KTW1234"</li><li><b>สรุปผล:</b> กดปุ่ม PDF เพื่อพิมพ์</li></ul>`,
                 confirmButtonText: 'เข้าใจแล้ว'
             });
         };
@@ -955,17 +949,14 @@
                 forceHideLoader();
                 const data = snap.val();
                 allMatchesData = data || {};
-                
                 if(data) {
                     allMatchesArray = Object.keys(data).map(k => ({...data[k], id: k}));
                     allMatchesArray.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
                 } else {
                     allMatchesArray = [];
                 }
-                
                 updateFilterOptions();
                 renderMatchList();
-                
             }, (error) => {
                 forceHideLoader();
                 Swal.fire('Error', 'เชื่อมต่อ Firebase ไม่ได้', 'error');
@@ -977,23 +968,15 @@
             const currentSport = filterSportSel.value;
             filterSportSel.innerHTML = '<option value="all">ทุกกีฬา</option>';
             const sports = [...new Set(allMatchesArray.map(m => m.sport))];
-            sports.forEach(s => {
-                filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
-            });
-            if([...filterSportSel.options].some(o => o.value === currentSport)) {
-                filterSportSel.value = currentSport;
-            }
+            sports.forEach(s => { filterSportSel.innerHTML += `<option value="${s}">${getSportName(s)}</option>`; });
+            if([...filterSportSel.options].some(o => o.value === currentSport)) filterSportSel.value = currentSport;
 
             const filterDateSel = document.getElementById('filterDate');
             const currentDate = filterDateSel.value;
             filterDateSel.innerHTML = '<option value="all">ทุกวัน</option>';
             const dates = [...new Set(allMatchesArray.map(m => m.date))].sort();
-            dates.forEach(d => {
-                filterDateSel.innerHTML += `<option value="${d}">${d}</option>`;
-            });
-            if([...filterDateSel.options].some(o => o.value === currentDate)) {
-                filterDateSel.value = currentDate;
-            }
+            dates.forEach(d => { filterDateSel.innerHTML += `<option value="${d}">${formatDateThai(d)}</option>`; });
+            if([...filterDateSel.options].some(o => o.value === currentDate)) filterDateSel.value = currentDate;
         }
 
         window.renderMatchList = () => {
@@ -1001,7 +984,6 @@
             const filterW = document.getElementById('filterWinner').value;
             const filterD = document.getElementById('filterDate').value;
             const list = document.getElementById('matchList');
-            
             list.innerHTML = '';
             
             if(allMatchesArray.length === 0) {
@@ -1011,9 +993,7 @@
                 return;
             }
 
-            let wY = 0, wB = 0;
-            let displayCount = 0;
-            
+            let wY = 0, wB = 0, displayCount = 0;
             allMatchesArray.forEach(m => {
                 if(m.status === 'done') {
                     if(m.winner === 'yellow') wY++;
@@ -1026,19 +1006,12 @@
                 if(filterD !== 'all' && m.date !== filterD) return;
 
                 displayCount++;
-                
                 let badge = m.status === 'done' ? '<span class="status-badge bg-done">จบ</span>' : '<span class="status-badge bg-wait">รอ</span>';
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'<span class="text-warning fw-bold">🟡</span>':(m.winner==='blue'?'<span class="text-primary fw-bold">🔵</span>':'➖')) : '-';
-
                 const hasRefs = m.referees && m.referees.some(r => r.trim() !== '');
-                const refIcon = hasRefs ? 
-                    '<i class="fas fa-whistle text-success me-1" title="มีกรรมการแล้ว"></i>' : 
-                    '<i class="fas fa-whistle text-secondary opacity-25 me-1" title="ยังไม่มีกรรมการ"></i>';
-
+                const refIcon = hasRefs ? '<i class="fas fa-whistle text-success me-1" title="มีกรรมการแล้ว"></i>' : '<i class="fas fa-whistle text-secondary opacity-25 me-1" title="ยังไม่มีกรรมการ"></i>';
                 const hasPlayers = (m.playersY && m.playersY.some(p=>p.trim()!=='')) || (m.playersB && m.playersB.some(p=>p.trim()!==''));
-                const playerIcon = hasPlayers ? 
-                    '<i class="fas fa-users text-success" title="มีรายชื่อแล้ว"></i>' : 
-                    '<i class="fas fa-users text-secondary opacity-25" title="ยังไม่มีรายชื่อ"></i>';
+                const playerIcon = hasPlayers ? '<i class="fas fa-users text-success" title="มีรายชื่อแล้ว"></i>' : '<i class="fas fa-users text-secondary opacity-25" title="ยังไม่มีรายชื่อ"></i>';
 
                 list.innerHTML += `
                     <tr>
@@ -1064,14 +1037,10 @@
                                 ${m.status === 'done' ? `<button class="btn btn-danger" onclick="previewReport('${m.id}')" title="พิมพ์"><i class="fas fa-print"></i></button>` : ''}
                             </div>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
             });
             
-            if(displayCount === 0) {
-                list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">ไม่พบรายการที่ตรงกับตัวกรอง</td></tr>';
-            }
-            
+            if(displayCount === 0) list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">ไม่พบรายการที่ตรงกับตัวกรอง</td></tr>';
             document.getElementById('sumWinY').innerText = wY;
             document.getElementById('sumWinB').innerText = wB;
         };
@@ -1090,41 +1059,28 @@
                 confirmButtonText: 'ลบรายการ',
                 cancelButtonText: 'ยกเลิก'
             });
-
             if (pass === 'KTW1234') {
-                remove(ref(db, 'matches/'+id)).then(() => {
-                    Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1000, showConfirmButton: false });
-                });
-            } else if (pass) {
-                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
-            }
+                remove(ref(db, 'matches/'+id)).then(() => { Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1000, showConfirmButton: false }); });
+            } else if (pass) { Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' }); }
         };
 
         document.getElementById('setupForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            
             const sport = document.getElementById('sportType').value;
             const category = document.getElementById('category').value;
             const matchDate = document.getElementById('matchDate').value;
             const matchTime = document.getElementById('matchTime').value;
             const location = document.getElementById('location').value;
             
-            if(!sport || !category || !matchDate || !matchTime) {
-                Swal.fire('กรุณากรอกข้อมูลให้ครบ', '', 'warning');
-                return;
-            }
+            if(!sport || !category || !matchDate || !matchTime) { Swal.fire('กรุณากรอกข้อมูลให้ครบ', '', 'warning'); return; }
             
             if(editingMatchId) {
-                update(ref(db, `matches/${editingMatchId}`), {
-                    sport, category, date: matchDate, time: matchTime, location: location || ''
-                }).then(() => {
+                update(ref(db, `matches/${editingMatchId}`), { sport, category, date: matchDate, time: matchTime, location: location || '' }).then(() => {
                     Swal.fire({ icon: 'success', title: 'บันทึกการแก้ไขเรียบร้อย', timer: 1500, showConfirmButton: false });
                     editingMatchId = null;
                     document.getElementById('setupForm').reset();
                     showPage('dashboard');
-                }).catch((error) => {
-                    Swal.fire('Error', 'ไม่สามารถแก้ไขได้', 'error');
-                });
+                }).catch((error) => { Swal.fire('Error', 'ไม่สามารถแก้ไขได้', 'error'); });
             } else {
                 let refs = sport === 'cheer' ? ['','','','',''] : ['']; 
                 push(ref(db, 'matches'), {
@@ -1137,27 +1093,21 @@
                     document.getElementById('setupForm').reset();
                     document.getElementById('matchDate').value = '2025-12-03';
                     showPage('dashboard');
-                }).catch((error) => {
-                    Swal.fire('Error', 'ไม่สามารถเพิ่มรายการได้', 'error');
-                });
+                }).catch((error) => { Swal.fire('Error', 'ไม่สามารถเพิ่มรายการได้', 'error'); });
             }
         });
 
         window.openMatch = (id) => {
             currentMatchId = id;
             isMatchUnlocked = false;
-            
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
                 if(!m) return;
-                
                 m.playersY = m.playersY || [];
                 m.playersB = m.playersB || [];
                 m.referees = m.referees || [''];
                 m.details = m.details || {};
-                
                 matchDataLocal = m;
-                
                 document.getElementById('matchTitleDisplay').innerText = getSportName(m.sport);
                 document.getElementById('matchCatDisplay').innerText = m.category;
                 document.getElementById('scoreDisplayY').innerText = m.scoreY || 0;
@@ -1170,15 +1120,9 @@
                 const refCount = (m.sport === 'cheer') ? 5 : 1;
                 let currentRefs = m.referees || [];
                 while(currentRefs.length < refCount) currentRefs.push('');
-                
-                currentRefs.forEach((name, i) => {
-                    if(i < refCount) {
-                        refDiv.innerHTML += `<input type="text" class="form-control form-control-sm mb-2" placeholder="กรรมการ ${i+1}" value="${name}" id="refInput_${i}">`;
-                    }
-                });
+                currentRefs.forEach((name, i) => { if(i < refCount) refDiv.innerHTML += `<input type="text" class="form-control form-control-sm mb-2" placeholder="กรรมการ ${i+1}" value="${name}" id="refInput_${i}">`; });
 
                 document.getElementById('signerLabel').innerText = (m.sport === 'cheer') ? "ประธานสีผู้รับรอง" : "ตัวแทนนักกีฬาผู้ชนะ";
-
                 renderPlayers(m.playersY, 'Y');
                 renderPlayers(m.playersB, 'B');
                 renderScoreControls(m);
@@ -1190,16 +1134,9 @@
             const div = document.getElementById(`players${team}`);
             div.innerHTML = '';
             const safeList = Array.isArray(list) ? list : []; 
-            if(safeList.length === 0) {
-                div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ (กด + เพิ่ม)</small>';
-            } else {
+            if(safeList.length === 0) { div.innerHTML = '<small class="text-muted fst-italic">ไม่มีรายชื่อ (กด + เพิ่ม)</small>'; } else {
                 safeList.forEach((p, i) => {
-                    div.innerHTML += `
-                        <div class="input-group input-group-sm mb-1">
-                            <span class="input-group-text" style="min-width:30px;">${i+1}</span>
-                            <input type="text" class="form-control" value="${p || ''}" onchange="updatePlayer('${team}', ${i}, this.value)" placeholder="ชื่อ-สกุล">
-                            <button class="btn btn-outline-danger" onclick="removePlayer('${team}', ${i})">×</button>
-                        </div>`;
+                    div.innerHTML += `<div class="input-group input-group-sm mb-1"><span class="input-group-text" style="min-width:30px;">${i+1}</span><input type="text" class="form-control" value="${p || ''}" onchange="updatePlayer('${team}', ${i}, this.value)" placeholder="ชื่อ-สกุล"><button class="btn btn-outline-danger" onclick="removePlayer('${team}', ${i})">×</button></div>`;
                 });
             }
         };
@@ -1230,29 +1167,16 @@
             const listY = matchDataLocal.playersY || [];
             const listB = matchDataLocal.playersB || [];
             const max = Math.max(listY.length, listB.length, 12);
-
             let tableRows = '';
             for(let i = 0; i < max; i++) {
                 tableRows += `<tr><td style="width:5%; text-align:center; font-weight:600; background:#fffde7;">${i+1}</td><td style="width:42.5%; padding-left:10px; background:#fffde7; height:28px;">${listY[i] || ''}</td><td style="width:5%; text-align:center; font-weight:600; background:#e3f2fd;">${i+1}</td><td style="width:42.5%; padding-left:10px; background:#e3f2fd; height:28px;">${listB[i] || ''}</td></tr>`;
             }
-
             const html = `
-                <div style="text-align:center; margin-bottom:15px; padding-bottom:15px; border-bottom:3px double #1a237e;">
-                    <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:65px; margin-bottom:8px;">
-                    <h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2>
-                    <h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"กระดุมทองเกมส์ 2568"</h3>
-                </div>
-                <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;">
-                    <table style="width:100%; font-size:11pt;"><tr><td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${matchDataLocal.date || '-'}</td></tr><tr><td><strong>รุ่น:</strong> ${matchDataLocal.category}</td><td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td></tr></table>
-                </div>
-                <table style="width:100%; border-collapse:collapse; font-size:10pt;">
-                    <thead><tr><th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีเหลือง</th><th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีฟ้า</th></tr><tr style="background:#eee;"><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th></tr></thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <div style="margin-top:30px;"><table style="width:100%;"><tr><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีเหลือง</p></td><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีฟ้า</p></td></tr></table></div>
-                <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
+                <div style="text-align:center; margin-bottom:15px; padding-bottom:15px; border-bottom:3px double #1a237e;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:65px; margin-bottom:8px;"><h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2><h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"กระดุมทองเกมส์ 2568"</h3></div>
+                <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;"><table style="width:100%; font-size:11pt;"><tr><td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${matchDataLocal.date || '-'}</td></tr><tr><td><strong>รุ่น:</strong> ${matchDataLocal.category}</td><td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td></tr></table></div>
+                <table style="width:100%; border-collapse:collapse; font-size:10pt;"><thead><tr><th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีเหลือง</th><th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีฟ้า</th></tr><tr style="background:#eee;"><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th></tr></thead><tbody>${tableRows}</tbody></table>
+                <div style="margin-top:30px;"><table style="width:100%;"><tr><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีเหลือง</p></td><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีฟ้า</p></td></tr></table></div><div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
             `;
-
             document.getElementById('playerListContent').innerHTML = html;
             html2pdf().set({ margin: [5,5,5,5], filename: `PlayerList_${getSportName(matchDataLocal.sport)}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(document.getElementById('playerListContent')).save();
         };
@@ -1268,18 +1192,8 @@
 
         function renderScoreControls(m) {
             const div = document.getElementById('dynamicScoreControls');
-            
             if (!isMatchUnlocked && m.status !== 'done') {
-                div.innerHTML = `
-                    <div class="text-center py-4 bg-light rounded border border-warning border-dashed">
-                        <i class="fas fa-lock fa-3x text-warning mb-3"></i>
-                        <h5>ล็อกการบันทึกผล</h5>
-                        <p class="text-muted small mb-3">ป้องกันนักเรียนแก้ไขผลการแข่งขัน</p>
-                        <button class="btn btn-warning fw-bold px-4" onclick="unlockScore()">
-                            <i class="fas fa-key me-2"></i> ปลดล็อก (สำหรับกรรมการ)
-                        </button>
-                    </div>
-                `;
+                div.innerHTML = `<div class="text-center py-4 bg-light rounded border border-warning border-dashed"><i class="fas fa-lock fa-3x text-warning mb-3"></i><h5>ล็อกการบันทึกผล</h5><p class="text-muted small mb-3">ป้องกันนักเรียนแก้ไขผลการแข่งขัน</p><button class="btn btn-warning fw-bold px-4" onclick="unlockScore()"><i class="fas fa-key me-2"></i> ปลดล็อก (สำหรับกรรมการ)</button></div>`;
                 document.querySelector('button[onclick="finishMatch()"]').style.display = 'none';
                 return;
             } else {
@@ -1288,25 +1202,10 @@
 
             let html = '';
             if(m.sport === 'cheer') {
-                html = `<h6 class="border-bottom pb-2 mb-2">คะแนนกรรมการ 5 ท่าน</h6>
-                        <div class="row g-2 text-center mb-1">
-                            <div class="col-6 offset-6 d-flex"><div class="w-50"><strong class="text-warning small">เหลือง</strong></div><div class="w-50"><strong class="text-info small">ฟ้า</strong></div></div>
-                        </div>`;
-                
+                html = `<h6 class="border-bottom pb-2 mb-2">คะแนนกรรมการ 5 ท่าน</h6><div class="row g-2 text-center mb-1"><div class="col-6 offset-6 d-flex"><div class="w-50"><strong class="text-warning small">เหลือง</strong></div><div class="w-50"><strong class="text-info small">ฟ้า</strong></div></div></div>`;
                 for(let i=1; i<=5; i++) { 
                     let refName = (m.referees && m.referees[i-1]) ? m.referees[i-1] : `กรรมการท่านที่ ${i}`;
-                    html += `
-                        <div class="row g-2 align-items-center mb-2">
-                            <div class="col-6 text-start">
-                                <span class="small fw-bold text-muted"><i class="fas fa-user-circle"></i> ${refName}</span>
-                            </div>
-                            <div class="col-3">
-                                <input type="number" class="form-control form-control-sm text-center border-warning" placeholder="0" value="${m.details?.[`j${i}y`]||0}" onchange="updateCheerScore(${i}, 'y', this.value)">
-                            </div>
-                            <div class="col-3">
-                                <input type="number" class="form-control form-control-sm text-center border-info" placeholder="0" value="${m.details?.[`j${i}b`]||0}" onchange="updateCheerScore(${i}, 'b', this.value)">
-                            </div>
-                        </div>`; 
+                    html += `<div class="row g-2 align-items-center mb-2"><div class="col-6 text-start"><span class="small fw-bold text-muted"><i class="fas fa-user-circle"></i> ${refName}</span></div><div class="col-3"><input type="number" class="form-control form-control-sm text-center border-warning" placeholder="0" value="${m.details?.[`j${i}y`]||0}" onchange="updateCheerScore(${i}, 'y', this.value)"></div><div class="col-3"><input type="number" class="form-control form-control-sm text-center border-info" placeholder="0" value="${m.details?.[`j${i}b`]||0}" onchange="updateCheerScore(${i}, 'b', this.value)"></div></div>`; 
                 }
             } else if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
                 html = `<h6 class="border-bottom pb-2 mb-2">คะแนนรายเซต</h6>`;
@@ -1315,20 +1214,8 @@
                 html = `<h6 class="border-bottom pb-2 mb-2">ผู้ชนะรายเซต</h6>`;
                 for(let i=1; i<=3; i++) { let w = m.details?.[`set${i}`] || 'none'; html += `<div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded"><span class="fw-bold small">Set ${i}</span><div class="btn-group btn-group-sm"><input type="radio" class="btn-check" name="s${i}" id="s${i}y" ${w==='yellow'?'checked':''} onchange="updateSetWin(${i}, 'yellow')"><label class="btn btn-outline-warning" for="s${i}y">🟡</label><input type="radio" class="btn-check" name="s${i}" id="s${i}n" ${w==='none'?'checked':''} onchange="updateSetWin(${i}, 'none')"><label class="btn btn-outline-secondary" for="s${i}n">-</label><input type="radio" class="btn-check" name="s${i}" id="s${i}b" ${w==='blue'?'checked':''} onchange="updateSetWin(${i}, 'blue')"><label class="btn btn-outline-primary" for="s${i}b">🔵</label></div></div>`; }
             } else if(['athletics', 'folksport'].includes(m.sport)) {
-                let isY = m.scoreY > m.scoreB;
-                let isB = m.scoreB > m.scoreY;
-                html = `
-                    <div class="text-center">
-                        <h6 class="border-bottom pb-2 mb-3">เลือกผู้ชนะ</h6>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="simpleWin" id="winY" autocomplete="off" ${isY ? 'checked' : ''} onchange="setSimpleWinner('yellow')">
-                            <label class="btn btn-outline-warning py-3" for="winY"><i class="fas fa-trophy me-2"></i>สีเหลืองชนะ</label>
-
-                            <input type="radio" class="btn-check" name="simpleWin" id="winB" autocomplete="off" ${isB ? 'checked' : ''} onchange="setSimpleWinner('blue')">
-                            <label class="btn btn-outline-info py-3" for="winB"><i class="fas fa-trophy me-2"></i>สีฟ้าชนะ</label>
-                        </div>
-                    </div>
-                `;
+                let isY = m.scoreY > m.scoreB; let isB = m.scoreB > m.scoreY;
+                html = `<div class="text-center"><h6 class="border-bottom pb-2 mb-3">เลือกผู้ชนะ</h6><div class="btn-group w-100" role="group"><input type="radio" class="btn-check" name="simpleWin" id="winY" autocomplete="off" ${isY ? 'checked' : ''} onchange="setSimpleWinner('yellow')"><label class="btn btn-outline-warning py-3" for="winY"><i class="fas fa-trophy me-2"></i>สีเหลืองชนะ</label><input type="radio" class="btn-check" name="simpleWin" id="winB" autocomplete="off" ${isB ? 'checked' : ''} onchange="setSimpleWinner('blue')"><label class="btn btn-outline-info py-3" for="winB"><i class="fas fa-trophy me-2"></i>สีฟ้าชนะ</label></div></div>`;
             } else {
                 html = `<div class="row text-center g-2"><div class="col-6"><button class="btn btn-warning w-100 py-3 fw-bold" onclick="manualScore('Y', 1)">+1 เหลือง</button></div><div class="col-6"><button class="btn btn-info w-100 py-3 fw-bold" onclick="manualScore('B', 1)">+1 ฟ้า</button></div><div class="col-6"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('Y', -1)">-1</button></div><div class="col-6"><button class="btn btn-sm btn-outline-secondary w-100" onclick="manualScore('B', -1)">-1</button></div></div>`;
             }
@@ -1336,30 +1223,12 @@
         }
 
         window.unlockScore = async () => {
-            const { value: pass } = await Swal.fire({
-                title: 'ใส่รหัสผ่านกรรมการ',
-                input: 'password',
-                inputPlaceholder: 'KTW...',
-                showCancelButton: true,
-                confirmButtonText: 'ปลดล็อก'
-            });
-
-            if (pass === 'KTW1234') {
-                isMatchUnlocked = true;
-                renderScoreControls(matchDataLocal);
-                Swal.fire({ icon: 'success', title: 'ปลดล็อกเรียบร้อย', timer: 1000, showConfirmButton: false });
-            } else if (pass) {
-                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
-            }
+            const { value: pass } = await Swal.fire({ title: 'ใส่รหัสผ่านกรรมการ', input: 'password', inputPlaceholder: 'KTW...', showCancelButton: true, confirmButtonText: 'ปลดล็อก' });
+            if (pass === 'KTW1234') { isMatchUnlocked = true; renderScoreControls(matchDataLocal); Swal.fire({ icon: 'success', title: 'ปลดล็อกเรียบร้อย', timer: 1000, showConfirmButton: false }); } else if (pass) { Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' }); }
         };
 
         window.setSimpleWinner = (team) => {
-            let updates = {};
-            if (team === 'yellow') {
-                updates = { scoreY: 1, scoreB: 0 };
-            } else {
-                updates = { scoreY: 0, scoreB: 1 };
-            }
+            let updates = (team === 'yellow') ? { scoreY: 1, scoreB: 0 } : { scoreY: 0, scoreB: 1 };
             document.getElementById('scoreDisplayY').innerText = updates.scoreY;
             document.getElementById('scoreDisplayB').innerText = updates.scoreB;
             update(ref(db, `matches/${currentMatchId}`), updates);
@@ -1394,35 +1263,14 @@
             document.getElementById(t==='Y'?'scoreDisplayY':'scoreDisplayB').innerText = newVal;
             update(ref(db, `matches/${currentMatchId}`), { [key]: newVal });
         };
-        window.clearMatchData = () => { 
-            if(confirm('ล้างคะแนน?')) {
-                update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} });
-                document.getElementById('scoreDisplayY').innerText = '0';
-                document.getElementById('scoreDisplayB').innerText = '0';
-            }
-        };
+        window.clearMatchData = () => { if(confirm('ล้างคะแนน?')) { update(ref(db, `matches/${currentMatchId}`), { scoreY: 0, scoreB: 0, details: {} }); document.getElementById('scoreDisplayY').innerText = '0'; document.getElementById('scoreDisplayB').innerText = '0'; } };
         
         window.finishMatch = () => {
             let m = matchDataLocal;
             let warningText = "โปรดตรวจสอบให้แน่ใจว่าลงผลการแข่งขันครบถ้วนทุก set แล้ว หากครบแล้ว กดยืนยัน";
-            
-            if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) {
-                if (m.scoreY === 2 || m.scoreB === 2) {
-                    warningText = "ได้ผู้ชนะ 2 ใน 3 เซตแล้ว ยืนยันจบการแข่งขัน?";
-                }
-            } else if(['athletics', 'folksport'].includes(m.sport)) {
-                 warningText = "ยืนยันผลการตัดสิน?";
-            }
-
-            Swal.fire({
-                title: 'ยืนยันจบการแข่งขัน',
-                text: warningText,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#198754',
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ตรวจสอบก่อน'
-            }).then((result) => {
+            if(['volleyball', 'beach_volleyball', 'sepaktakraw'].includes(m.sport)) { if (m.scoreY === 2 || m.scoreB === 2) warningText = "ได้ผู้ชนะ 2 ใน 3 เซตแล้ว ยืนยันจบการแข่งขัน?"; } 
+            else if(['athletics', 'folksport'].includes(m.sport)) { warningText = "ยืนยันผลการตัดสิน?"; }
+            Swal.fire({ title: 'ยืนยันจบการแข่งขัน', text: warningText, icon: 'question', showCancelButton: true, confirmButtonColor: '#198754', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ตรวจสอบก่อน' }).then((result) => {
                 if (result.isConfirmed) {
                     let y = matchDataLocal.scoreY || 0, b = matchDataLocal.scoreB || 0;
                     update(ref(db, `matches/${currentMatchId}`), { status: 'done', winner: y>b?'yellow':(b>y?'blue':'draw') }).then(()=>showPage('dashboard'));
@@ -1434,134 +1282,35 @@
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
                 if(!m) { Swal.fire('Error', 'ไม่พบข้อมูล', 'error'); return; }
-                
-                let html = `
-                    <div style="text-align:center; margin-bottom:15px; padding-bottom:10px; border-bottom:3px double #1a237e;">
-                        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:70px;">
-                        <h2 style="margin:8px 0 0; font-family:'Kanit',sans-serif; color:#1a237e; font-size:18pt;">รายงานผลการแข่งขัน</h2>
-                        <h3 style="margin:3px 0; font-family:'Kanit',sans-serif; color:#ff9800; font-size:14pt;">"กระดุมทองเกมส์ 2568"</h3>
-                    </div>
-                    <div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:15px;">
-                        <table style="width:100%; font-size:11pt;"><tr><td><strong>กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${m.date}</td></tr><tr><td><strong>รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>สนาม:</strong> ${m.location || '-'}</td></tr></table>
-                    </div>
-                    <div style="text-align:center; padding:25px 0; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:12px; margin-bottom:15px;">
-                        <table style="width:100%; color:#fff;"><tr><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td><td style="width:20%; text-align:center;"><span style="font-size:20pt; opacity:0.7;">VS</span></td><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td></tr></table>
-                    </div>
-                    <div style="background:${m.winner==='yellow'?'#fff8e1':(m.winner==='blue'?'#e3f2fd':'#f5f5f5')}; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; border:3px solid ${m.winner==='yellow'?'#ffc107':(m.winner==='blue'?'#2196f3':'#999')};">
-                        <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ผู้ชนะ: <strong>${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</strong></h3>
-                    </div>
-                    ${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px;">${m.note}</div></div>` : ''}
-                    <div style="margin-top:40px;"><table style="width:100%;"><tr>${(m.referees||['']).map((r,i) => r ? `<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${r})<br>กรรมการ ${i+1}</small></td>` : '').join('')}<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></td></tr></table></div>
-                    <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
-                `;
+                let html = `<div style="text-align:center; margin-bottom:15px; padding-bottom:10px; border-bottom:3px double #1a237e;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:70px;"><h2 style="margin:8px 0 0; font-family:'Kanit',sans-serif; color:#1a237e; font-size:18pt;">รายงานผลการแข่งขัน</h2><h3 style="margin:3px 0; font-family:'Kanit',sans-serif; color:#ff9800; font-size:14pt;">"กระดุมทองเกมส์ 2568"</h3></div><div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:15px;"><table style="width:100%; font-size:11pt;"><tr><td><strong>กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${m.date}</td></tr><tr><td><strong>รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>สนาม:</strong> ${m.location || '-'}</td></tr></table></div><div style="text-align:center; padding:25px 0; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:12px; margin-bottom:15px;"><table style="width:100%; color:#fff;"><tr><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td><td style="width:20%; text-align:center;"><span style="font-size:20pt; opacity:0.7;">VS</span></td><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td></tr></table></div><div style="background:${m.winner==='yellow'?'#fff8e1':(m.winner==='blue'?'#e3f2fd':'#f5f5f5')}; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; border:3px solid ${m.winner==='yellow'?'#ffc107':(m.winner==='blue'?'#2196f3':'#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ผู้ชนะ: <strong>${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</strong></h3></div>${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px;">${m.note}</div></div>` : ''}<div style="margin-top:40px;"><table style="width:100%;"><tr>${(m.referees||['']).map((r,i) => r ? `<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${r})<br>กรรมการ ${i+1}</small></td>` : '').join('')}<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></td></tr></table></div><div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>`;
                 document.getElementById('reportContent').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
             }, { onlyOnce: true });
         };
 
         window.previewSummaryReport = () => {
-            if(!allMatchesArray || allMatchesArray.length === 0) {
-                Swal.fire({ icon: 'info', title: 'ไม่พบข้อมูล', text: 'ยังไม่มีรายการแข่งขัน' });
-                return;
-            }
-
+            if(!allMatchesArray || allMatchesArray.length === 0) { Swal.fire({ icon: 'info', title: 'ไม่พบข้อมูล', text: 'ยังไม่มีรายการแข่งขัน' }); return; }
             let wY = 0, wB = 0, draw = 0, pending = 0;
-            allMatchesArray.forEach(m => {
-                if(m.status === 'done') { if(m.winner === 'yellow') wY++; else if(m.winner === 'blue') wB++; else draw++; } else { pending++; }
-            });
-
+            allMatchesArray.forEach(m => { if(m.status === 'done') { if(m.winner === 'yellow') wY++; else if(m.winner === 'blue') wB++; else draw++; } else { pending++; } });
             let tableRows = allMatchesArray.map((m, idx) => {
                 let rowBg = m.winner === 'yellow' ? '#fffde7' : (m.winner === 'blue' ? '#e3f2fd' : '#fff');
                 let statusTxt = m.status === 'done' ? '✅' : '⏳';
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'🟡':(m.winner==='blue'?'🔵':'➖')) : '-';
                 return `<tr style="background:${rowBg};"><td style="border:1px solid #333; padding:4px; text-align:center;">${idx+1}</td><td style="border:1px solid #333; padding:4px; text-align:left; font-size:9pt;">${getSportName(m.sport)}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.category || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.date || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreY || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreB || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${winnerTxt}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${statusTxt}</td></tr>`;
             }).join('');
-
-            const html = `
-                <div style="text-align:center; margin-bottom:12px; padding:12px; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:10px; color:#fff;">
-                    <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:50px; margin-bottom:5px;">
-                    <h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ตารางสรุปผลการแข่งขัน</h2>
-                    <h3 style="margin:2px 0 0; font-family:'Kanit',sans-serif; font-size:12pt; font-weight:400;">"กระดุมทองเกมส์ 2568"</h3>
-                </div>
-                <div style="display:flex; gap:8px; margin-bottom:12px;">
-                    <div style="flex:1; background:linear-gradient(135deg,#fff8e1,#ffe082); padding:10px; border-radius:8px; text-align:center; border:2px solid #ffc107;"><div style="font-size:24pt; font-weight:bold; color:#f57c00;">${wY}</div><div style="font-size:9pt; font-weight:600;">🥇 เหลืองชนะ</div></div>
-                    <div style="flex:1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:10px; border-radius:8px; text-align:center; border:2px solid #2196f3;"><div style="font-size:24pt; font-weight:bold; color:#1565c0;">${wB}</div><div style="font-size:9pt; font-weight:600;">🥇 ฟ้าชนะ</div></div>
-                    <div style="flex:1; background:#f5f5f5; padding:10px; border-radius:8px; text-align:center; border:2px solid #9e9e9e;"><div style="font-size:24pt; font-weight:bold; color:#616161;">${draw}</div><div style="font-size:9pt; font-weight:600;">🤝 เสมอ</div></div>
-                    <div style="flex:1; background:#fff3e0; padding:10px; border-radius:8px; text-align:center; border:2px solid #ff9800;"><div style="font-size:24pt; font-weight:bold; color:#e65100;">${pending}</div><div style="font-size:9pt; font-weight:600;">⏳ รอแข่ง</div></div>
-                </div>
-                <table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px;">
-                    <thead><tr><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:4%;">#</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:20%; text-align:left;">กีฬา</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">รุ่น</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">วันที่</th><th style="background:#ffc107; color:#000; border:1px solid #333; padding:5px; width:8%;">🟡</th><th style="background:#2196f3; color:#fff; border:1px solid #333; padding:5px; width:8%;">🔵</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:10%;">ชนะ</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:6%;">สถานะ</th></tr></thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <div style="page-break-inside: avoid;">
-                    <div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};">
-                        <h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3>
-                        <p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p>
-                    </div>
-                    <div style="text-align:center; font-size:8pt; margin-top:15px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
-                    <div style="text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div>
-                </div>
-            `;
-
+            const html = `<div style="text-align:center; margin-bottom:12px; padding:12px; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:10px; color:#fff;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:50px; margin-bottom:5px;"><h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ตารางสรุปผลการแข่งขัน</h2><h3 style="margin:2px 0 0; font-family:'Kanit',sans-serif; font-size:12pt; font-weight:400;">"กระดุมทองเกมส์ 2568"</h3></div><div style="display:flex; gap:8px; margin-bottom:12px;"><div style="flex:1; background:linear-gradient(135deg,#fff8e1,#ffe082); padding:10px; border-radius:8px; text-align:center; border:2px solid #ffc107;"><div style="font-size:24pt; font-weight:bold; color:#f57c00;">${wY}</div><div style="font-size:9pt; font-weight:600;">🥇 เหลืองชนะ</div></div><div style="flex:1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:10px; border-radius:8px; text-align:center; border:2px solid #2196f3;"><div style="font-size:24pt; font-weight:bold; color:#1565c0;">${wB}</div><div style="font-size:9pt; font-weight:600;">🥇 ฟ้าชนะ</div></div><div style="flex:1; background:#f5f5f5; padding:10px; border-radius:8px; text-align:center; border:2px solid #9e9e9e;"><div style="font-size:24pt; font-weight:bold; color:#616161;">${draw}</div><div style="font-size:9pt; font-weight:600;">🤝 เสมอ</div></div><div style="flex:1; background:#fff3e0; padding:10px; border-radius:8px; text-align:center; border:2px solid #ff9800;"><div style="font-size:24pt; font-weight:bold; color:#e65100;">${pending}</div><div style="font-size:9pt; font-weight:600;">⏳ รอแข่ง</div></div></div><table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px;"><thead><tr><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:4%;">#</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:20%; text-align:left;">กีฬา</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">รุ่น</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">วันที่</th><th style="background:#ffc107; color:#000; border:1px solid #333; padding:5px; width:8%;">🟡</th><th style="background:#2196f3; color:#fff; border:1px solid #333; padding:5px; width:8%;">🔵</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:10%;">ชนะ</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:6%;">สถานะ</th></tr></thead><tbody>${tableRows}</tbody></table><div style="page-break-inside: avoid;"><div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3><p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p></div><div style="text-align:center; font-size:8pt; margin-top:15px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div><div style="text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div></div>`;
             document.getElementById('summaryContent').innerHTML = html;
             new bootstrap.Modal(document.getElementById('summaryModal')).show();
-        };
-
-        window.copyDailyReport = () => {
-            if(!allMatchesArray || allMatchesArray.length === 0) {
-                 Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูล', text: 'ยังไม่มีข้อมูลการแข่งขัน' });
-                 return;
-            }
-            
-            const filterD = document.getElementById('filterDate').value;
-            let targetMatches = allMatchesArray;
-            let dateTitle = "สรุปผลการแข่งขัน";
-            
-            if(filterD !== 'all') {
-                targetMatches = allMatchesArray.filter(m => m.date === filterD);
-                dateTitle = `สรุปผลการแข่งขัน ประจำวันที่ ${filterD}`;
-            }
-
-            let text = `📢 ${dateTitle}\n(ข้อมูล ณ วันที่ ${getThaiDate()})\n🏆 กีฬาภายใน "กระดุมทองเกมส์ 2568"\n----------------------------\n`;
-            let wY=0, wB=0;
-
-            targetMatches.forEach(m => {
-                if(m.status === 'done') {
-                    if(m.winner === 'yellow') wY++; else if(m.winner === 'blue') wB++;
-                    let icon = m.winner === 'yellow' ? '🟡' : (m.winner === 'blue' ? '🔵' : '🤝');
-                    text += `✅ ${getSportName(m.sport)} (${m.category})\n   🟡 เหลือง ${m.scoreY} - ${m.scoreB} ฟ้า 🔵 | ${icon}\n\n`;
-                }
-            });
-            
-            if(filterD === 'all') {
-                 text += `----------------------------\n📊 สรุปเหรียญรวม\n🥇 สีเหลือง: ${wY} เหรียญ\n🥇 สีฟ้า: ${wB} เหรียญ\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#`;
-            }
-
-            text += `\n\n#กระดุมทองเกมส์2568`;
-            copyToClipboard(text);
         };
 
         window.copyMatchText = (id, type) => {
             const m = allMatchesArray.find(x => x.id === id);
             if(!m) return;
-            
             let text = "";
-            if(type === 'schedule') {
-                text = `📅 กำหนดการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n⏰ เวลา: ${m.time} น. (วันที่ ${m.date})\n📍 สนาม: ${m.location || '-'}\n\n#กระดุมทองเกมส์2568`;
-            } else {
-                let wTxt = m.status !== 'done' ? 'ยังไม่แข่ง' : (m.winner==='yellow'?'สีเหลืองชนะ':(m.winner==='blue'?'สีฟ้าชนะ':'เสมอ'));
-                text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#\n------------------\n#กระดุมทองเกมส์2568`;
-            }
-            copyToClipboard(text);
+            if(type === 'schedule') { text = `📅 กำหนดการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n⏰ เวลา: ${m.time} น. (วันที่ ${m.date})\n📍 สนาม: ${m.location || '-'}\n\n#กระดุมทองเกมส์2568`; } 
+            else { let wTxt = m.status !== 'done' ? 'ยังไม่แข่ง' : (m.winner==='yellow'?'สีเหลืองชนะ':(m.winner==='blue'?'สีฟ้าชนะ':'เสมอ')); text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#\n------------------\n#กระดุมทองเกมส์2568`; }
+            navigator.clipboard.writeText(text).then(() => { Swal.fire({ icon: 'success', title: 'คัดลอกข้อความแล้ว', timer: 1000, showConfirmButton: false }); });
         };
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                Swal.fire({ icon: 'success', title: 'คัดลอกข้อความแล้ว', timer: 1000, showConfirmButton: false });
-            }).catch(err => {
-                Swal.fire('Error', 'ไม่สามารถคัดลอกได้', 'error');
-            });
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(forceHideLoader, 5000);
