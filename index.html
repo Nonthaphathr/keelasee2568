@@ -117,13 +117,13 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            padding: 20mm 25mm; /* Standard margins */
+            padding: 20mm 25mm;
             color: #000;
             position: relative;
-            font-family: 'Sarabun', sans-serif;
+            font-family: 'Kanit', sans-serif;
             box-sizing: border-box;
-            line-height: 1.6;
-            font-size: 16pt;
+            line-height: 1.5;
+            font-size: 14pt;
         }
         .report-preview-page * {
             text-shadow: none !important;
@@ -132,7 +132,8 @@
         .speech-line {
             text-align: justify;
             text-justify: inter-word;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            line-height: 1.6;
         }
         .speech-indent {
             text-indent: 2.5cm;
@@ -169,7 +170,7 @@
             .display-3 { font-size: 2.5rem !important; }
             .navbar-nav .btn { padding: 6px 10px; font-size: 0.8rem; }
             .modal-dialog { margin: 10px; }
-            .report-preview-page { width: 100%; min-height: auto; padding: 5mm; font-size: 12pt; }
+            .report-preview-page { width: 100%; min-height: auto; padding: 5mm; font-size: 11pt; }
         }
         
         @media (max-width: 375px) {
@@ -198,6 +199,20 @@
             margin-top: 2rem;
             margin-bottom: 1rem;
             font-weight: 300;
+        }
+        
+        .award-type-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            transition: all 0.3s;
+        }
+        
+        .award-type-item:hover {
+            border-color: #2196f3;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
         }
     </style>
 </head>
@@ -474,7 +489,7 @@
     </div>
 
     <div class="modal fade" id="closingSpeechModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title"><i class="fas fa-scroll"></i> สร้างคำกล่าวรายงาน (พิธีปิด)</h5>
@@ -482,24 +497,35 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">ชื่อผู้กล่าวรายงาน</label>
+                        <label class="form-label fw-bold">ชื่อผู้กล่าวรายงาน</label>
                         <input type="text" class="form-control" id="speechReporter" placeholder="เช่น นายนนทพัทธ์ หิรัญเรือง" value="นายนนทพัทธ์ หิรัญเรือง">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">ชื่อประธานในพิธี (ถ้ามี)</label>
-                        <input type="text" class="form-control" id="speechChairman" placeholder="ถ้าไม่ระบุ จะเว้นว่างไว้">
+                        <label class="form-label fw-bold">ชื่อประธานในพิธี (ถ้ามี)</label>
+                        <input type="text" class="form-control" id="speechChairman" placeholder="ถ้าไม่ระบุ จะใช้เครื่องหมายจุดแทน">
                     </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-primary"><i class="fas fa-trophy"></i> กำหนดประเภทรางวัล</h6>
+                        <p class="text-muted small mb-2">เลือกว่าแต่ละกีฬาจะมอบรางวัลอย่างไร</p>
+                        <div id="awardTypeContainer" class="border rounded p-3 bg-light">
+                            <p class="text-center text-muted">กำลังโหลดรายการกีฬา...</p>
+                        </div>
+                    </div>
+                    
                     <div class="alert alert-info small">
-                        <i class="fas fa-info-circle"></i> ระบบจะคำนวณถ้วยรางวัลจากผลการแข่งขันจริง ดังนี้:
-                        <ul class="mb-0 ps-3">
-                            <li><strong>ทั่วไป:</strong> นับจำนวนเหรียญทอง</li>
-                            <li><strong>วอลเลย์ชายหาด/เปตอง/ตะกร้อ/กรีฑา:</strong> นับคะแนนรวม (ชนะได้ 3 แพ้ได้ 0) ผู้ที่มีคะแนนรวมสูงสุดรับถ้วยรางวัลเดียว</li>
+                        <i class="fas fa-info-circle"></i> <strong>คำอธิบาย:</strong>
+                        <ul class="mb-0 ps-3 small">
+                            <li><strong>แยกรายการ:</strong> แต่ละรุ่นได้รางวัลแยก (เช่น ฟุตบอลชาย, ฟุตบอลหญิง)</li>
+                            <li><strong>คะแนนรวม:</strong> รวมคะแนนทุกรุ่นมอบถ้วยเดียว (ชนะ=3, แพ้=0)</li>
                         </ul>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                    <button type="button" class="btn btn-primary" onclick="generateClosingSpeech()">สร้างเอกสาร</button>
+                    <button type="button" class="btn btn-primary" onclick="generateClosingSpeech()"><i class="fas fa-file-alt me-1"></i> สร้างเอกสาร</button>
                 </div>
             </div>
         </div>
@@ -562,11 +588,64 @@
         
         // --- NEW FUNCTION: Prepare Closing Speech ---
         window.prepareClosingSpeech = () => {
+            // สร้างรายการกีฬาที่มีในระบบ
+            const sportsMap = {};
+            allMatchesArray.forEach(m => {
+                if (!sportsMap[m.sport]) {
+                    sportsMap[m.sport] = {
+                        name: getSportName(m.sport),
+                        key: m.sport,
+                        categories: []
+                    };
+                }
+                if (!sportsMap[m.sport].categories.includes(m.category)) {
+                    sportsMap[m.sport].categories.push(m.category);
+                }
+            });
+            
+            // สร้าง HTML สำหรับเลือกประเภทรางวัล
+            const container = document.getElementById('awardTypeContainer');
+            if (Object.keys(sportsMap).length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">ยังไม่มีรายการแข่งขันในระบบ</p>';
+            } else {
+                let html = '';
+                Object.values(sportsMap).forEach(sport => {
+                    html += `
+                        <div class="award-type-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold text-dark">
+                                        <i class="fas fa-trophy text-warning me-1"></i>
+                                        ${sport.name}
+                                    </h6>
+                                    <small class="text-muted">
+                                        ${sport.categories.join(', ')}
+                                    </small>
+                                </div>
+                                <div class="form-check form-check-inline ms-3">
+                                    <input class="form-check-input" type="radio" name="award_${sport.key}" id="${sport.key}_separate" value="separate" checked>
+                                    <label class="form-check-label small" for="${sport.key}_separate">
+                                        แยกรายการ
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="award_${sport.key}" id="${sport.key}_combined" value="combined">
+                                    <label class="form-check-label small" for="${sport.key}_combined">
+                                        คะแนนรวม
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            
             new bootstrap.Modal(document.getElementById('closingSpeechModal')).show();
         };
 
-        // --- NEW FUNCTION: Logic for Special Aggregated Score (Win=3, Loss=0) ---
-        function calculateSpecialScore(sportType) {
+        // ฟังก์ชันคำนวณผู้ชนะแบบนับคะแนนรวม (Win=3, Loss=0)
+        function calculateCombinedScore(sportType) {
             let scoreY = 0;
             let scoreB = 0;
             
@@ -575,18 +654,15 @@
             matches.forEach(m => {
                 if (m.winner === 'yellow') scoreY += 3;
                 else if (m.winner === 'blue') scoreB += 3;
-                // draw gets 1? or 0? Prompt said "Win 3, Loss 0", usually draw is 1. 
-                // But prompt implies only win/loss logic. Assuming draw = 1 for safety, 
-                // or strict 3/0 as requested. Let's stick to prompt: Win 3, else 0.
             });
 
-            if (scoreY > scoreB) return 'สีเหลือง';
-            if (scoreB > scoreY) return 'สีฟ้า';
+            if (scoreY > scoreB) return `สีเหลือง (${scoreY} คะแนน)`;
+            if (scoreB > scoreY) return `สีฟ้า (${scoreB} คะแนน)`;
             if (scoreY === 0 && scoreB === 0) return '...............';
-            return 'เสมอกัน (ครองถ้วยร่วม)';
+            return 'เสมอกัน';
         }
 
-        // --- NEW FUNCTION: Logic for Regular Gold Medal Count ---
+        // ฟังก์ชันคำนวณผู้ชนะแบบนับเหรียญทอง
         function calculateGoldWinner(sportType, categoryFilter = null) {
             let winY = 0;
             let winB = 0;
@@ -594,9 +670,7 @@
             const matches = allMatchesArray.filter(m => {
                 if (m.sport !== sportType || m.status !== 'done') return false;
                 if (categoryFilter) {
-                    // Check if category matches filter (e.g., looking for "หญิง")
-                    if (categoryFilter === 'female') return m.category.includes('หญิง') || m.category.includes('Women');
-                    if (categoryFilter === 'male') return !m.category.includes('หญิง') && !m.category.includes('Women');
+                    return m.category.toLowerCase().includes(categoryFilter.toLowerCase());
                 }
                 return true;
             });
@@ -612,26 +686,67 @@
             return 'เสมอกัน';
         }
         
+        // ฟังก์ชันสร้างรายการกีฬาแบบแยกรายการ
+        function generateSeparateAwards(sportKey) {
+            const sport = allMatchesArray.filter(m => m.sport === sportKey);
+            const categories = [...new Set(sport.map(m => m.category))];
+            
+            return categories.map(cat => {
+                const winner = calculateGoldWinner(sportKey, cat);
+                return {
+                    category: cat,
+                    winner: winner
+                };
+            });
+        }
+        
         // --- NEW FUNCTION: Generate and Render Closing Speech PDF ---
         window.generateClosingSpeech = () => {
             const reporter = document.getElementById('speechReporter').value;
             const chairman = document.getElementById('speechChairman').value || '..................................................................';
             
-            // Calculate Winners
-            const w_folk = calculateGoldWinner('folksport'); // Folk: Count Golds
-            const w_athletics = calculateSpecialScore('athletics'); // Athletics: Special 3pts Rule
-            const w_beach = calculateSpecialScore('beach_volleyball'); // Beach: Special 3pts Rule
-            const w_petanque = calculateSpecialScore('petanque'); // Petanque: Special 3pts Rule
-            const w_takraw = calculateSpecialScore('sepaktakraw'); // Takraw: Special 3pts Rule
-            const w_foot_m = calculateGoldWinner('football', 'male'); // Football Men
-            const w_foot_f = calculateGoldWinner('football', 'female'); // Football Women
-            const w_rov = calculateGoldWinner('esports'); // ROV
-            const w_cheer = calculateGoldWinner('cheer'); // Cheer
+            // รวบรวมข้อมูลประเภทรางวัล
+            const awardTypes = {};
+            document.querySelectorAll('[id^="award_"]').forEach(radio => {
+                if (radio.checked) {
+                    const sportKey = radio.name.replace('award_', '');
+                    awardTypes[sportKey] = radio.value;
+                }
+            });
             
-            // Calculate Total Score (Overall Winner)
-            // Assign 1 point per Trophy won above (Simple Logic for template)
-            // Or sum all match wins? Usually "Aggregate Score" comes from Athletics points + Sport points.
-            // Let's count Total Gold Medals across ALL sports for the Overall Cup.
+            // สร้างรายการกีฬาที่จัดแข่งขัน
+            const sportsInEvent = [...new Set(allMatchesArray.map(m => m.sport))];
+            const sportListText = sportsInEvent.map(s => getSportName(s)).join(' ');
+            
+            // สร้างรายการถ้วยรางวัล
+            let awardList = [];
+            let awardNumber = 1;
+            
+            sportsInEvent.forEach(sportKey => {
+                const awardType = awardTypes[sportKey] || 'separate';
+                
+                if (awardType === 'combined') {
+                    // นับคะแนนรวม
+                    const winner = calculateCombinedScore(sportKey);
+                    awardList.push({
+                        number: awardNumber++,
+                        title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)}`,
+                        winner: winner
+                    });
+                } else {
+                    // แยกรายการ
+                    const awards = generateSeparateAwards(sportKey);
+                    awards.forEach(award => {
+                        awardList.push({
+                            number: awardNumber++,
+                            title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} ${award.category}`,
+                            winner: award.winner
+                        });
+                    });
+                }
+            });
+            
+            // คำนวณรางวัลรวม
             let totalY = 0, totalB = 0;
             allMatchesArray.forEach(m => {
                 if(m.status === 'done') {
@@ -645,62 +760,56 @@
             const w_runnerup = totalY > totalB ? 'สีฟ้า' : (totalB > totalY ? 'สีเหลือง' : '-');
 
             const html = `
-                <div style="line-height: 1.8; font-size: 16pt;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 2.5cm; margin-bottom: 10px;">
-                        <h4 style="margin: 0; font-weight: bold;">คำกล่าวรายงานต่อประธานในพิธีปิดกิจกรรมกีฬาภายใน</h4>
-                        <h4 style="margin: 0; font-weight: bold;">"กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖๘</h4>
+                <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
+                    <div style="text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 3px double #1a237e;">
+                        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 2cm; margin-bottom: 8px;">
+                        <h4 style="margin: 0; font-weight: bold; font-size: 16pt;">คำกล่าวรายงานต่อประธานในพิธีปิดกิจกรรมกีฬาภายใน</h4>
+                        <h4 style="margin: 3px 0 0; font-weight: bold; font-size: 14pt;">"กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖๘</h4>
                     </div>
                     
-                    <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 12px; font-size: 13pt;">
                         <strong>กราบเรียน</strong> ท่านประธานที่เคารพ
                     </div>
                     
-                    <div class="speech-line speech-indent">
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">
                         กระผม/ดิฉัน ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณาจารย์ และนักเรียนโรงเรียนกระดุมทองวิทยา 
                         ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖๘ 
                         ซึ่งกำลังจะเสร็จสิ้นในวันนี้
                     </div>
                     
-                    <div class="speech-line speech-indent">
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">
                         การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ สีเหลือง และสีฟ้า ได้ดำเนินการแข่งขันกีฬาหลายประเภท 
-                        ได้แก่ กีฬาพื้นบ้าน กรีฑา วอลเลย์บอลชายหาด เปตอง เซปักตะกร้อ ฟุตบอล ๗ คน E-Sports และการแสดงเชียร์ลีดเดอร์ 
+                        ได้แก่ ${sportListText} 
                         การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ 
                         ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียนโรงเรียนกระดุมทองวิทยาทุกคน
                     </div>
                     
-                    <div class="speech-line speech-indent">
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">
                         บัดนี้ การแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖๘ ได้ถึงบทสรุปลงแล้ว 
                         กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้
                     </div>
 
-                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                    <div style="margin-top: 12px; margin-bottom: 12px; font-size: 13pt;">
                         <strong>รางวัลการแข่งขันแต่ละประเภท</strong>
-                        <ol style="margin-top: 5px; padding-left: 25px;">
-                            <li>ถ้วยชนะเลิศการแข่งขันกีฬาพื้นบ้าน ได้แก่ <strong>${w_folk}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันกรีฑาคะแนนรวม ได้แก่ <strong>${w_athletics}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันวอลเลย์บอลชายหาด ได้แก่ <strong>${w_beach}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันเปตอง ได้แก่ <strong>${w_petanque}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันเซปักตะกร้อ ได้แก่ <strong>${w_takraw}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันฟุตบอล ๗ คน ชาย ได้แก่ <strong>${w_foot_m}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขันฟุตบอล ๗ คน หญิง ได้แก่ <strong>${w_foot_f}</strong></li>
-                            <li>ถ้วยชนะเลิศการแข่งขัน E-Sports ROV ได้แก่ <strong>${w_rov}</strong></li>
-                            <li>ถ้วยชนะเลิศการแสดงเชียร์ลีดเดอร์ ได้แก่ <strong>${w_cheer}</strong></li>
+                        <ol style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
+                            ${awardList.map(award => 
+                                `<li>${award.title} ได้แก่ <strong>${award.winner}</strong></li>`
+                            ).join('')}
                         </ol>
                         
-                        <strong>รางวัลชนะเลิศรวมกีฬา</strong>
-                        <ol start="10" style="margin-top: 5px; padding-left: 25px;">
+                        <strong style="margin-top: 15px; display: block;">รางวัลชนะเลิศรวมกีฬา</strong>
+                        <ol start="${awardNumber}" style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
                             <li>ถ้วยชนะเลิศการแข่งขันกีฬาภายในโรงเรียน คะแนนรวม ได้แก่ <strong>${w_overall}</strong> (รวม ${score_overall} เหรียญทอง)</li>
                             <li>ถ้วยรองชนะเลิศอันดับ ๑ ได้แก่ <strong>${w_runnerup}</strong></li>
                         </ol>
                     </div>
 
-                    <div class="speech-line speech-indent" style="margin-top: 20px;">
+                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">
                         และลำดับต่อไป กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ 
-                        และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์” ประจำปีการศึกษา ๒๕๖๘
+                        และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖๘
                     </div>
                     
-                    <div style="text-align: right; margin-top: 20px; margin-right: 50px;">
+                    <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">
                         ขอกราบเรียนเชิญครับ/ค่ะ
                     </div>
                 </div>
