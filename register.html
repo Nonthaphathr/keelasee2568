@@ -79,6 +79,12 @@
         
         .match-card:active { transform: scale(0.98); }
         .match-card:hover { box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        
+        .match-card.done-match {
+            background: #f8f9fa;
+            opacity: 0.9;
+            border: 1px dashed #ccc;
+        }
 
         .sport-badge {
             width: 60px; height: 60px;
@@ -89,15 +95,11 @@
             color: white;
             box-shadow: 0 4px 10px rgba(237, 143, 3, 0.3);
         }
-
-        .status-dot {
-            height: 10px; width: 10px;
-            background-color: #bbb;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
+        
+        .done-match .sport-badge {
+            background: linear-gradient(45deg, #56ab2f, #a8e063); /* Green for done */
+            box-shadow: none;
         }
-        .status-dot.active { background-color: #28a745; box-shadow: 0 0 5px #28a745; }
 
         /* Filter Section */
         .filter-container {
@@ -140,7 +142,7 @@
             border-radius: 8px;
             border: 1px solid #ddd;
             padding: 10px;
-            font-size: 1.1rem; /* ใหญ่ขึ้นเพื่อให้กดง่าย */
+            font-size: 1.1rem;
         }
         .player-input:focus { border-color: #2c5364; box-shadow: 0 0 0 0.2rem rgba(44, 83, 100, 0.15); }
 
@@ -169,10 +171,22 @@
     <div class="container" style="margin-top: -20px;">
         
         <div class="filter-container animate__animated animate__fadeIn">
-            <label class="small text-muted mb-1 fw-bold"><i class="fas fa-filter me-1"></i> กรองรายการแข่งขัน</label>
-            <select id="filterSport" class="form-select border-0 bg-light fw-bold text-dark shadow-none py-2" onchange="renderMatches()">
-                <option value="all">🏆 แสดงทั้งหมด</option>
-                </select>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="small text-muted mb-1 fw-bold"><i class="fas fa-filter me-1"></i> ชนิดกีฬา</label>
+                    <select id="filterSport" class="form-select border-0 bg-light fw-bold text-dark shadow-none py-2" onchange="renderMatches()">
+                        <option value="all">ทั้งหมด</option>
+                        </select>
+                </div>
+                <div class="col-6">
+                    <label class="small text-muted mb-1 fw-bold"><i class="fas fa-tasks me-1"></i> สถานะ</label>
+                    <select id="filterStatus" class="form-select border-0 bg-light fw-bold text-dark shadow-none py-2" onchange="renderMatches()">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="wait" selected>⏳ รอแข่งขัน</option>
+                        <option value="done">✅ แข่งจบแล้ว</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div id="matchList" class="pb-5">
@@ -191,6 +205,7 @@
                     <div>
                         <h4 class="modal-title" id="modalSportName">ชื่อกีฬา</h4>
                         <div class="badge bg-white text-dark mt-1" id="modalCategory">รุ่น...</div>
+                        <span id="modalStatusBadge" class="badge bg-success mt-1 ms-1 d-none">แข่งจบแล้ว (แก้ไขย้อนหลัง)</span>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -257,19 +272,16 @@
         let tempPlayersY = [];
         let tempPlayersB = [];
 
-        // Helper: แปลงรหัสกีฬาเป็นชื่อภาษาไทย (ต้องตรงกับไฟล์หลัก)
         window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','athletics':'กรีฑา','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
 
-        // Load Data Realtime
         onValue(ref(db, 'matches'), (snap) => {
             const data = snap.val();
             if (data) {
-                // แปลง object เป็น array และเรียงตามเวลา
                 allMatches = Object.keys(data).map(k => ({...data[k], id: k}))
                                      .sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
                 
-                updateFilterDropdown(); // สร้างตัวเลือกใน Filter อัตโนมัติ
-                renderMatches();        // แสดงรายการ
+                updateFilterDropdown();
+                renderMatches();
             } else {
                 document.getElementById('matchList').innerHTML = `
                     <div class="text-center mt-5 p-5 bg-white rounded-4 shadow-sm">
@@ -280,64 +292,75 @@
             }
         });
 
-        // ฟังก์ชันสร้างตัวเลือก Filter อัตโนมัติ
         function updateFilterDropdown() {
             const select = document.getElementById('filterSport');
             const currentVal = select.value;
             
-            // ดึงรายชื่อกีฬาที่มีอยู่จริง (Unique)
             const sports = [...new Set(allMatches.map(m => m.sport))];
             
-            // เก็บตัวเลือกแรกไว้ (แสดงทั้งหมด) แล้วเติมที่เหลือ
-            select.innerHTML = '<option value="all">🏆 แสดงทั้งหมด</option>';
+            select.innerHTML = '<option value="all">ทั้งหมด</option>';
             sports.forEach(s => {
                 select.innerHTML += `<option value="${s}">${getSportName(s)}</option>`;
             });
 
-            // คืนค่าที่เลือกไว้เดิม (ถ้ามี)
             select.value = currentVal;
         }
 
         window.renderMatches = () => {
-            const filterVal = document.getElementById('filterSport').value;
+            const filterSport = document.getElementById('filterSport').value;
+            const filterStatus = document.getElementById('filterStatus').value;
             const container = document.getElementById('matchList');
             container.innerHTML = '';
 
-            // กรองรายการ (แสดงเฉพาะที่ยังไม่จบการแข่งขัน status != 'done')
             const filtered = allMatches.filter(m => {
-                const matchSport = (filterVal === 'all' || m.sport === filterVal);
-                const isNotDone = m.status !== 'done';
-                return matchSport && isNotDone;
+                // กรองชนิดกีฬา
+                const matchSport = (filterSport === 'all' || m.sport === filterSport);
+                
+                // กรองสถานะ
+                let matchStatus = true;
+                if (filterStatus === 'wait') {
+                    matchStatus = (m.status !== 'done');
+                } else if (filterStatus === 'done') {
+                    matchStatus = (m.status === 'done');
+                }
+                // ถ้า filterStatus === 'all' ก็ให้เป็น true เสมอ
+
+                return matchSport && matchStatus;
             });
 
             if(filtered.length === 0) {
                 container.innerHTML = `
                     <div class="text-center mt-4 p-4 text-muted animate__animated animate__fadeIn">
                         <i class="fas fa-search fa-2x mb-2 opacity-50"></i>
-                        <p>ไม่พบรายการแข่งขันในหมวดหมู่นี้</p>
+                        <p>ไม่พบรายการแข่งขันตามเงื่อนไข</p>
                     </div>`;
                 return;
             }
 
-            // สร้าง Card รายการ
             filtered.forEach((m, index) => {
                 const countY = (m.playersY || []).filter(x=>x).length;
                 const countB = (m.playersB || []).filter(x=>x).length;
-                
-                // ใช้ Animation Delay เพื่อให้ Card ค่อยๆ ขึ้นมาทีละใบ
                 const delay = index * 0.05;
+                const isDone = m.status === 'done';
+
+                const statusBadge = isDone 
+                    ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i>จบแล้ว</span>' 
+                    : '<span class="badge bg-secondary ms-2 text-white-50"><i class="fas fa-hourglass-half me-1"></i>รอแข่ง</span>';
+
+                const cardClass = isDone ? 'match-card done-match' : 'match-card';
+                const iconClass = isDone ? 'fas fa-check' : 'fas fa-running';
 
                 container.innerHTML += `
-                    <div class="match-card p-3 d-flex align-items-center slide-up" style="animation-delay: ${delay}s" onclick="openRegister('${m.id}')">
+                    <div class="${cardClass} p-3 d-flex align-items-center slide-up" style="animation-delay: ${delay}s" onclick="openRegister('${m.id}')">
                         <div class="sport-badge me-3">
-                            <i class="fas fa-running"></i>
+                            <i class="${iconClass}"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap">
                                 <h5 class="fw-bold mb-1 text-dark">${getSportName(m.sport)}</h5>
-                                <small class="text-muted"><i class="far fa-clock me-1"></i>${m.time}</small>
+                                <div class="mb-1">${statusBadge}</div>
                             </div>
-                            <p class="text-secondary mb-2 small">${m.category} | ${m.date}</p>
+                            <div class="small text-muted mb-2"><i class="far fa-clock me-1"></i>${m.time} น. | ${m.category}</div>
                             
                             <div class="d-flex gap-2">
                                 <span class="badge ${countY > 0 ? 'bg-warning text-dark' : 'bg-light text-secondary border'} rounded-pill px-3">
@@ -363,11 +386,16 @@
             document.getElementById('modalSportName').innerText = getSportName(m.sport);
             document.getElementById('modalCategory').innerText = m.category;
             
-            // Clone ข้อมูลมาใส่ตัวแปร temp เพื่อแก้ไขก่อนบันทึก
+            const badge = document.getElementById('modalStatusBadge');
+            if(m.status === 'done') {
+                badge.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
+            }
+            
             tempPlayersY = [...(m.playersY || [])];
             tempPlayersB = [...(m.playersB || [])];
             
-            // ต้องมีช่องว่างอย่างน้อย 1 ช่องเสมอ
             if(tempPlayersY.length === 0) tempPlayersY.push('');
             if(tempPlayersB.length === 0) tempPlayersB.push('');
 
@@ -415,7 +443,6 @@
         };
 
         window.savePlayers = () => {
-            // กรองช่องว่างออกก่อนบันทึก
             const cleanY = tempPlayersY.filter(n => n.trim() !== '');
             const cleanB = tempPlayersB.filter(n => n.trim() !== '');
 
