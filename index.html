@@ -215,6 +215,43 @@
             box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
         }
         
+        /* Settings Styles */
+        .setting-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+        .setting-section h6 {
+            color: #1a237e;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .logo-preview {
+            max-height: 80px;
+            max-width: 150px;
+            object-fit: contain;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 5px;
+            background: white;
+        }
+        .sport-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .sport-item:hover {
+            border-color: #2196f3;
+        }
+        
         @media print {
             body {
                 background: white;
@@ -233,19 +270,19 @@
 <body>
 
     <div id="loadingOverlay">
-        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="spinner-logo">
+        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="spinner-logo" id="loadingLogo">
         <h4 class="text-secondary fw-bold">กำลังโหลดข้อมูล...</h4>
-        <small class="text-muted">กระดุมทองเกมส์ 2568</small>
+        <small class="text-muted" id="loadingEventName">กระดุมทองเกมส์ 2568</small>
         <button class="btn btn-sm btn-outline-secondary mt-3" onclick="forceHideLoader()">กดตรงนี้หากรอนานเกินไป</button>
     </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" alt="Logo">
+                <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" alt="Logo" id="navbarLogo">
                 <div class="d-flex flex-column ms-2">
-                    <span class="fs-5 fw-bold text-warning">กีฬาภายใน กระดุมทองเกมส์ 2568</span>
-                    <small class="text-white-50 d-none d-sm-block" style="font-size: 0.75rem;">โรงเรียนกระดุมทองวิทยา</small>
+                    <span class="fs-5 fw-bold text-warning" id="navbarEventName">กีฬาภายใน กระดุมทองเกมส์ 2568</span>
+                    <small class="text-white-50 d-none d-sm-block" style="font-size: 0.75rem;" id="navbarSchoolName">โรงเรียนกระดุมทองวิทยา</small>
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -260,6 +297,7 @@
                         </a>
                     </li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0 w-100" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
+                    <li class="nav-item"><button class="btn btn-sm btn-outline-success border-0 w-100" onclick="showSettings()"><i class="fas fa-cog me-1"></i> ตั้งค่าระบบ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light w-100" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-add-match w-100" onclick="prepareAddMatch()"><i class="fas fa-plus me-1"></i> เพิ่มรายการ</button></li>
                 </ul>
@@ -342,15 +380,6 @@
                             <label class="form-label small fw-bold">ชนิดกีฬา</label>
                             <select class="form-select" id="sportType" required>
                                 <option value="" disabled selected>-- เลือก --</option>
-                                <option value="football">ฟุตบอล 7 คน</option>
-                                <option value="volleyball">วอลเลย์บอล</option>
-                                <option value="beach_volleyball">วอลเลย์บอลชายหาด</option>
-                                <option value="sepaktakraw">เซปักตะกร้อ</option>
-                                <option value="esports">E-Sports ROV</option>
-                                <option value="petanque">เปตอง</option>
-                                <option value="athletics">กรีฑา</option>
-                                <option value="folksport">กีฬาพื้นบ้าน</option>
-                                <option value="cheer">ประกวดกองเชียร์ฯ</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -423,7 +452,7 @@
                                     </h6>
                                     <div id="playersB" class="d-flex flex-column gap-2 mt-2"></div>
                                 </div>
-                                <button class="btn btn-sm btn-dark w-100 mt-2" onclick="printPlayerList()"><i class="fas fa-print me-1"></i> พิมพ์รายชื่อ (PDF)</button>
+                                <button class="btn btn-sm btn-dark w-100 mt-2" onclick="previewPlayerList()"><i class="fas fa-print me-1"></i> พิมพ์รายชื่อ</button>
                             </div>
                         </div>
                     </div>
@@ -593,8 +622,111 @@
         </div>
     </div>
 
-    <div class="d-none">
-        <div id="playerListContent" class="report-preview-page"></div>
+    <!-- Player List Preview Modal -->
+    <div class="modal fade" id="playerListModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white py-2">
+                    <h5 class="modal-title"><i class="fas fa-users me-2"></i>ใบรายชื่อนักกีฬา</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-secondary p-2" style="overflow-y: auto; max-height: 80vh;">
+                    <div id="playerListContent" class="report-preview-page"></div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+                    <button class="btn btn-primary btn-sm" onclick="printDocument('playerListContent')"><i class="fas fa-print me-1"></i> พิมพ์</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-cog me-2"></i>ตั้งค่าระบบ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- ข้อมูลพื้นฐาน -->
+                    <div class="setting-section">
+                        <h6><i class="fas fa-school me-2"></i>ข้อมูลพื้นฐาน</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">ชื่อโรงเรียน</label>
+                                <input type="text" class="form-control" id="settingSchoolName" placeholder="เช่น โรงเรียนกระดุมทองวิทยา">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">ปีการศึกษา</label>
+                                <input type="text" class="form-control" id="settingAcademicYear" placeholder="เช่น 2568">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">ชื่อกิจกรรม/งาน</label>
+                                <input type="text" class="form-control" id="settingEventName" placeholder="เช่น กระดุมทองเกมส์">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- รูปภาพ -->
+                    <div class="setting-section">
+                        <h6><i class="fas fa-image me-2"></i>รูปภาพ/โลโก้</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">ตราโรงเรียน (.png)</label>
+                                <input type="file" class="form-control form-control-sm" id="settingSchoolLogo" accept="image/png" onchange="previewLogo('school')">
+                                <div class="mt-2 text-center">
+                                    <img id="previewSchoolLogo" src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="logo-preview">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">ตรากิจกรรม (.png) - ถ้ามี</label>
+                                <input type="file" class="form-control form-control-sm" id="settingEventLogo" accept="image/png" onchange="previewLogo('event')">
+                                <div class="mt-2 text-center">
+                                    <img id="previewEventLogo" src="" class="logo-preview" style="display:none;">
+                                    <small id="noEventLogoText" class="text-muted">ยังไม่มีรูป</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning small mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> <strong>หมายเหตุ:</strong> รูปภาพจะถูกแปลงเป็น Base64 และบันทึกลง Firebase โปรดใช้รูปขนาดไม่เกิน 500KB เพื่อประสิทธิภาพที่ดี
+                        </div>
+                    </div>
+
+                    <!-- รายการกีฬา -->
+                    <div class="setting-section">
+                        <h6><i class="fas fa-running me-2"></i>รายการกีฬาที่จะจัด</h6>
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="newSportKey" placeholder="รหัส (ภาษาอังกฤษ) เช่น football">
+                                <input type="text" class="form-control" id="newSportName" placeholder="ชื่อกีฬา เช่น ฟุตบอล 7 คน">
+                                <button class="btn btn-success" type="button" onclick="addSportToList()"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <small class="text-muted">รหัสกีฬา: ใช้ภาษาอังกฤษ ไม่มีเว้นวรรค (เช่น football, volleyball, esports)</small>
+                        </div>
+                        <div id="sportListContainer" class="border rounded p-2 bg-white" style="max-height: 200px; overflow-y: auto;">
+                            <p class="text-center text-muted small mb-0">กำลังโหลดรายการกีฬา...</p>
+                        </div>
+                    </div>
+
+                    <!-- รหัสผ่าน -->
+                    <div class="setting-section">
+                        <h6><i class="fas fa-lock me-2"></i>รหัสผ่านระบบ</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">รหัสผ่านกรรมการ (ปลดล็อก/ลบ)</label>
+                                <input type="text" class="form-control" id="settingPassword" placeholder="รหัสผ่าน">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-success" onclick="saveSettings()"><i class="fas fa-save me-1"></i> บันทึกการตั้งค่า</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -621,6 +753,211 @@
         let editingMatchId = null;
         let isMatchUnlocked = false;
 
+        // ===== ข้อมูลการตั้งค่าระบบ =====
+        let systemSettings = {
+            schoolName: 'โรงเรียนกระดุมทองวิทยา',
+            eventName: 'กระดุมทองเกมส์',
+            academicYear: '2568',
+            schoolLogo: 'https://nonthaphathr.github.io/uploadimg/logoschool.png',
+            eventLogo: '',
+            password: 'KTW1234',
+            sports: {
+                'football': 'ฟุตบอล 7 คน',
+                'volleyball': 'วอลเลย์บอล',
+                'beach_volleyball': 'วอลเลย์บอลชายหาด',
+                'sepaktakraw': 'เซปักตะกร้อ',
+                'esports': 'E-Sports ROV',
+                'petanque': 'เปตอง',
+                'athletics': 'กรีฑา',
+                'folksport': 'กีฬาพื้นบ้าน',
+                'cheer': 'ประกวดกองเชียร์ฯ'
+            }
+        };
+
+        // ===== โหลดการตั้งค่าจาก Firebase =====
+        function loadSettings() {
+            onValue(ref(db, 'settings'), (snap) => {
+                const data = snap.val();
+                if (data) {
+                    systemSettings = { ...systemSettings, ...data };
+                    if (data.sports) {
+                        systemSettings.sports = data.sports;
+                    }
+                }
+                applySettingsToUI();
+                updateSportDropdown();
+            }, { onlyOnce: true });
+        }
+
+        // ===== ใช้การตั้งค่ากับ UI =====
+        function applySettingsToUI() {
+            // Navbar
+            document.getElementById('navbarLogo').src = systemSettings.schoolLogo;
+            document.getElementById('navbarEventName').innerText = `กีฬาภายใน ${systemSettings.eventName} ${systemSettings.academicYear}`;
+            document.getElementById('navbarSchoolName').innerText = systemSettings.schoolName;
+            
+            // Loading
+            document.getElementById('loadingLogo').src = systemSettings.schoolLogo;
+            document.getElementById('loadingEventName').innerText = `${systemSettings.eventName} ${systemSettings.academicYear}`;
+            
+            // Title
+            document.title = `ระบบบันทึกผลการแข่งขัน - ${systemSettings.eventName} ${systemSettings.academicYear}`;
+        }
+
+        // ===== อัพเดท Dropdown กีฬา =====
+        function updateSportDropdown() {
+            const select = document.getElementById('sportType');
+            select.innerHTML = '<option value="" disabled selected>-- เลือก --</option>';
+            Object.entries(systemSettings.sports).forEach(([key, name]) => {
+                select.innerHTML += `<option value="${key}">${name}</option>`;
+            });
+        }
+
+        // ===== แสดง Modal ตั้งค่า =====
+        window.showSettings = async () => {
+            const { value: pass } = await Swal.fire({
+                title: 'ใส่รหัสผ่านเพื่อตั้งค่าระบบ',
+                input: 'password',
+                inputPlaceholder: 'รหัสผ่าน...',
+                showCancelButton: true,
+                confirmButtonText: 'เข้าสู่ระบบ',
+                cancelButtonText: 'ยกเลิก'
+            });
+            
+            if (pass === systemSettings.password) {
+                // โหลดค่าปัจจุบันลงฟอร์ม
+                document.getElementById('settingSchoolName').value = systemSettings.schoolName;
+                document.getElementById('settingEventName').value = systemSettings.eventName;
+                document.getElementById('settingAcademicYear').value = systemSettings.academicYear;
+                document.getElementById('settingPassword').value = systemSettings.password;
+                document.getElementById('previewSchoolLogo').src = systemSettings.schoolLogo;
+                
+                if (systemSettings.eventLogo) {
+                    document.getElementById('previewEventLogo').src = systemSettings.eventLogo;
+                    document.getElementById('previewEventLogo').style.display = 'block';
+                    document.getElementById('noEventLogoText').style.display = 'none';
+                } else {
+                    document.getElementById('previewEventLogo').style.display = 'none';
+                    document.getElementById('noEventLogoText').style.display = 'block';
+                }
+                
+                renderSportList();
+                new bootstrap.Modal(document.getElementById('settingsModal')).show();
+            } else if (pass) {
+                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
+            }
+        };
+
+        // ===== แสดงรายการกีฬา =====
+        function renderSportList() {
+            const container = document.getElementById('sportListContainer');
+            if (Object.keys(systemSettings.sports).length === 0) {
+                container.innerHTML = '<p class="text-center text-muted small mb-0">ยังไม่มีรายการกีฬา</p>';
+                return;
+            }
+            let html = '';
+            Object.entries(systemSettings.sports).forEach(([key, name]) => {
+                html += `
+                    <div class="sport-item">
+                        <div>
+                            <span class="fw-bold">${name}</span>
+                            <small class="text-muted ms-2">(${key})</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeSportFromList('${key}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ===== เพิ่มกีฬา =====
+        window.addSportToList = () => {
+            const key = document.getElementById('newSportKey').value.trim().toLowerCase().replace(/\s+/g, '_');
+            const name = document.getElementById('newSportName').value.trim();
+            
+            if (!key || !name) {
+                Swal.fire({ icon: 'warning', title: 'กรุณากรอกข้อมูลให้ครบ' });
+                return;
+            }
+            
+            if (systemSettings.sports[key]) {
+                Swal.fire({ icon: 'warning', title: 'รหัสกีฬานี้มีอยู่แล้ว' });
+                return;
+            }
+            
+            systemSettings.sports[key] = name;
+            renderSportList();
+            document.getElementById('newSportKey').value = '';
+            document.getElementById('newSportName').value = '';
+        };
+
+        // ===== ลบกีฬา =====
+        window.removeSportFromList = (key) => {
+            if (confirm(`ลบกีฬา "${systemSettings.sports[key]}" ?`)) {
+                delete systemSettings.sports[key];
+                renderSportList();
+            }
+        };
+
+        // ===== Preview Logo =====
+        window.previewLogo = (type) => {
+            const input = document.getElementById(type === 'school' ? 'settingSchoolLogo' : 'settingEventLogo');
+            const preview = document.getElementById(type === 'school' ? 'previewSchoolLogo' : 'previewEventLogo');
+            const noText = document.getElementById('noEventLogoText');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    if (type === 'event' && noText) noText.style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        // ===== บันทึกการตั้งค่า =====
+        window.saveSettings = async () => {
+            systemSettings.schoolName = document.getElementById('settingSchoolName').value || systemSettings.schoolName;
+            systemSettings.eventName = document.getElementById('settingEventName').value || systemSettings.eventName;
+            systemSettings.academicYear = document.getElementById('settingAcademicYear').value || systemSettings.academicYear;
+            systemSettings.password = document.getElementById('settingPassword').value || systemSettings.password;
+            
+            // อ่าน Base64 จากรูปภาพ (ถ้ามีการอัปโหลดใหม่)
+            const schoolLogoInput = document.getElementById('settingSchoolLogo');
+            const eventLogoInput = document.getElementById('settingEventLogo');
+            
+            if (schoolLogoInput.files && schoolLogoInput.files[0]) {
+                systemSettings.schoolLogo = await fileToBase64(schoolLogoInput.files[0]);
+            }
+            
+            if (eventLogoInput.files && eventLogoInput.files[0]) {
+                systemSettings.eventLogo = await fileToBase64(eventLogoInput.files[0]);
+            }
+            
+            // บันทึกลง Firebase
+            set(ref(db, 'settings'), systemSettings).then(() => {
+                applySettingsToUI();
+                updateSportDropdown();
+                Swal.fire({ icon: 'success', title: 'บันทึกการตั้งค่าเรียบร้อย', timer: 1500, showConfirmButton: false });
+                bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+            }).catch((error) => {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: error.message });
+            });
+        };
+
+        // ===== แปลงไฟล์เป็น Base64 =====
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         window.getThaiDate = () => {
             const date = new Date();
             const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -646,7 +983,7 @@
                 <html>
                 <head>
                     <meta charset="UTF-8">
-                    <title>พิมพ์เอกสาร - กระดุมทองเกมส์ 2568</title>
+                    <title>พิมพ์เอกสาร - ${systemSettings.eventName} ${systemSettings.academicYear}</title>
                     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
                     <style>
                         @page { size: A4; margin: 20mm 25mm; }
@@ -717,6 +1054,8 @@
                 return;
             }
 
+            const eventTag = `#${systemSettings.eventName.replace(/\s+/g, '')}${systemSettings.academicYear}`;
+
             if (type === 'schedule') {
                 document.getElementById('previewTitle').innerHTML = '<i class="far fa-calendar-alt me-2"></i> ตัวอย่างกำหนดการ';
                 text = `📅 กำหนดการแข่งขันกีฬาภายใน\n📍 ประจำ${dateLabel}\n----------------------------\n`;
@@ -745,7 +1084,7 @@
                 }
             }
 
-            text += `----------------------------\n#กระดุมทองเกมส์2568`;
+            text += `----------------------------\n${eventTag}`;
             
             document.getElementById('copyPreviewText').value = text;
             new bootstrap.Modal(document.getElementById('copyPreviewModal')).show();
@@ -839,6 +1178,7 @@
             const chairman = document.getElementById('speechChairman').value || '..................................................................';
             const sportsInEvent = [...new Set(allMatchesArray.map(m => m.sport))];
             const sportListText = sportsInEvent.map(s => getSportName(s)).join(' ');
+            const yearShort = systemSettings.academicYear.slice(-2);
             
             let awardList = [];
             let awardNumber = 1;
@@ -866,14 +1206,14 @@
             const html = `
                 <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
                     <div style="text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 3px double #1a237e;">
-                        <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height: 2cm; margin-bottom: 8px;">
+                        <img src="${systemSettings.schoolLogo}" style="height: 2cm; margin-bottom: 8px;">
                         <h4 style="margin: 0; font-weight: bold; font-size: 16pt;">คำกล่าวรายงานต่อประธานในพิธีปิดกิจกรรมกีฬาภายใน</h4>
-                        <h4 style="margin: 3px 0 0; font-weight: bold; font-size: 14pt;">"กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖...</h4>
+                        <h4 style="margin: 3px 0 0; font-weight: bold; font-size: 14pt;">"${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort}</h4>
                     </div>
                     <div style="margin-bottom: 12px; font-size: 13pt;"><strong>กราบเรียน</strong> ${chairman}</div>
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">กระผม/ดิฉัน ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียนโรงเรียนกระดุมทองวิทยา ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... ซึ่งกำลังจะเสร็จสิ้นในวันนี้</div>
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ สีเหลือง และสีฟ้า ได้ดำเนินการแข่งขันกีฬาหลายประเภท ได้แก่ ${sportListText} การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียนโรงเรียนกระดุมทองวิทยาทุกคน</div>
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">บัดนี้ การแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖... ได้ถึงบทสรุปลงแล้ว กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">กระผม/ดิฉัน ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียน${systemSettings.schoolName} ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ซึ่งกำลังจะเสร็จสิ้นในวันนี้</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ สีเหลือง และสีฟ้า ได้ดำเนินการแข่งขันกีฬาหลายประเภท ได้แก่ ${sportListText} การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียน${systemSettings.schoolName}ทุกคน</div>
+                    <div class="speech-line speech-indent" style="font-size: 13pt;">บัดนี้ การแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ได้ถึงบทสรุปลงแล้ว กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้</div>
                     <div style="margin-top: 12px; margin-bottom: 12px; font-size: 13pt;">
                         <strong>รางวัลการแข่งขันแต่ละประเภท</strong>
                         <ol style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">${awardList.map(award => `<li>${award.title} ได้แก่ <strong>${award.winner}</strong></li>`).join('')}</ol>
@@ -883,7 +1223,7 @@
                             <li>ถ้วยรองชนะเลิศอันดับ ๑ ได้แก่ <strong>${w_runnerup}</strong></li>
                         </ol>
                     </div>
-                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">และลำดับต่อไป กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "กระดุมทองเกมส์" ประจำปีการศึกษา ๒๕๖...</div>
+                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">และลำดับต่อไป กระผม/ดิฉัน ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort}</div>
                     <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">ขอกราบเรียนเชิญครับ/ค่ะ</div>
                 </div>
             `;
@@ -917,6 +1257,7 @@
             document.getElementById('setupTitle').innerHTML = '<i class="fas fa-calendar-plus"></i> เพิ่มรายการแข่งขัน';
             document.getElementById('setupSubmitBtn').innerText = 'บันทึก';
             document.getElementById('matchDate').value = '2025-12-03';
+            updateSportDropdown();
             showPage('setup');
         }
 
@@ -924,6 +1265,7 @@
             const m = allMatchesArray.find(x => x.id === id);
             if(!m) return;
             editingMatchId = id;
+            updateSportDropdown();
             document.getElementById('sportType').value = m.sport;
             document.getElementById('category').value = m.category;
             document.getElementById('matchDate').value = m.date;
@@ -937,12 +1279,12 @@
         window.showManual = () => {
             Swal.fire({
                 title: 'คู่มือการใช้งาน',
-                html: `<ul class="text-start small"><li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่</li><li><b>แก้ไขรายการ:</b> กดปุ่มสีฟ้า > แก้ไขรายละเอียด</li><li><b>ลงทะเบียน:</b> แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา</li><li><b>ลงคะแนน:</b> กดปุ่มปลดล็อก > ใส่รหัส "KTW1234"</li><li><b>สรุปผล:</b> กดปุ่ม PDF เพื่อพิมพ์</li></ul>`,
+                html: `<ul class="text-start small"><li><b>เพิ่มรายการ:</b> สร้างรายการแข่งใหม่</li><li><b>แก้ไขรายการ:</b> กดปุ่มสีฟ้า > แก้ไขรายละเอียด</li><li><b>ลงทะเบียน:</b> แท็บ "รายชื่อ" กด + เพิ่มนักกีฬา</li><li><b>ลงคะแนน:</b> กดปุ่มปลดล็อก > ใส่รหัส (ดูในตั้งค่า)</li><li><b>ตั้งค่าระบบ:</b> ปรับชื่อโรงเรียน/กิจกรรม/กีฬา</li><li><b>สรุปผล:</b> กดปุ่ม PDF เพื่อพิมพ์</li></ul>`,
                 confirmButtonText: 'เข้าใจแล้ว'
             });
         };
 
-        window.getSportName = (k) => ({'football':'ฟุตบอล 7 คน','volleyball':'วอลเลย์บอล','beach_volleyball':'วอลเลย์บอลชายหาด','esports':'E-Sports ROV','petanque':'เปตอง','athletics':'กรีฑา','sepaktakraw':'เซปักตะกร้อ','folksport':'กีฬาพื้นบ้าน','cheer':'ประกวดกองเชียร์ฯ'}[k]||k);
+        window.getSportName = (k) => systemSettings.sports[k] || k;
 
         function loadMatches() {
             onValue(ref(db, 'matches'), (snap) => {
@@ -1059,7 +1401,7 @@
                 confirmButtonText: 'ลบรายการ',
                 cancelButtonText: 'ยกเลิก'
             });
-            if (pass === 'KTW1234') {
+            if (pass === systemSettings.password) {
                 remove(ref(db, 'matches/'+id)).then(() => { Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1000, showConfirmButton: false }); });
             } else if (pass) { Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' }); }
         };
@@ -1163,22 +1505,75 @@
             set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key]).then(() => { renderPlayers(matchDataLocal[key], team); });
         };
 
-        window.printPlayerList = () => {
+        // ===== ฟังก์ชันพิมพ์รายชื่อนักกีฬา (แก้ไขใหม่ - ใช้ Modal Preview) =====
+        window.previewPlayerList = () => {
             const listY = matchDataLocal.playersY || [];
             const listB = matchDataLocal.playersB || [];
             const max = Math.max(listY.length, listB.length, 12);
             let tableRows = '';
             for(let i = 0; i < max; i++) {
-                tableRows += `<tr><td style="width:5%; text-align:center; font-weight:600; background:#fffde7;">${i+1}</td><td style="width:42.5%; padding-left:10px; background:#fffde7; height:28px;">${listY[i] || ''}</td><td style="width:5%; text-align:center; font-weight:600; background:#e3f2fd;">${i+1}</td><td style="width:42.5%; padding-left:10px; background:#e3f2fd; height:28px;">${listB[i] || ''}</td></tr>`;
+                tableRows += `<tr>
+                    <td style="width:5%; text-align:center; font-weight:600; background:#fffde7; border:1px solid #333;">${i+1}</td>
+                    <td style="width:42.5%; padding-left:10px; background:#fffde7; height:28px; border:1px solid #333;">${listY[i] || ''}</td>
+                    <td style="width:5%; text-align:center; font-weight:600; background:#e3f2fd; border:1px solid #333;">${i+1}</td>
+                    <td style="width:42.5%; padding-left:10px; background:#e3f2fd; height:28px; border:1px solid #333;">${listB[i] || ''}</td>
+                </tr>`;
             }
+            
             const html = `
-                <div style="text-align:center; margin-bottom:15px; padding-bottom:15px; border-bottom:3px double #1a237e;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:65px; margin-bottom:8px;"><h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2><h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"กระดุมทองเกมส์ 2568"</h3></div>
-                <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;"><table style="width:100%; font-size:11pt;"><tr><td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${matchDataLocal.date || '-'}</td></tr><tr><td><strong>รุ่น:</strong> ${matchDataLocal.category}</td><td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td></tr></table></div>
-                <table style="width:100%; border-collapse:collapse; font-size:10pt;"><thead><tr><th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีเหลือง</th><th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีฟ้า</th></tr><tr style="background:#eee;"><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th><th style="border:1px solid #333; padding:5px; width:5%;">ที่</th><th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th></tr></thead><tbody>${tableRows}</tbody></table>
-                <div style="margin-top:30px;"><table style="width:100%;"><tr><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีเหลือง</p></td><td style="width:50%; text-align:center; padding-top:25px;"><div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div><p style="margin:0; font-size:9pt;">(................................................)</p><p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีฟ้า</p></td></tr></table></div><div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
+                <div style="text-align:center; margin-bottom:15px; padding-bottom:15px; border-bottom:3px double #1a237e;">
+                    <img src="${systemSettings.schoolLogo}" style="height:65px; margin-bottom:8px;">
+                    <h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2>
+                    <h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"${systemSettings.eventName} ${systemSettings.academicYear}"</h3>
+                </div>
+                <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;">
+                    <table style="width:100%; font-size:11pt;">
+                        <tr>
+                            <td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td>
+                            <td style="text-align:right;"><strong>วันที่:</strong> ${formatDateThai(matchDataLocal.date) || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>รุ่น:</strong> ${matchDataLocal.category}</td>
+                            <td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td>
+                        </tr>
+                    </table>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size:10pt;">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีเหลือง</th>
+                            <th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีมสีฟ้า</th>
+                        </tr>
+                        <tr style="background:#eee;">
+                            <th style="border:1px solid #333; padding:5px; width:5%;">ที่</th>
+                            <th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th>
+                            <th style="border:1px solid #333; padding:5px; width:5%;">ที่</th>
+                            <th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <div style="margin-top:30px;">
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="width:50%; text-align:center; padding-top:25px;">
+                                <div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div>
+                                <p style="margin:0; font-size:9pt;">(................................................)</p>
+                                <p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีเหลือง</p>
+                            </td>
+                            <td style="width:50%; text-align:center; padding-top:25px;">
+                                <div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div>
+                                <p style="margin:0; font-size:9pt;">(................................................)</p>
+                                <p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีมสีฟ้า</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>
             `;
+            
             document.getElementById('playerListContent').innerHTML = html;
-            html2pdf().set({ margin: [5,5,5,5], filename: `PlayerList_${getSportName(matchDataLocal.sport)}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4' } }).from(document.getElementById('playerListContent')).save();
+            new bootstrap.Modal(document.getElementById('playerListModal')).show();
         };
 
         window.saveMatchInfo = () => {
@@ -1223,8 +1618,8 @@
         }
 
         window.unlockScore = async () => {
-            const { value: pass } = await Swal.fire({ title: 'ใส่รหัสผ่านกรรมการ', input: 'password', inputPlaceholder: 'KTW...', showCancelButton: true, confirmButtonText: 'ปลดล็อก' });
-            if (pass === 'KTW1234') { isMatchUnlocked = true; renderScoreControls(matchDataLocal); Swal.fire({ icon: 'success', title: 'ปลดล็อกเรียบร้อย', timer: 1000, showConfirmButton: false }); } else if (pass) { Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' }); }
+            const { value: pass } = await Swal.fire({ title: 'ใส่รหัสผ่านกรรมการ', input: 'password', inputPlaceholder: 'รหัสผ่าน...', showCancelButton: true, confirmButtonText: 'ปลดล็อก' });
+            if (pass === systemSettings.password) { isMatchUnlocked = true; renderScoreControls(matchDataLocal); Swal.fire({ icon: 'success', title: 'ปลดล็อกเรียบร้อย', timer: 1000, showConfirmButton: false }); } else if (pass) { Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' }); }
         };
 
         window.setSimpleWinner = (team) => {
@@ -1282,7 +1677,7 @@
             onValue(ref(db, 'matches/'+id), (snap) => {
                 const m = snap.val();
                 if(!m) { Swal.fire('Error', 'ไม่พบข้อมูล', 'error'); return; }
-                let html = `<div style="text-align:center; margin-bottom:15px; padding-bottom:10px; border-bottom:3px double #1a237e;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:70px;"><h2 style="margin:8px 0 0; font-family:'Kanit',sans-serif; color:#1a237e; font-size:18pt;">รายงานผลการแข่งขัน</h2><h3 style="margin:3px 0; font-family:'Kanit',sans-serif; color:#ff9800; font-size:14pt;">"กระดุมทองเกมส์ 2568"</h3></div><div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:15px;"><table style="width:100%; font-size:11pt;"><tr><td><strong>กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${m.date}</td></tr><tr><td><strong>รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>สนาม:</strong> ${m.location || '-'}</td></tr></table></div><div style="text-align:center; padding:25px 0; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:12px; margin-bottom:15px;"><table style="width:100%; color:#fff;"><tr><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td><td style="width:20%; text-align:center;"><span style="font-size:20pt; opacity:0.7;">VS</span></td><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td></tr></table></div><div style="background:${m.winner==='yellow'?'#fff8e1':(m.winner==='blue'?'#e3f2fd':'#f5f5f5')}; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; border:3px solid ${m.winner==='yellow'?'#ffc107':(m.winner==='blue'?'#2196f3':'#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ผู้ชนะ: <strong>${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</strong></h3></div>${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px;">${m.note}</div></div>` : ''}<div style="margin-top:40px;"><table style="width:100%;"><tr>${(m.referees||['']).map((r,i) => r ? `<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${r})<br>กรรมการ ${i+1}</small></td>` : '').join('')}<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></td></tr></table></div><div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>`;
+                let html = `<div style="text-align:center; margin-bottom:15px; padding-bottom:10px; border-bottom:3px double #1a237e;"><img src="${systemSettings.schoolLogo}" style="height:70px;"><h2 style="margin:8px 0 0; font-family:'Kanit',sans-serif; color:#1a237e; font-size:18pt;">รายงานผลการแข่งขัน</h2><h3 style="margin:3px 0; font-family:'Kanit',sans-serif; color:#ff9800; font-size:14pt;">"${systemSettings.eventName} ${systemSettings.academicYear}"</h3></div><div style="background:#f5f5f5; padding:12px; border-radius:8px; margin-bottom:15px;"><table style="width:100%; font-size:11pt;"><tr><td><strong>กีฬา:</strong> ${getSportName(m.sport)}</td><td style="text-align:right;"><strong>วันที่:</strong> ${m.date}</td></tr><tr><td><strong>รุ่น:</strong> ${m.category}</td><td style="text-align:right;"><strong>สนาม:</strong> ${m.location || '-'}</td></tr></table></div><div style="text-align:center; padding:25px 0; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:12px; margin-bottom:15px;"><table style="width:100%; color:#fff;"><tr><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#ffd700; font-size:16pt;">สีเหลือง</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreY || 0}</div></td><td style="width:20%; text-align:center;"><span style="font-size:20pt; opacity:0.7;">VS</span></td><td style="width:40%; text-align:center;"><h3 style="margin:0; color:#81d4fa; font-size:16pt;">สีฟ้า</h3><div style="font-size:50pt; font-weight:bold;">${m.scoreB || 0}</div></td></tr></table></div><div style="background:${m.winner==='yellow'?'#fff8e1':(m.winner==='blue'?'#e3f2fd':'#f5f5f5')}; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; border:3px solid ${m.winner==='yellow'?'#ffc107':(m.winner==='blue'?'#2196f3':'#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ผู้ชนะ: <strong>${m.winner==='yellow'?'ทีมสีเหลือง':(m.winner==='blue'?'ทีมสีฟ้า':'เสมอ')}</strong></h3></div>${m.note ? `<div style="margin-bottom:15px;"><strong>หมายเหตุ:</strong><div style="padding:8px; border:1px solid #ddd; border-radius:4px; margin-top:5px;">${m.note}</div></div>` : ''}<div style="margin-top:40px;"><table style="width:100%;"><tr>${(m.referees||['']).map((r,i) => r ? `<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${r})<br>กรรมการ ${i+1}</small></td>` : '').join('')}<td style="text-align:center;"><div style="border-bottom:1px dotted #000; width:100px; margin:0 auto 5px;"></div><small style="font-size:9pt;">(${m.athleteSign||'................'})<br>${m.sport==='cheer'?'ประธานสี':'ตัวแทนนักกีฬา'}</small></td></tr></table></div><div style="text-align:center; font-size:8pt; margin-top:20px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div>`;
                 document.getElementById('reportContent').innerHTML = html;
                 new bootstrap.Modal(document.getElementById('reportModal')).show();
             }, { onlyOnce: true });
@@ -1298,7 +1693,7 @@
                 let winnerTxt = m.status === 'done' ? (m.winner==='yellow'?'🟡':(m.winner==='blue'?'🔵':'➖')) : '-';
                 return `<tr style="background:${rowBg};"><td style="border:1px solid #333; padding:4px; text-align:center;">${idx+1}</td><td style="border:1px solid #333; padding:4px; text-align:left; font-size:9pt;">${getSportName(m.sport)}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.category || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-size:9pt;">${m.date || '-'}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreY || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center; font-weight:bold;">${m.scoreB || 0}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${winnerTxt}</td><td style="border:1px solid #333; padding:4px; text-align:center;">${statusTxt}</td></tr>`;
             }).join('');
-            const html = `<div style="text-align:center; margin-bottom:12px; padding:12px; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:10px; color:#fff;"><img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" style="height:50px; margin-bottom:5px;"><h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ตารางสรุปผลการแข่งขัน</h2><h3 style="margin:2px 0 0; font-family:'Kanit',sans-serif; font-size:12pt; font-weight:400;">"กระดุมทองเกมส์ 2568"</h3></div><div style="display:flex; gap:8px; margin-bottom:12px;"><div style="flex:1; background:linear-gradient(135deg,#fff8e1,#ffe082); padding:10px; border-radius:8px; text-align:center; border:2px solid #ffc107;"><div style="font-size:24pt; font-weight:bold; color:#f57c00;">${wY}</div><div style="font-size:9pt; font-weight:600;">🥇 เหลืองชนะ</div></div><div style="flex:1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:10px; border-radius:8px; text-align:center; border:2px solid #2196f3;"><div style="font-size:24pt; font-weight:bold; color:#1565c0;">${wB}</div><div style="font-size:9pt; font-weight:600;">🥇 ฟ้าชนะ</div></div><div style="flex:1; background:#f5f5f5; padding:10px; border-radius:8px; text-align:center; border:2px solid #9e9e9e;"><div style="font-size:24pt; font-weight:bold; color:#616161;">${draw}</div><div style="font-size:9pt; font-weight:600;">🤝 เสมอ</div></div><div style="flex:1; background:#fff3e0; padding:10px; border-radius:8px; text-align:center; border:2px solid #ff9800;"><div style="font-size:24pt; font-weight:bold; color:#e65100;">${pending}</div><div style="font-size:9pt; font-weight:600;">⏳ รอแข่ง</div></div></div><table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px;"><thead><tr><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:4%;">#</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:20%; text-align:left;">กีฬา</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">รุ่น</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">วันที่</th><th style="background:#ffc107; color:#000; border:1px solid #333; padding:5px; width:8%;">🟡</th><th style="background:#2196f3; color:#fff; border:1px solid #333; padding:5px; width:8%;">🔵</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:10%;">ชนะ</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:6%;">สถานะ</th></tr></thead><tbody>${tableRows}</tbody></table><div style="page-break-inside: avoid;"><div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3><p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p></div><div style="text-align:center; font-size:8pt; margin-top:15px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div><div style="text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div></div>`;
+            const html = `<div style="text-align:center; margin-bottom:12px; padding:12px; background:linear-gradient(135deg,#1a237e,#3949ab); border-radius:10px; color:#fff;"><img src="${systemSettings.schoolLogo}" style="height:50px; margin-bottom:5px;"><h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:16pt;">🏆 ตารางสรุปผลการแข่งขัน</h2><h3 style="margin:2px 0 0; font-family:'Kanit',sans-serif; font-size:12pt; font-weight:400;">"${systemSettings.eventName} ${systemSettings.academicYear}"</h3></div><div style="display:flex; gap:8px; margin-bottom:12px;"><div style="flex:1; background:linear-gradient(135deg,#fff8e1,#ffe082); padding:10px; border-radius:8px; text-align:center; border:2px solid #ffc107;"><div style="font-size:24pt; font-weight:bold; color:#f57c00;">${wY}</div><div style="font-size:9pt; font-weight:600;">🥇 เหลืองชนะ</div></div><div style="flex:1; background:linear-gradient(135deg,#e3f2fd,#90caf9); padding:10px; border-radius:8px; text-align:center; border:2px solid #2196f3;"><div style="font-size:24pt; font-weight:bold; color:#1565c0;">${wB}</div><div style="font-size:9pt; font-weight:600;">🥇 ฟ้าชนะ</div></div><div style="flex:1; background:#f5f5f5; padding:10px; border-radius:8px; text-align:center; border:2px solid #9e9e9e;"><div style="font-size:24pt; font-weight:bold; color:#616161;">${draw}</div><div style="font-size:9pt; font-weight:600;">🤝 เสมอ</div></div><div style="flex:1; background:#fff3e0; padding:10px; border-radius:8px; text-align:center; border:2px solid #ff9800;"><div style="font-size:24pt; font-weight:bold; color:#e65100;">${pending}</div><div style="font-size:9pt; font-weight:600;">⏳ รอแข่ง</div></div></div><table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px;"><thead><tr><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:4%;">#</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:20%; text-align:left;">กีฬา</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">รุ่น</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:14%;">วันที่</th><th style="background:#ffc107; color:#000; border:1px solid #333; padding:5px; width:8%;">🟡</th><th style="background:#2196f3; color:#fff; border:1px solid #333; padding:5px; width:8%;">🔵</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:10%;">ชนะ</th><th style="background:#1a237e; color:#fff; border:1px solid #333; padding:5px; width:6%;">สถานะ</th></tr></thead><tbody>${tableRows}</tbody></table><div style="page-break-inside: avoid;"><div style="margin-top:15px; padding:10px; background:${wY > wB ? '#fff8e1' : (wB > wY ? '#e3f2fd' : '#f5f5f5')}; border-radius:8px; text-align:center; border:3px solid ${wY > wB ? '#ffc107' : (wB > wY ? '#2196f3' : '#999')};"><h3 style="margin:0; font-family:'Kanit',sans-serif; font-size:13pt;">🎊 ${wY > wB ? '🟡 สีเหลืองนำ!' : (wB > wY ? '🔵 สีฟ้านำ!' : '🤝 เสมอกัน!')}</h3><p style="margin:3px 0 0; font-size:10pt;">เหลือง ${wY} | ฟ้า ${wB} | เสมอ ${draw} | รอแข่ง ${pending}</p></div><div style="text-align:center; font-size:8pt; margin-top:15px; color:#666;">พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง</div><div style="text-align:center; font-size:7pt; color:#999;">พิมพ์เมื่อ: ${new Date().toLocaleString('th-TH')}</div></div>`;
             document.getElementById('summaryContent').innerHTML = html;
             new bootstrap.Modal(document.getElementById('summaryModal')).show();
         };
@@ -1306,17 +1701,20 @@
         window.copyMatchText = (id, type) => {
             const m = allMatchesArray.find(x => x.id === id);
             if(!m) return;
+            const eventTag = `#${systemSettings.eventName.replace(/\s+/g, '')}${systemSettings.academicYear}`;
             let text = "";
-            if(type === 'schedule') { text = `📅 กำหนดการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n⏰ เวลา: ${m.time} น. (วันที่ ${m.date})\n📍 สนาม: ${m.location || '-'}\n\n#กระดุมทองเกมส์2568`; } 
-            else { let wTxt = m.status !== 'done' ? 'ยังไม่แข่ง' : (m.winner==='yellow'?'สีเหลืองชนะ':(m.winner==='blue'?'สีฟ้าชนะ':'เสมอ')); text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#\n------------------\n#กระดุมทองเกมส์2568`; }
+            if(type === 'schedule') { text = `📅 กำหนดการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n⏰ เวลา: ${m.time} น. (วันที่ ${m.date})\n📍 สนาม: ${m.location || '-'}\n\n${eventTag}`; } 
+            else { let wTxt = m.status !== 'done' ? 'ยังไม่แข่ง' : (m.winner==='yellow'?'สีเหลืองชนะ':(m.winner==='blue'?'สีฟ้าชนะ':'เสมอ')); text = `📢 ผลการแข่งขัน\n🏆 กีฬา: ${getSportName(m.sport)} (${m.category})\n------------------\n🟡 สีเหลือง ${m.scoreY || 0} - ${m.scoreB || 0} สีฟ้า 🔵\nผล: ${wTxt}\nดูผลทั้งหมดคลิก : https://nonthaphathr.github.io/keelasee2568/#\n------------------\n${eventTag}`; }
             navigator.clipboard.writeText(text).then(() => { Swal.fire({ icon: 'success', title: 'คัดลอกข้อความแล้ว', timer: 1000, showConfirmButton: false }); });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(forceHideLoader, 5000);
+            loadSettings();
             loadMatches();
         });
         
+        loadSettings();
         loadMatches();
     </script>
 </body>
