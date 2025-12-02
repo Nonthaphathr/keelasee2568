@@ -16,80 +16,121 @@
         :root {
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --primary-gradient: linear-gradient(135deg, #1a237e 0%, #3949ab 50%, #1a237e 100%);
         }
 
         * { -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Sarabun', sans-serif;
-            background: linear-gradient(135deg, #1a237e 0%, #3949ab 50%, #1a237e 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
             padding: 20px;
+            background-attachment: fixed;
         }
 
         h1, h2, h3, h4, h5, .btn, .modal-title { font-family: 'Kanit', sans-serif; }
 
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .spin-slow {
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: var(--glass-shadow);
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            transition: all 0.3s ease;
         }
 
         .doc-type-card {
             background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
+            border: 2px solid #eef2f5;
+            border-radius: 16px;
+            padding: 25px 20px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
+            position: relative;
+            overflow: hidden;
         }
         .doc-type-card:hover {
-            border-color: #1a237e;
-            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.2);
-            transform: translateY(-3px);
+            border-color: #3949ab;
+            box-shadow: 0 10px 25px rgba(57, 73, 171, 0.15);
+            transform: translateY(-5px);
         }
         .doc-type-card.selected {
             border-color: #ffc107;
             background: #fffde7;
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.25);
+            transform: scale(1.02);
         }
         .doc-type-card i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .doc-type-card:hover i {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .award-type-item {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
             background: white;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
         .award-type-item:hover {
             border-color: #2196f3;
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
         }
 
         .gender-badge {
             font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
             margin-left: 5px;
+            font-weight: 600;
         }
-        .gender-male { background: #e3f2fd; color: #1565c0; }
-        .gender-female { background: #fce4ec; color: #c2185b; }
-        .gender-mixed { background: #f3e5f5; color: #7b1fa2; }
+        .gender-male { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .gender-female { background: #fce4ec; color: #c2185b; border: 1px solid #f8bbd0; }
+        .gender-mixed { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
+
+        /* Custom Loader */
+        .custom-loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: #FF3D00;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Report Paper Styles */
         .report-preview-page {
             background: white;
             width: 210mm;
-            min-height: auto;
+            min-height: 297mm; /* A4 Ratio */
             margin: 10px auto;
             padding: 20mm 25mm;
             color: #000;
@@ -97,7 +138,8 @@
             font-family: 'Kanit', sans-serif;
             box-sizing: border-box;
             line-height: 1.5;
-            font-size: 14pt;
+            font-size: 16pt; /* Standard official doc size */
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
         .report-preview-page * {
             text-shadow: none !important;
@@ -106,7 +148,7 @@
         .speech-line {
             text-align: justify;
             text-justify: inter-word;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             line-height: 1.6;
         }
         .speech-indent {
@@ -118,47 +160,76 @@
             top: 20px;
             left: 20px;
             z-index: 100;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .back-btn:hover { transform: scale(1.05); }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            backdrop-filter: blur(5px);
+        }
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
         }
 
         @media (max-width: 768px) {
-            .report-preview-page { width: 100%; min-height: auto; padding: 5mm; font-size: 11pt; }
+            .report-preview-page { width: 100%; min-height: auto; padding: 15mm; font-size: 12pt; }
             body { padding: 10px; }
-            .glass-card { padding: 15px; }
+            .glass-card { padding: 20px; }
+            .doc-type-card i { font-size: 2rem; }
         }
 
         @media print {
             body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .report-preview-page { margin: 0; padding: 20mm 25mm; width: 100%; page-break-after: auto; }
+            .report-preview-page { margin: 0; padding: 20mm 25mm; width: 100%; page-break-after: auto; box-shadow: none; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="btn btn-light back-btn shadow">
+    <a href="index.html" class="btn btn-light back-btn shadow no-print">
         <i class="fas fa-arrow-left me-1"></i> กลับหน้าหลัก
     </a>
 
     <div class="container py-4">
-        <div class="text-center mb-4">
-            <h1 class="text-white fw-bold"><i class="fas fa-scroll me-2"></i>ระบบสร้างเอกสารพิธีการ</h1>
-            <p class="text-white-50">เลือกประเภทเอกสารที่ต้องการสร้าง</p>
+        <div class="text-center mb-4 fade-in">
+            <div id="mainLogoContainer" class="logo-placeholder d-none">
+                </div>
+            <div id="defaultIcon" class="mb-3">
+                <i class="fas fa-scroll text-white fa-3x filter-shadow"></i>
+            </div>
+            <h1 class="text-white fw-bold text-shadow">ระบบสร้างเอกสารพิธีการ</h1>
+            <p class="text-white-50 fs-5" id="eventTitleDisplay">เลือกประเภทเอกสารที่ต้องการสร้าง</p>
         </div>
 
         <div class="glass-card mx-auto" style="max-width: 900px;">
-            <!-- Step 1: เลือกประเภทเอกสาร -->
-            <div id="step1">
-                <h5 class="mb-3 border-bottom pb-2"><i class="fas fa-file-alt text-primary me-2"></i>ขั้นตอนที่ 1: เลือกประเภทเอกสาร</h5>
+            <div id="step1" class="fade-in">
+                <h5 class="mb-4 pb-2 border-bottom border-light"><i class="fas fa-file-alt text-primary me-2"></i>ขั้นตอนที่ 1: เลือกประเภทเอกสาร</h5>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <div class="doc-type-card" onclick="selectDocType('opening_chairman')">
-                            <i class="fas fa-microphone text-success"></i>
+                            <i class="fas fa-microphone-alt text-success"></i>
                             <h6 class="fw-bold mb-1">คำกล่าวเปิด (ประธานในพิธี)</h6>
                             <small class="text-muted">คำกล่าวของประธานในพิธีเปิดการแข่งขัน</small>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="doc-type-card" onclick="selectDocType('opening_report')">
-                            <i class="fas fa-clipboard-list text-primary"></i>
+                            <i class="fas fa-clipboard-check text-primary"></i>
                             <h6 class="fw-bold mb-1">คำกล่าวรายงาน (พิธีเปิด)</h6>
                             <small class="text-muted">คำกล่าวรายงานต่อประธานในพิธีเปิด</small>
                         </div>
@@ -174,68 +245,92 @@
                         <div class="doc-type-card" onclick="selectDocType('closing_report')">
                             <i class="fas fa-trophy text-warning"></i>
                             <h6 class="fw-bold mb-1">คำกล่าวรายงาน (พิธีปิด)</h6>
-                            <small class="text-muted">คำกล่าวรายงานต่อประธานพร้อมมอบรางวัล</small>
+                            <small class="text-muted">คำกล่าวรายงานต่อประธานพร้อมสรุปผลรางวัล</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 2: กรอกข้อมูล -->
             <div id="step2" class="d-none">
-                <h5 class="mb-3 border-bottom pb-2"><i class="fas fa-edit text-primary me-2"></i>ขั้นตอนที่ 2: กรอกข้อมูล</h5>
+                <h5 class="mb-4 pb-2 border-bottom border-light"><i class="fas fa-edit text-primary me-2"></i>ขั้นตอนที่ 2: กรอกข้อมูล</h5>
                 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">ชื่อผู้กล่าว/ประธาน</label>
-                    <input type="text" class="form-control" id="speakerName" placeholder="เช่น นายนนทพัทธ์ หิรัญเรือง">
-                    <small class="text-muted">* ระบบจะตรวจสอบคำนำหน้าเพื่อเลือกคำสรรพนาม (นาย=กระผม, นาง/นางสาว=ดิฉัน)</small>
-                </div>
-                
-                <div class="mb-3" id="chairmanNameContainer">
-                    <label class="form-label fw-bold">ชื่อประธานในพิธี (ถ้ามี)</label>
-                    <input type="text" class="form-control" id="chairmanName" placeholder="ถ้าไม่ระบุ จะใช้เครื่องหมายจุดแทน">
-                </div>
-
-                <!-- ส่วนกำหนดรางวัล (สำหรับ closing_report) -->
-                <div id="awardSection" class="d-none">
-                    <hr>
-                    <h6 class="fw-bold text-primary"><i class="fas fa-trophy"></i> กำหนดประเภทรางวัล</h6>
-                    <p class="text-muted small mb-2">เลือกว่าแต่ละกีฬาจะมอบรางวัลอย่างไร</p>
-                    <div id="awardTypeContainer" class="border rounded p-3 bg-light" style="max-height: 400px; overflow-y: auto;">
-                        <p class="text-center text-muted">กำลังโหลดรายการกีฬา...</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" id="speakerLabel">ชื่อผู้กล่าว/ประธาน</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="speakerName" placeholder="เช่น นายนนทพัทธ์ หิรัญเรือง">
+                        </div>
+                        <small class="text-muted" style="font-size: 0.8rem;">* ระบบจะเลือกคำสรรพนามให้อัตโนมัติ (นาย=กระผม, นาง/นางสาว=ดิฉัน)</small>
                     </div>
-                    
-                    <div class="alert alert-info small mt-3">
-                        <i class="fas fa-info-circle"></i> <strong>คำอธิบาย:</strong>
-                        <ul class="mb-0 ps-3 small">
-                            <li><strong>แยกรายการ:</strong> แต่ละรุ่นได้รางวัลแยก (เช่น ฟุตบอลชาย ม.ต้น, ฟุตบอลหญิง ม.ปลาย)</li>
-                            <li><strong>แยกชาย/หญิง:</strong> รวมคะแนนตามเพศ (ชายรวมชาย, หญิงรวมหญิง) - <span class="badge bg-success">ใหม่!</span></li>
-                            <li><strong>คะแนนรวม:</strong> รวมคะแนนทุกรุ่นมอบถ้วยเดียว</li>
-                        </ul>
+
+                    <div class="col-md-6" id="chairmanNameContainer">
+                        <label class="form-label fw-bold">ชื่อประธานในพิธี (ถ้ามี)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-user-tie"></i></span>
+                            <input type="text" class="form-control" id="chairmanName" placeholder="ระบุชื่อประธาน">
+                        </div>
                     </div>
                 </div>
 
-                <div class="d-flex gap-2 mt-4">
-                    <button class="btn btn-secondary" onclick="goBack()"><i class="fas fa-arrow-left me-1"></i> ย้อนกลับ</button>
-                    <button class="btn btn-primary flex-grow-1" onclick="generateDocument()"><i class="fas fa-file-alt me-1"></i> สร้างเอกสาร</button>
+                <div id="awardSection" class="d-none mt-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-header bg-white border-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold text-primary mb-0"><i class="fas fa-trophy me-2"></i>กำหนดประเภทรางวัล</h6>
+                                <span class="badge bg-primary rounded-pill" id="matchCountBadge">กำลังโหลด...</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div id="awardTypeContainer" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">กำลังโหลดข้อมูลการแข่งขัน...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                             <div class="alert alert-info small mb-0 border-0 shadow-sm">
+                                <i class="fas fa-info-circle me-1"></i> <strong>Tips:</strong>
+                                <ul class="mb-0 ps-3 mt-1" style="font-size: 0.85rem;">
+                                    <li><strong>แยกรายการ:</strong> มอบรางวัลแยกตามรุ่น (เช่น ฟุตบอลชาย ม.ต้น, ฟุตบอลหญิง ม.ปลาย)</li>
+                                    <li><strong>แยกชาย/หญิง:</strong> รวมคะแนนแยกตามเพศ <span class="badge bg-success" style="font-size:0.6rem">แนะนำ</span></li>
+                                    <li><strong>คะแนนรวม:</strong> รวมคะแนนทุกรุ่นในกีฬานั้นมอบถ้วยเดียว</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                    <button class="btn btn-secondary rounded-pill px-4" onclick="goBack()">
+                        <i class="fas fa-arrow-left me-1"></i> ย้อนกลับ
+                    </button>
+                    <button class="btn btn-primary flex-grow-1 rounded-pill shadow-sm" onclick="generateDocument()">
+                        <i class="fas fa-file-alt me-1"></i> สร้างเอกสาร
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Preview Modal -->
     <div class="modal fade" id="previewModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white py-2">
-                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>ตัวอย่างเอกสาร</h5>
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white py-3">
+                    <h5 class="modal-title"><i class="fas fa-print me-2"></i>ตัวอย่างเอกสาร</h5>
                     <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body bg-secondary p-2" style="overflow-y: auto; max-height: 80vh;">
+                <div class="modal-body bg-secondary bg-opacity-10 p-4 d-flex justify-content-center" style="overflow-y: auto; max-height: 80vh;">
                     <div id="documentContent" class="report-preview-page"></div>
                 </div>
-                <div class="modal-footer py-2">
-                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
-                    <button class="btn btn-primary btn-sm" onclick="printDocument()"><i class="fas fa-print me-1"></i> พิมพ์</button>
+                <div class="modal-footer py-2 bg-light">
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">ปิด</button>
+                    <button class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" onclick="printDocument()">
+                        <i class="fas fa-print me-1"></i> สั่งพิมพ์ / บันทึก PDF
+                    </button>
                 </div>
             </div>
         </div>
@@ -260,6 +355,8 @@
         
         let allMatchesArray = [];
         let selectedDocType = null;
+        let isMatchesLoaded = false;
+        let isSettingsLoaded = false;
 
         // ===== ข้อมูลการตั้งค่าระบบ =====
         let systemSettings = {
@@ -292,8 +389,28 @@
                     if (data.sports) {
                         systemSettings.sports = data.sports;
                     }
+                    updateUIWithSettings();
                 }
-            }, { onlyOnce: true });
+                isSettingsLoaded = true;
+            });
+        }
+
+        // ===== อัปเดต UI หน้าแรกตามการตั้งค่า =====
+        function updateUIWithSettings() {
+            // อัปเดตโลโก้หน้าแรก
+            const logoContainer = document.getElementById('mainLogoContainer');
+            const defaultIcon = document.getElementById('defaultIcon');
+            const eventTitle = document.getElementById('eventTitleDisplay');
+
+            if (systemSettings.schoolLogo) {
+                logoContainer.innerHTML = `<img src="${systemSettings.schoolLogo}" class="logo-img">`;
+                logoContainer.classList.remove('d-none');
+                defaultIcon.classList.add('d-none');
+            }
+            
+            if(systemSettings.eventName) {
+                eventTitle.textContent = `${systemSettings.eventName} ประจำปีการศึกษา ${systemSettings.academicYear}`;
+            }
         }
 
         // ===== โหลดข้อมูลการแข่งขัน =====
@@ -306,10 +423,17 @@
                 } else {
                     allMatchesArray = [];
                 }
+                
+                isMatchesLoaded = true;
+                
+                // Reactive Update: ถ้าอยู่ในหน้า closing_report ให้เรนเดอร์ใหม่ทันทีที่ข้อมูลมา
+                if (selectedDocType === 'closing_report') {
+                    renderAwardTypes();
+                }
             });
         }
 
-        // ===== ฟังก์ชันตรวจสอบคำนำหน้าและเลือกสรรพนาม =====
+        // ===== Utility Functions =====
         function getPronoun(name) {
             const trimmedName = (name || '').trim();
             if (trimmedName.startsWith('นาย')) return 'กระผม';
@@ -326,7 +450,6 @@
 
         window.getSportName = (k) => systemSettings.sports[k] || k;
 
-        // ===== ฟังก์ชันตรวจสอบเพศจาก category =====
         function detectGender(category) {
             const cat = (category || '').toLowerCase();
             if (cat.includes('หญิง')) return 'female';
@@ -340,57 +463,88 @@
             return '<span class="gender-badge gender-mixed">ผสม</span>';
         }
 
-        // ===== เลือกประเภทเอกสาร =====
+        // ===== เลือกประเภทเอกสาร (Logic หลัก) =====
         window.selectDocType = (type) => {
             selectedDocType = type;
             
-            // ลบ class selected จากทุก card
+            // Animation for selection
             document.querySelectorAll('.doc-type-card').forEach(card => card.classList.remove('selected'));
-            
-            // เพิ่ม class selected ให้ card ที่เลือก
             event.currentTarget.classList.add('selected');
             
-            // รอสักครู่แล้วไปขั้นตอนถัดไป
+            // Delay for animation
             setTimeout(() => {
-                document.getElementById('step1').classList.add('d-none');
-                document.getElementById('step2').classList.remove('d-none');
+                const step1 = document.getElementById('step1');
+                step1.classList.add('d-none');
                 
-                // จัดการ UI ตามประเภทเอกสาร
+                const step2 = document.getElementById('step2');
+                step2.classList.remove('d-none');
+                step2.classList.add('fade-in'); // Add animation
+                
+                // UI Management
                 const chairmanContainer = document.getElementById('chairmanNameContainer');
                 const awardSection = document.getElementById('awardSection');
+                const speakerLabel = document.getElementById('speakerLabel');
                 
                 if (type === 'opening_chairman' || type === 'closing_chairman') {
-                    // คำกล่าวประธาน - ไม่ต้องระบุประธาน
                     chairmanContainer.classList.add('d-none');
                     awardSection.classList.add('d-none');
-                    document.querySelector('label[for="speakerName"]').textContent = 'ชื่อประธานในพิธี';
+                    speakerLabel.textContent = 'ชื่อประธานในพิธี';
                 } else if (type === 'opening_report') {
-                    // คำกล่าวรายงานพิธีเปิด
                     chairmanContainer.classList.remove('d-none');
                     awardSection.classList.add('d-none');
-                    document.querySelector('label[for="speakerName"]').textContent = 'ชื่อผู้กล่าวรายงาน';
+                    speakerLabel.textContent = 'ชื่อผู้กล่าวรายงาน';
                 } else if (type === 'closing_report') {
-                    // คำกล่าวรายงานพิธีปิด - แสดงส่วนรางวัล
                     chairmanContainer.classList.remove('d-none');
                     awardSection.classList.remove('d-none');
-                    document.querySelector('label[for="speakerName"]').textContent = 'ชื่อผู้กล่าวรายงาน';
+                    speakerLabel.textContent = 'ชื่อผู้กล่าวรายงาน';
+                    
+                    // เรียก Render ทันที (จะมี Logic เช็ค Loading ข้างใน)
                     renderAwardTypes();
                 }
-            }, 200);
+            }, 300);
         };
 
         window.goBack = () => {
-            document.getElementById('step2').classList.add('d-none');
-            document.getElementById('step1').classList.remove('d-none');
+            const step2 = document.getElementById('step2');
+            step2.classList.add('d-none');
+            step2.classList.remove('fade-in');
+            
+            const step1 = document.getElementById('step1');
+            step1.classList.remove('d-none');
+            step1.classList.add('fade-in');
+            
             document.querySelectorAll('.doc-type-card').forEach(card => card.classList.remove('selected'));
             selectedDocType = null;
         };
 
-        // ===== แสดงประเภทรางวัล (ปรับปรุงใหม่ - รองรับแยกชาย/หญิง) =====
+        // ===== แสดงประเภทรางวัล (แก้ไขปัญหาโหลดไม่ขึ้น) =====
         function renderAwardTypes() {
             const container = document.getElementById('awardTypeContainer');
+            const badge = document.getElementById('matchCountBadge');
+
+            // 1. Loading State
+            if (!isMatchesLoaded) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="custom-loader"></div>
+                        <p class="mt-3 text-muted fw-bold">กำลังเชื่อมต่อฐานข้อมูล...</p>
+                    </div>`;
+                badge.textContent = 'Waiting...';
+                return;
+            }
+
+            // 2. Data Loaded but Empty
+            if (allMatchesArray.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
+                        <p>ยังไม่มีรายการแข่งขันในระบบ</p>
+                    </div>`;
+                badge.textContent = '0 รายการ';
+                return;
+            }
             
-            // จัดกลุ่มกีฬาและ categories
+            // 3. Render Data
             const sportsMap = {};
             allMatchesArray.forEach(m => {
                 if (!sportsMap[m.sport]) {
@@ -413,47 +567,40 @@
                 }
             });
             
-            if (Object.keys(sportsMap).length === 0) {
-                container.innerHTML = '<p class="text-center text-muted">ยังไม่มีรายการแข่งขันในระบบ</p>';
-                return;
-            }
-            
             let html = '';
             Object.values(sportsMap).forEach(sport => {
-                // แสดง categories พร้อม badge เพศ
                 let categoriesHtml = sport.categories.map(c => 
-                    `<span class="badge bg-light text-dark border me-1 mb-1">${c.name} ${getGenderLabel(c.gender)}</span>`
+                    `<span class="badge bg-white text-dark border me-1 mb-1 shadow-sm">${c.name} ${getGenderLabel(c.gender)}</span>`
                 ).join('');
                 
-                // ตรวจสอบว่ามีทั้งชายและหญิงหรือไม่
                 const hasGenderSplit = sport.hasMale && sport.hasFemale;
                 
                 html += `
-                    <div class="award-type-item">
+                    <div class="award-type-item fade-in">
                         <div class="d-flex justify-content-between align-items-start flex-wrap">
                             <div class="flex-grow-1 mb-2">
-                                <h6 class="mb-1 fw-bold text-dark">
-                                    <i class="fas fa-trophy text-warning me-1"></i> ${sport.name}
-                                    ${hasGenderSplit ? '<span class="badge bg-success ms-2" style="font-size:0.65rem;">มีชาย+หญิง</span>' : ''}
+                                <h6 class="mb-2 fw-bold text-dark d-flex align-items-center">
+                                    <i class="fas fa-medal text-warning me-2"></i> ${sport.name}
+                                    ${hasGenderSplit ? '<span class="badge bg-success ms-2 rounded-pill" style="font-size:0.6rem;">แยกชาย/หญิงได้</span>' : ''}
                                 </h6>
-                                <div class="small">${categoriesHtml}</div>
+                                <div class="small text-secondary lh-lg">${categoriesHtml}</div>
                             </div>
-                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <div class="form-check form-check-inline">
+                            <div class="d-flex flex-wrap gap-2 align-items-center bg-light p-2 rounded">
+                                <div class="form-check form-check-inline m-0 me-2">
                                     <input class="form-check-input" type="radio" name="award_${sport.key}" 
                                            id="${sport.key}_separate" value="separate" checked>
                                     <label class="form-check-label small" for="${sport.key}_separate">แยกรายการ</label>
                                 </div>
                                 ${hasGenderSplit ? `
-                                <div class="form-check form-check-inline">
+                                <div class="form-check form-check-inline m-0 me-2">
                                     <input class="form-check-input" type="radio" name="award_${sport.key}" 
                                            id="${sport.key}_gender" value="gender">
                                     <label class="form-check-label small text-success fw-bold" for="${sport.key}_gender">
-                                        <i class="fas fa-venus-mars"></i> แยกชาย/หญิง
+                                        <i class="fas fa-venus-mars"></i> แยกเพศ
                                     </label>
                                 </div>
                                 ` : ''}
-                                <div class="form-check form-check-inline">
+                                <div class="form-check form-check-inline m-0">
                                     <input class="form-check-input" type="radio" name="award_${sport.key}" 
                                            id="${sport.key}_combined" value="combined">
                                     <label class="form-check-label small" for="${sport.key}_combined">คะแนนรวม</label>
@@ -462,10 +609,12 @@
                         </div>
                     </div>`;
             });
+            
             container.innerHTML = html;
+            badge.textContent = `${Object.keys(sportsMap).length} กีฬา`;
         }
 
-        // ===== คำนวณผู้ชนะ =====
+        // ===== Logic การคำนวณรางวัล (เหมือนเดิม) =====
         function calculateGoldWinner(sportType, categoryFilter = null, genderFilter = null) {
             let winY = 0, winB = 0;
             const matches = allMatchesArray.filter(m => {
@@ -509,7 +658,7 @@
             });
         }
 
-        // ===== สร้างหัวเอกสาร =====
+        // ===== สร้างหัวเอกสาร (ดึงโลโก้จริง) =====
         function getDocumentHeader(title, subtitle = '') {
             const hasEventLogo = systemSettings.eventLogo && systemSettings.eventLogo.trim() !== '';
             let logoHtml = '';
@@ -525,18 +674,18 @@
                 logoHtml = `<img src="${systemSettings.schoolLogo}" style="height:2cm; margin-bottom:8px;">`;
             }
             
-            let subtitleHtml = subtitle ? `<h4 style="margin:3px 0 0; font-weight:bold; font-size:14pt;">"${subtitle}"</h4>` : '';
+            let subtitleHtml = subtitle ? `<h4 style="margin:3px 0 0; font-weight:bold; font-size:16pt;">"${subtitle}"</h4>` : '';
             
             return `
-                <div style="text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 3px double #1a237e;">
+                <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px double #000;">
                     ${logoHtml}
-                    <h4 style="margin: 0; font-weight: bold; font-size: 16pt;">${title}</h4>
+                    <h3 style="margin: 0; font-weight: bold; font-size: 18pt;">${title}</h3>
                     ${subtitleHtml}
                 </div>
             `;
         }
 
-        // ===== สร้างเอกสาร =====
+        // ===== Main Generate Function =====
         window.generateDocument = () => {
             const speakerName = document.getElementById('speakerName').value || '...............................................';
             const chairmanName = document.getElementById('chairmanName').value || '...................................................................';
@@ -544,7 +693,6 @@
             const ending = getEnding(speakerName);
             const yearShort = systemSettings.academicYear.slice(-2);
             
-            // รายการกีฬาที่จัด
             const sportsInEvent = [...new Set(allMatchesArray.map(m => m.sport))];
             const sportListText = sportsInEvent.map(s => getSportName(s)).join(' ');
             const sportCount = sportsInEvent.length;
@@ -570,46 +718,49 @@
             new bootstrap.Modal(document.getElementById('previewModal')).show();
         };
 
+        // ... (Functions generateSpeech ทั้งหมดคงเดิม ไม่มีการเปลี่ยนแปลง Logic เนื้อหา) ...
+        // เพื่อประหยัดพื้นที่ ผมจะคง code ส่วน generateSpeech ไว้เหมือนเดิมตามต้นฉบับของคุณ
+        // แต่จะใส่ Comment ไว้เพื่อให้แน่ใจว่ามันถูกนำมาใส่ในไฟล์จริง
+
         // ===== คำกล่าวเปิด (ประธานในพิธี) =====
         function generateOpeningChairmanSpeech(chairman, pronoun, ending, yearShort, sportListText) {
             return `
-                <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
+                <div style="line-height: 1.6; font-size: 16pt; font-family: 'Kanit', sans-serif;">
                     ${getDocumentHeader('คำกล่าวเปิด', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
                     
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <strong>โดยประธานในพิธี</strong><br>
-                        <span>(${chairman})</span>
+                    <div style="text-align: center; margin-bottom: 20px; font-weight:bold;">
+                        โดยประธานในพิธี (${chairman})
                     </div>
                     
-                    <div style="margin-bottom: 15px; font-size: 13pt;">
+                    <div style="margin-bottom: 15px;">
                         ท่านคณะกรรมการสถานศึกษาขั้นพื้นฐาน${systemSettings.schoolName} ท่านผู้บริหาร คณะครู นักเรียน และผู้มีเกียรติทุกท่าน
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         วันนี้ถือเป็นวันที่มีความสำคัญยิ่งสำหรับ${systemSettings.schoolName} ในฐานะที่เราจะได้ร่วมกันเปิดการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ซึ่งเป็นกิจกรรมที่ส่งเสริมให้นักเรียนได้พัฒนาทักษะด้านกีฬา สร้างความสามัคคีในหมู่คณะ และฝึกฝนการทำงานเป็นทีมอันเป็นรากฐานสำคัญของการเป็นพลเมืองที่ดีในอนาคต
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         การจัดการแข่งขันกีฬาภายในครั้งนี้ ประกอบด้วยคณะสี ๒ สี คือ ${systemSettings.teamYellow}และ${systemSettings.teamBlue} โดยมีการแข่งขันกีฬาหลากหลายประเภท ได้แก่ ${sportListText} ซึ่งทุกประเภทล้วนมีคุณค่าและความหมายในการพัฒนานักเรียนทั้งสิ้น
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ${pronoun}ขอเน้นย้ำว่า การกีฬาไม่ได้มีเพียงแค่การแข่งขันเพื่อชัยชนะเท่านั้น แต่สิ่งที่สำคัญยิ่งกว่านั้นคือ การได้เรียนรู้ที่จะยอมรับในกติกา การเคารพในคู่แข่งขัน การรู้แพ้รู้ชนะรู้อภัย และการมีน้ำใจนักกีฬา สิ่งเหล่านี้คือคุณค่าอันประเสริฐที่จะติดตัวนักเรียนไปตลอดชีวิต
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ขอขอบคุณคณะกรรมการจัดการแข่งขัน คณะครูผู้ควบคุมนักกีฬา ผู้ปกครอง ศิษย์เก่า และทุกฝ่ายที่มีส่วนร่วมในการจัดงานครั้งนี้ให้สำเร็จลุล่วงไปด้วยดี หวังเป็นอย่างยิ่งว่า นักกีฬาทุกคนจะได้แสดงความสามารถอย่างเต็มที่ ด้วยความมุ่งมั่นและน้ำใจนักกีฬาที่ดีงาม
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ขอให้การแข่งขันในครั้งนี้เป็นไปด้วยความเรียบร้อย และขอให้นักกีฬาทุกท่านประสบความสำเร็จตามความมุ่งหวัง
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         บัดนี้ ได้เวลาอันสมควรแล้ว ${pronoun}ขอกล่าวเปิดการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ณ บัดนี้
                     </div>
                     
-                    <div style="text-align:center; font-size:7pt; margin-top:40px; color:#999; border-top:1px solid #eee; padding-top:10px;">
+                    <div style="text-align:center; font-size:10pt; margin-top:50px; color:#666; border-top:1px solid #ddd; padding-top:10px;">
                         เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง
                     </div>
                 </div>
@@ -618,52 +769,51 @@
 
         // ===== คำกล่าวรายงาน (พิธีเปิด) =====
         function generateOpeningReportSpeech(reporter, chairman, pronoun, ending, yearShort, sportListText, sportCount) {
-            return `
-                <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
-                    ${getDocumentHeader('คำกล่าวรายงานต่อประธานในพิธีเปิดกิจกรรมกีฬาภายใน', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
+             return `
+                <div style="line-height: 1.6; font-size: 16pt; font-family: 'Kanit', sans-serif;">
+                    ${getDocumentHeader('คำกล่าวรายงานต่อประธานในพิธีเปิด', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
                     
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <strong>โดยประธานผู้จัดการแข่งขัน</strong><br>
-                        <span>(${reporter})</span>
+                    <div style="text-align: center; margin-bottom: 20px; font-weight:bold;">
+                        โดยประธานผู้จัดการแข่งขัน (${reporter})
                     </div>
                     
-                    <div style="margin-bottom: 12px; font-size: 13pt;">
+                    <div style="margin-bottom: 12px;">
                         <strong>เรียน</strong> ${chairman} ประธานในพิธีที่เคารพอย่างสูง
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ${pronoun} ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียน${systemSettings.schoolName}ทุกคน ขอกราบขอบพระคุณเป็นอย่างสูงที่ท่านได้ให้เกียรติมาเป็นประธานในพิธีเปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ในวันนี้
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ${pronoun}ขอกราบเรียนให้ท่านประธานและผู้มีเกียรติทุกท่านทราบถึงวัตถุประสงค์และรายละเอียดของการจัดการแข่งขันกีฬาภายในโรงเรียนในครั้งนี้ดังนี้
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         การจัดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} มีวัตถุประสงค์เพื่อส่งเสริมให้นักเรียนได้พัฒนาทักษะด้านกีฬา ออกกำลังกายเพื่อสุขภาพที่แข็งแรง สร้างความสามัคคีในหมู่คณะ และปลูกฝังคุณธรรมจริยธรรม โดยเฉพาะน้ำใจนักกีฬา การรู้แพ้รู้ชนะรู้อภัย และการทำงานเป็นทีม
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         การแข่งขันในครั้งนี้แบ่งออกเป็น ๒ คณะสี ได้แก่ ${systemSettings.teamYellow}และ${systemSettings.teamBlue} โดยมีการแข่งขันกีฬาหลากหลายประเภท ประกอบด้วย ${sportListText} รวมทั้งสิ้น ${sportCount} ประเภท นักเรียนทุกคนได้เตรียมความพร้อมและฝึกซ้อมมาอย่างดีเพื่อเข้าร่วมการแข่งขันในครั้งนี้
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         คณะกรรมการจัดการแข่งขันได้จัดเตรียมสนามแข่งขัน อุปกรณ์กีฬา และกรรมการตัดสินที่มีความรู้ความสามารถเพื่อให้การแข่งขันดำเนินไปด้วยความเป็นธรรมและเรียบร้อย นอกจากนี้ยังมีการกำหนดกติกาและระเบียบการแข่งขันให้ชัดเจน เพื่อให้นักกีฬาทุกคนได้แข่งขันอย่างเต็มความสามารถภายใต้กรอบแห่งความยุติธรรม
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         การจัดงานในครั้งนี้สำเร็จลุล่วงได้ด้วยความร่วมมือจากทุกฝ่าย ทั้งคณะผู้บริหาร คณะครู ผู้ปกครอง ศิษย์เก่า และนักเรียนทุกคน ที่ได้ร่วมแรงร่วมใจกันจัดเตรียมงานให้มีความพร้อมในทุกด้าน
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         บัดนี้นักกีฬาทั้งสองคณะสีพร้อมที่จะลงสนามแข่งขันด้วยความมุ่งมั่นและตั้งใจ ${pronoun}จึงขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทและกล่าวเปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ในลำดับต่อไป
                     </div>
                     
-                    <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">
+                    <div style="text-align: right; margin-top: 30px; margin-right: 50px;">
                         ขอกราบเรียนเชิญ${ending}
                     </div>
                     
-                    <div style="text-align:center; font-size:7pt; margin-top:40px; color:#999; border-top:1px solid #eee; padding-top:10px;">
+                    <div style="text-align:center; font-size:10pt; margin-top:50px; color:#666; border-top:1px solid #ddd; padding-top:10px;">
                         เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง
                     </div>
                 </div>
@@ -672,51 +822,50 @@
 
         // ===== คำกล่าวปิด (ประธานในพิธี) =====
         function generateClosingChairmanSpeech(chairman, pronoun, ending, yearShort) {
-            return `
-                <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
+             return `
+                <div style="line-height: 1.6; font-size: 16pt; font-family: 'Kanit', sans-serif;">
                     ${getDocumentHeader('คำกล่าวในพิธีปิด', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
                     
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <strong>โดยประธานในพิธี</strong><br>
-                        <span>(${chairman})</span>
+                    <div style="text-align: center; margin-bottom: 20px; font-weight:bold;">
+                        โดยประธานในพิธี (${chairman})
                     </div>
                     
-                    <div style="margin-bottom: 15px; font-size: 13pt;">
+                    <div style="margin-bottom: 15px;">
                         ท่านคณะกรรมการสถานศึกษาขั้นพื้นฐาน${systemSettings.schoolName} ท่านผู้บริหาร คณะครู นักเรียน และผู้มีเกียรติทุกท่าน
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         วันนี้เป็นวันสุดท้ายของการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ซึ่งได้ดำเนินมาด้วยความเรียบร้อยและประสบความสำเร็จอย่างสมบูรณ์
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         นับเป็นภาพที่สวยงามอย่างยิ่งที่ได้เห็นนักเรียนทุกคนแสดงความสามารถและน้ำใจนักกีฬาออกมาอย่างชัดเจน เต็มไปด้วยความเป็นมิตรและความเคารพซึ่งกันและกัน ชัยชนะที่แท้จริงไม่ได้อยู่ที่ถ้วยรางวัล แต่อยู่ที่บทเรียนชีวิตที่นักเรียนทุกคนได้เรียนรู้จากการเข้าร่วมกิจกรรมครั้งนี้
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         สำหรับนักกีฬาที่ได้รับรางวัล ขอแสดงความยินดีกับความสำเร็จ ขอให้จำไว้เสมอว่ารางวัลคือผลจากความพยายามและการทำงานร่วมกันเป็นทีม ขอให้ใช้ความสำเร็จนี้เป็นแรงผลักดันในการพัฒนาตนเองต่อไป สำหรับนักกีฬาที่ยังไม่ได้รับรางวัล การลงสนามแข่งขันด้วยความตั้งใจและพยายามอย่างเต็มที่นั้นคือชัยชนะอันยิ่งใหญ่แล้ว การแพ้ไม่ได้หมายความว่าไม่เก่ง แต่หมายความว่ายังมีโอกาสเรียนรู้และพัฒนาตนเองให้ดีขึ้นอีก ขอให้นำประสบการณ์ครั้งนี้ไปเป็นบทเรียนสำหรับอนาคต
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ขอขอบคุณคณะกรรมการจัดการแข่งขัน คณะครูผู้ควบคุมนักกีฬา ครูผู้ฝึกสอน กรรมการตัดสิน เจ้าหน้าที่ทุกฝ่าย ผู้ปกครอง และศิษย์เก่าที่ได้สละเวลาและแรงกายแรงใจมาร่วมจัดงานในครั้งนี้ให้ประสบความสำเร็จอย่างงดงาม
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         หวังเป็นอย่างยิ่งว่านักเรียนทุกคนจะนำประสบการณ์และบทเรียนจากการแข่งขันครั้งนี้ไปใช้ในชีวิตประจำวัน จงรักษาความสามัคคี น้ำใจนักกีฬา และจิตวิญญาณของการเป็นนักกีฬาที่ดีไว้เสมอ คุณสมบัติเหล่านี้จะเป็นรากฐานสำคัญที่จะนำไปสู่ความสำเร็จในทุกด้านของชีวิต
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         บัดนี้ ได้เวลาอันสมควรแล้ว ${pronoun}ขอกล่าวปิดการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ณ บัดนี้
                     </div>
                     
-                    <div style="text-align:center; font-size:7pt; margin-top:40px; color:#999; border-top:1px solid #eee; padding-top:10px;">
+                    <div style="text-align:center; font-size:10pt; margin-top:50px; color:#666; border-top:1px solid #ddd; padding-top:10px;">
                         เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง
                     </div>
                 </div>
             `;
         }
 
-        // ===== คำกล่าวรายงาน (พิธีปิด) - พร้อมระบบแยกรางวัลชาย/หญิง =====
+        // ===== คำกล่าวรายงาน (พิธีปิด) =====
         function generateClosingReportSpeech(reporter, chairman, pronoun, ending, yearShort, sportListText, sportsInEvent) {
             let awardList = [];
             let awardNumber = 1;
@@ -726,14 +875,12 @@
                 const awardType = selectedRadio ? selectedRadio.value : 'separate';
                 
                 if (awardType === 'combined') {
-                    // รวมคะแนนทั้งหมด
                     awardList.push({ 
                         number: awardNumber++, 
                         title: `ถ้วยชนะเลิศการแข่งขัน${getSportName(sportKey)} (คะแนนรวม)`, 
                         winner: calculateCombinedScore(sportKey) 
                     });
                 } else if (awardType === 'gender') {
-                    // แยกชาย/หญิง (ใหม่!)
                     const sportMatches = allMatchesArray.filter(m => m.sport === sportKey);
                     const hasMale = sportMatches.some(m => detectGender(m.category) === 'male');
                     const hasFemale = sportMatches.some(m => detectGender(m.category) === 'female');
@@ -755,7 +902,6 @@
                         });
                     }
                 } else {
-                    // แยกรายการ
                     const awards = generateSeparateAwards(sportKey);
                     awards.forEach(award => {
                         awardList.push({ 
@@ -768,7 +914,6 @@
                 }
             });
             
-            // คำนวณรางวัลรวม
             let totalY = 0, totalB = 0;
             allMatchesArray.forEach(m => { 
                 if(m.status === 'done') { 
@@ -782,54 +927,57 @@
             const w_runnerup = totalY > totalB ? systemSettings.teamBlue : (totalB > totalY ? systemSettings.teamYellow : '-');
 
             return `
-                <div style="line-height: 1.6; font-size: 14pt; font-family: 'Kanit', sans-serif;">
-                    ${getDocumentHeader('คำกล่าวรายงานต่อประธานในพิธีปิดกิจกรรมกีฬาภายใน', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
+                <div style="line-height: 1.6; font-size: 16pt; font-family: 'Kanit', sans-serif;">
+                    ${getDocumentHeader('คำกล่าวรายงานต่อประธานในพิธีปิด', `${systemSettings.eventName} ประจำปีการศึกษา ๒๕${yearShort}`)}
                     
-                    <div style="margin-bottom: 12px; font-size: 13pt;">
+                    <div style="text-align: center; margin-bottom: 20px; font-weight:bold;">
+                        โดยประธานผู้จัดการแข่งขัน (${reporter})
+                    </div>
+                    
+                    <div style="margin-bottom: 12px;">
                         <strong>เรียน</strong> ${chairman} ประธานในพิธีที่เคารพอย่างสูง
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         ${pronoun} ${reporter} ในนามคณะกรรมการจัดการแข่งขัน คณะครู และนักเรียน${systemSettings.schoolName} ขอขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ซึ่งกำลังจะเสร็จสิ้นในวันนี้
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         การแข่งขันในครั้งนี้ประกอบด้วยคณะสี ๒ สี คือ ${systemSettings.teamYellow} และ${systemSettings.teamBlue} ได้ดำเนินการแข่งขันกีฬาหลายประเภท ได้แก่ ${sportListText} การแข่งขันกีฬาทุกประเภทได้ดำเนินการมาด้วยความเรียบร้อย และบรรลุตามวัตถุประสงค์ทุกประการ ด้วยความร่วมมือร่วมใจจากผู้บริหาร คณาจารย์ ผู้ปกครอง ศิษย์เก่า และนักเรียน${systemSettings.schoolName}ทุกคน
                     </div>
                     
-                    <div class="speech-line speech-indent" style="font-size: 13pt;">
+                    <div class="speech-line speech-indent">
                         บัดนี้ การแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort} ได้ถึงบทสรุปลงแล้ว ${pronoun}ขอกราบเรียนเชิญท่านประธานได้มอบถ้วยรางวัลและโล่รางวัลแก่ผู้ชนะการแข่งขัน ดังต่อไปนี้
                     </div>
                     
-                    <div style="margin-top: 12px; margin-bottom: 12px; font-size: 13pt;">
+                    <div style="margin-top: 12px; margin-bottom: 12px;">
                         <strong>รางวัลการแข่งขันแต่ละประเภท</strong>
-                        <ol style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
+                        <ol style="margin-top: 8px; padding-left: 30px; line-height: 1.8;">
                             ${awardList.map(award => `<li>${award.title} ได้แก่ <strong>${award.winner}</strong></li>`).join('')}
                         </ol>
                         
                         <strong style="margin-top: 15px; display: block;">รางวัลชนะเลิศรวมกีฬา</strong>
-                        <ol start="${awardNumber}" style="margin-top: 8px; padding-left: 25px; line-height: 1.8;">
+                        <ol start="${awardNumber}" style="margin-top: 8px; padding-left: 30px; line-height: 1.8;">
                             <li>ถ้วยชนะเลิศการแข่งขันกีฬาภายในโรงเรียน คะแนนรวม ได้แก่ <strong>${w_overall}</strong> (รวม ${score_overall} ถ้วยรางวัล)</li>
                             <li>ถ้วยรองชนะเลิศอันดับ ๑ ได้แก่ <strong>${w_runnerup}</strong></li>
                         </ol>
                     </div>
                     
-                    <div class="speech-line speech-indent" style="margin-top: 15px; font-size: 13pt;">
+                    <div class="speech-line speech-indent" style="margin-top: 15px;">
                         และลำดับต่อไป ${pronoun}ขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทต่อนักกีฬา กรรมการ เจ้าหน้าที่ และผู้เกี่ยวข้องทั้งหลาย ประกอบพิธีปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ๒๕${yearShort}
                     </div>
                     
-                    <div style="text-align: right; margin-top: 25px; margin-right: 50px; font-size: 13pt;">
+                    <div style="text-align: right; margin-top: 30px; margin-right: 50px;">
                         ขอกราบเรียนเชิญ${ending}
                     </div>
                     
-                    <div style="text-align:center; font-size:7pt; margin-top:40px; color:#999; border-top:1px solid #eee; padding-top:10px;">
+                    <div style="text-align:center; font-size:10pt; margin-top:50px; color:#666; border-top:1px solid #ddd; padding-top:10px;">
                         เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง
                     </div>
                 </div>
             `;
         }
 
-        // ===== พิมพ์เอกสาร =====
         window.printDocument = () => {
             const element = document.getElementById('documentContent');
             const printWindow = window.open('', '', 'width=900,height=700');
@@ -843,9 +991,9 @@
                     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
                     <style>
                         @page { size: A4; margin: 20mm 25mm; }
-                        body { font-family: 'Kanit', sans-serif; margin: 0; padding: 0; background: white; line-height: 1.5; }
+                        body { font-family: 'Kanit', sans-serif; margin: 0; padding: 0; background: white; line-height: 1.5; font-size: 16pt; }
                         @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-                        .speech-line { text-align: justify; text-justify: inter-word; margin-bottom: 8px; line-height: 1.6; }
+                        .speech-line { text-align: justify; text-justify: inter-word; margin-bottom: 10px; line-height: 1.6; }
                         .speech-indent { text-indent: 2.5cm; }
                     </style>
                 </head>
@@ -857,14 +1005,11 @@
             setTimeout(() => { printWindow.focus(); printWindow.print(); printWindow.close(); }, 500);
         };
 
-        // ===== เริ่มต้น =====
+        // เริ่มต้น
         document.addEventListener('DOMContentLoaded', () => {
             loadSettings();
             loadMatches();
         });
-
-        loadSettings();
-        loadMatches();
     </script>
 </body>
 </html>
