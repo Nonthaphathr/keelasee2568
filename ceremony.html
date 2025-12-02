@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75, maximum-scale=1.5, user-scalable=yes">
+    <title>ระบบสร้างเอกสารพิธีการ - กระดุมทองเกมส์</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        /* CSS ชุดเดิมเพื่อให้ธีมเหมือนกันเป๊ะ */
+        :root { --glass-bg: rgba(255, 255, 255, 0.95); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        * { -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(rgba(240, 242, 245, 0.85), rgba(240, 242, 245, 0.85)), 
+                        url('https://nonthaphathr.github.io/uploadimg/keelaseebg.png');
+            background-repeat: no-repeat; background-position: center center;
+            background-attachment: fixed; background-size: cover;
+            min-height: 100vh; padding-bottom: 60px;
+        }
+        h1, h2, h3, h4, h5, .nav-link, .btn, .modal-title { font-family: 'Kanit', sans-serif; }
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--glass-shadow); padding: 20px; transition: all 0.3s ease; height: 100%;
+        }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+        .navbar { background: rgba(21, 30, 61, 0.98) !important; backdrop-filter: blur(10px); }
+        
+        /* Document Styles (สำหรับ Print) */
+        .report-preview-page {
+            background: white; width: 210mm; min-height: 297mm; margin: 10px auto; padding: 25mm 25mm;
+            color: #000; font-family: 'Kanit', sans-serif; font-size: 14pt; line-height: 1.6;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .speech-indent { text-indent: 2.5cm; text-align: justify; text-justify: inter-word; margin-bottom: 15px; }
+        
+        @media print {
+            body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .navbar, .container, .modal-header, .modal-footer, .no-print { display: none !important; }
+            .modal { position: static; overflow: visible; }
+            .modal-dialog { margin: 0; width: 100%; max-width: 100%; }
+            .modal-content { border: none; shadow: none; }
+            .modal-body { padding: 0; }
+            .report-preview-page { width: 100%; margin: 0; padding: 20mm 25mm; box-shadow: none; page-break-after: always; }
+        }
+        
+        .doc-icon { font-size: 3rem; margin-bottom: 15px; background: -webkit-linear-gradient(#ffc107, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="fas fa-chevron-left me-2"></i> กลับหน้าหลัก
+            </a>
+            <span class="navbar-text text-warning fw-bold mx-auto">ระบบสร้างเอกสารพิธีการ</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 text-center mb-2">
+                <h3 class="fw-bold text-dark text-shadow-white"><i class="fas fa-file-signature me-2"></i>เลือกประเภทเอกสาร</h3>
+                <p class="text-muted">ข้อมูลโรงเรียนและผลการแข่งขันจะถูกดึงมาใส่อัตโนมัติ</p>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="glass-card text-center" style="cursor: pointer;" onclick="openModal('openingPresident')">
+                    <i class="fas fa-user-tie doc-icon"></i>
+                    <h5 class="fw-bold mb-2">1. คำกล่าวเปิด (ประธาน)</h5>
+                    [cite_start]<p class="text-muted small mb-0">สำหรับประธานในพิธี กล่าวเปิดงาน [cite: 1-12]</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="glass-card text-center" style="cursor: pointer;" onclick="openModal('openingReport')">
+                    <i class="fas fa-file-alt doc-icon"></i>
+                    <h5 class="fw-bold mb-2">2. คำกล่าวรายงาน (พิธีเปิด)</h5>
+                    [cite_start]<p class="text-muted small mb-0">สำหรับประธานจัดงาน กล่าวรายงานวัตถุประสงค์ [cite: 13-26]</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="glass-card text-center" style="cursor: pointer;" onclick="openModal('closingPresident')">
+                    <i class="fas fa-flag-checkered doc-icon"></i>
+                    <h5 class="fw-bold mb-2">3. คำกล่าวปิด (ประธาน)</h5>
+                    [cite_start]<p class="text-muted small mb-0">สำหรับประธานในพิธี กล่าวปิดงานและให้โอวาท [cite: 27-37]</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="glass-card text-center" style="cursor: pointer;" onclick="prepareClosingReport()">
+                    <i class="fas fa-trophy doc-icon"></i>
+                    <h5 class="fw-bold mb-2">4. คำกล่าวรายงาน (พิธีปิด)</h5>
+                    <p class="text-muted small mb-0">สรุปผลการแข่งขันและเชิญมอบรางวัล (ระบบเดิม)</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5 text-muted small">
+            พัฒนาระบบโดย ครูนนทพัทธ์ หิรัญเรือง
+        </div>
+    </div>
+
+    <div class="modal fade" id="inputModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="inputModalTitle">กรอกข้อมูล</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="docForm">
+                        <input type="hidden" id="docType">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">ชื่อประธานในพิธี</label>
+                            <input type="text" class="form-control" id="chairmanName" placeholder="เช่น นายอำนวย การดี">
+                        </div>
+                        <div class="mb-3" id="reporterField">
+                            <label class="form-label fw-bold">ชื่อผู้กล่าวรายงาน</label>
+                            <input type="text" class="form-control" id="reporterName" placeholder="เช่น ครูนนทพัทธ์ หิรัญเรือง">
+                            <small class="text-muted">* ระบบจะเลือกคำสรรพนาม (กระผม/ดิฉัน) อัตโนมัติ</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-success" onclick="generateDocument()"><i class="fas fa-print me-1"></i> สร้างเอกสาร</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="closingSetupModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="fas fa-cogs"></i> ตั้งค่าการมอบรางวัล (พิธีปิด)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                         <div class="col-md-6">
+                            <label class="form-label fw-bold">ชื่อประธานในพิธี</label>
+                            <input type="text" class="form-control" id="closingChairman" placeholder="ถ้าไม่ระบุ จะเว้นว่างไว้">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ชื่อผู้กล่าวรายงาน</label>
+                            <input type="text" class="form-control" id="closingReporter" value="นายนนทพัทธ์ หิรัญเรือง">
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="fw-bold">กำหนดประเภทรางวัลในแต่ละกีฬา:</h6>
+                    <div id="awardTypeContainer" class="border rounded p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+                        <p class="text-center text-muted">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" onclick="generateClosingReport()"><i class="fas fa-file-alt me-1"></i> สร้างเอกสาร</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">ตัวอย่างเอกสาร</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-secondary p-4">
+                    <div id="previewContent" class="report-preview-page mx-auto"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">แก้ไข</button>
+                    <button type="button" class="btn btn-primary" onclick="printDoc()"><i class="fas fa-print me-1"></i> สั่งพิมพ์</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        // Config เดิมจากโค้ดหลัก
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
+            authDomain: "kradumthong-esports.firebaseapp.com",
+            databaseURL: "https://kradumthong-esports-default-rtdb.firebaseio.com",
+            projectId: "kradumthong-esports",
+            storageBucket: "kradumthong-esports.firebasestorage.app",
+            messagingSenderId: "297783930970",
+            appId: "1:297783930970:web:8addc3c392708a07c52863"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // ตัวแปร Global
+        let systemSettings = {
+            schoolName: 'โรงเรียนกระดุมทองวิทยา',
+            eventName: 'กระดุมทองเกมส์',
+            academicYear: '2568',
+            schoolLogo: 'https://nonthaphathr.github.io/uploadimg/logoschool.png',
+            teamYellow: 'สีเหลือง', teamBlue: 'สีฟ้า',
+            sports: {}
+        };
+        let allMatchesArray = [];
+
+        // โหลดข้อมูลเมื่อเข้าหน้าเว็บ
+        onValue(ref(db, 'settings'), (snap) => {
+            const data = snap.val();
+            if (data) systemSettings = { ...systemSettings, ...data };
+        });
+
+        onValue(ref(db, 'matches'), (snap) => {
+            const data = snap.val();
+            allMatchesArray = data ? Object.keys(data).map(k => ({...data[k], id: k})) : [];
+        });
+
+        // ================= Functions ทั่วไป =================
+        window.openModal = (type) => {
+            document.getElementById('docType').value = type;
+            document.getElementById('reporterField').classList.add('d-none');
+            
+            let title = "";
+            if(type === 'openingPresident') title = "1. คำกล่าวเปิด (ประธาน)";
+            else if(type === 'openingReport') {
+                title = "2. คำกล่าวรายงาน (พิธีเปิด)";
+                document.getElementById('reporterField').classList.remove('d-none');
+            }
+            else if(type === 'closingPresident') title = "3. คำกล่าวปิด (ประธาน)";
+
+            document.getElementById('inputModalTitle').innerText = title;
+            new bootstrap.Modal(document.getElementById('inputModal')).show();
+        };
+
+        window.printDoc = () => window.print();
+
+        function getHeader() {
+            const hasEventLogo = systemSettings.eventLogo && systemSettings.eventLogo.trim() !== '';
+            let logos = hasEventLogo 
+                ? `<div style="display:flex; justify-content:center; gap:20px; margin-bottom:10px;">
+                    <img src="${systemSettings.schoolLogo}" style="height:2cm;">
+                    <img src="${systemSettings.eventLogo}" style="height:2cm;">
+                   </div>`
+                : `<div style="text-align:center;"><img src="${systemSettings.schoolLogo}" style="height:2cm; margin-bottom:10px;"></div>`;
+            return logos;
+        }
+
+        function getPronoun(name) {
+            return (name.startsWith('นาย')) ? 'กระผม' : (name.startsWith('นาง') ? 'ดิฉัน' : 'กระผม/ดิฉัน');
+        }
+        function getEnding(name) {
+            return (name.startsWith('นาย')) ? 'ครับ' : (name.startsWith('นาง') ? 'ค่ะ' : 'ครับ/ค่ะ');
+        }
+        function getSportList() {
+            const s = Object.values(systemSettings.sports);
+            return s.length > 0 ? s.join(", ") : "........................";
+        }
+        function getSportName(k) { return systemSettings.sports[k] || k; }
+
+        // ================= 1-3. Generate Documents Base =================
+        window.generateDocument = () => {
+            const type = document.getElementById('docType').value;
+            const chairman = document.getElementById('chairmanName').value || "...................................................";
+            const reporter = document.getElementById('reporterName').value || "...................................................";
+            const logoHtml = getHeader();
+            let html = "";
+
+            if (type === 'openingPresident') {
+                [cite_start]// [cite: 1-12]
+                html = `
+                    ${logoHtml}
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h3 style="margin:0; font-weight:bold;">คำกล่าวเปิด</h3>
+                        <h4 style="margin:5px 0;">กิจกรรมกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear}</h4>
+                        <div>โดยประธานในพิธี (${chairman})</div>
+                    </div>
+                    <div style="margin-bottom:15px;"><strong>เรียน ท่านคณะกรรมการสถานศึกษาฯ ผู้บริหาร คณะครู นักเรียน และผู้มีเกียรติทุกท่าน</strong></div>
+                    <div class="speech-indent">วันนี้ถือเป็นวันที่มีความสำคัญยิ่งสำหรับ${systemSettings.schoolName} ในฐานะที่เราจะได้ร่วมกันเปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ซึ่งเป็นกิจกรรมที่ส่งเสริมให้นักเรียนได้พัฒนาทักษะด้านกีฬา สร้างความสามัคคี และฝึกฝนการทำงานเป็นทีม</div>
+                    <div class="speech-indent">การจัดการแข่งขันครั้งนี้ ประกอบด้วยคณะสีสองสี คือ ${systemSettings.teamYellow}และ${systemSettings.teamBlue} มีกีฬาหลากหลายประเภท ได้แก่ ${getSportList()} ซึ่งทุกประเภทล้วนมีคุณค่าในการพัฒนานักเรียนทั้งสิ้น</div>
+                    <div class="speech-indent">ข้าพเจ้า ขอเน้นย้ำว่า การกีฬาไม่ได้มีเพียงแค่การแข่งขันเพื่อชัยชนะ แต่สำคัญกว่านั้นคือ การรู้แพ้รู้ชนะรู้อภัย และการมีน้ำใจนักกีฬา สิ่งเหล่านี้คือคุณค่าอันประเสริฐที่จะติดตัวนักเรียนไปตลอดชีวิต</div>
+                    <div class="speech-indent">ขอขอบคุณคณะกรรมการจัดการแข่งขัน และทุกฝ่ายที่มีส่วนร่วมในการจัดงานครั้งนี้ให้สำเร็จลุล่วงไปด้วยดี หวังว่านักกีฬาทุกคนจะได้แสดงความสามารถอย่างเต็มที่</div>
+                    <div class="speech-indent">บัดนี้ ได้เวลาอันสมควรแล้ว ข้าพเจ้า ขอกล่าวเปิดการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear} ณ บัดนี้</div>
+                `;
+            } else if (type === 'openingReport') {
+                [cite_start]// [cite: 13-26]
+                const pro = getPronoun(reporter);
+                const end = getEnding(reporter);
+                html = `
+                    ${logoHtml}
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h3 style="margin:0; font-weight:bold;">คำกล่าวรายงาน (พิธีเปิด)</h3>
+                        <h4 style="margin:5px 0;">กิจกรรมกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear}</h4>
+                        <div>โดยประธานผู้จัดการแข่งขัน (${reporter})</div>
+                    </div>
+                    <div style="margin-bottom:15px;"><strong>เรียน ${chairman} ประธานในพิธีที่เคารพอย่างสูง</strong></div>
+                    <div class="speech-indent">${pro} ${reporter} ในนามคณะกรรมการจัดการแข่งขัน ขอกราบขอบพระคุณเป็นอย่างสูงที่ท่านได้ให้เกียรติมาเป็นประธานในพิธีเปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ในวันนี้</div>
+                    <div class="speech-indent">การจัดการแข่งขันมีวัตถุประสงค์เพื่อส่งเสริมให้นักเรียนได้พัฒนาทักษะด้านกีฬา ออกกำลังกายเพื่อสุขภาพ สร้างความสามัคคี และปลูกฝังคุณธรรมจริยธรรม โดยเฉพาะน้ำใจนักกีฬา</div>
+                    <div class="speech-indent">การแข่งขันแบ่งเป็นสองคณะสี คือ ${systemSettings.teamYellow}และ${systemSettings.teamBlue} ประกอบด้วยกีฬา: ${getSportList()} นักเรียนทุกคนได้เตรียมความพร้อมมาอย่างดี</div>
+                    <div class="speech-indent">คณะกรรมการได้จัดเตรียมสนามและกรรมการตัดสินที่มีความรู้ความสามารถ เพื่อให้การแข่งขันดำเนินไปด้วยความเรียบร้อยและยุติธรรม งานครั้งนี้สำเร็จได้ด้วยความร่วมมือจากทุกฝ่าย</div>
+                    <div class="speech-indent">บัดนี้ นักกีฬาทั้งสองคณะสีพร้อมแล้ว ${pro}จึงขอกราบเรียนเชิญท่านประธานได้กล่าวให้โอวาทและกล่าวเปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ในลำดับต่อไป</div>
+                    <div style="text-align:right; margin-top:30px; margin-right:50px;"><strong>ขอกราบเรียนเชิญ${end}</strong></div>
+                `;
+            } else if (type === 'closingPresident') {
+                [cite_start]// [cite: 27-37]
+                html = `
+                    ${logoHtml}
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h3 style="margin:0; font-weight:bold;">คำกล่าวปิด</h3>
+                        <h4 style="margin:5px 0;">กิจกรรมกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear}</h4>
+                        <div>โดยประธานในพิธี (${chairman})</div>
+                    </div>
+                    <div style="margin-bottom:15px;"><strong>เรียน ท่านคณะกรรมการสถานศึกษาฯ ผู้บริหาร คณะครู นักเรียน และผู้มีเกียรติทุกท่าน</strong></div>
+                    <div class="speech-indent">วันนี้เป็นวันสุดท้ายของการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ซึ่งได้ดำเนินมาด้วยความเรียบร้อยและประสบความสำเร็จอย่างสมบูรณ์</div>
+                    <div class="speech-indent">นับเป็นภาพที่สวยงามที่ได้เห็นนักเรียนทุกคนแสดงความสามารถและน้ำใจนักกีฬา ชัยชนะที่แท้จริงไม่ได้อยู่ที่ถ้วยรางวัล แต่อยู่ที่บทเรียนชีวิตที่นักเรียนทุกคนได้เรียนรู้</div>
+                    <div class="speech-indent">สำหรับนักกีฬาที่ได้รับรางวัล ข้าพเจ้าขอแสดงความยินดี สำหรับนักกีฬาที่ยังไม่ได้รับรางวัล การลงสนามด้วยความตั้งใจคือชัยชนะอันยิ่งใหญ่แล้ว ขอให้นำประสบการณ์ครั้งนี้ไปพัฒนาตนเองต่อไป</div>
+                    <div class="speech-indent">ขอขอบคุณคณะกรรมการจัดการแข่งขัน และทุกฝ่ายที่ได้สละเวลามาร่วมจัดงานในครั้งนี้ให้ประสบความสำเร็จอย่างงดงาม จงรักษาความสามัคคีและน้ำใจนักกีฬาไว้เสมอ</div>
+                    <div class="speech-indent">บัดนี้ ได้เวลาอันสมควรแล้ว ข้าพเจ้า ขอกล่าวปิดการแข่งขันกีฬาภายในโรงเรียน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear} ณ บัดนี้</div>
+                `;
+            }
+
+            // Footer
+            html += `<div style="text-align:center; font-size:9pt; margin-top:50px; color:#999; border-top:1px solid #eee; padding-top:10px;">เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</div>`;
+            
+            document.getElementById('previewContent').innerHTML = html;
+            bootstrap.Modal.getInstance(document.getElementById('inputModal')).hide();
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        };
+
+        // ================= 4. Closing Report Logic (Legacy) =================
+        window.prepareClosingReport = () => {
+            const sportsMap = {};
+            allMatchesArray.forEach(m => {
+                if (!sportsMap[m.sport]) sportsMap[m.sport] = { name: getSportName(m.sport), key: m.sport, categories: [] };
+                if (!sportsMap[m.sport].categories.includes(m.category)) sportsMap[m.sport].categories.push(m.category);
+            });
+            
+            const container = document.getElementById('awardTypeContainer');
+            if (Object.keys(sportsMap).length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">ยังไม่มีรายการแข่งขันในระบบ</p>';
+            } else {
+                let html = '';
+                Object.values(sportsMap).forEach(sport => {
+                    html += `
+                        <div class="border rounded p-2 mb-2 bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div><strong class="text-primary">${sport.name}</strong> <small class="text-muted">(${sport.categories.join(', ')})</small></div>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="award_${sport.key}" value="separate" checked> <label class="small">แยกรายการ</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="award_${sport.key}" value="combined"> <label class="small">คะแนนรวม</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            }
+            new bootstrap.Modal(document.getElementById('closingSetupModal')).show();
+        };
+
+        // Helper calculations needed for Closing Report
+        function calculateGoldWinner(sportType, categoryFilter) {
+            let winY = 0, winB = 0;
+            allMatchesArray.filter(m => m.sport === sportType && m.status === 'done' && (!categoryFilter || m.category === categoryFilter))
+                .forEach(m => { if(m.winner==='yellow') winY++; else if(m.winner==='blue') winB++; });
+            return winY > winB ? systemSettings.teamYellow : (winB > winY ? systemSettings.teamBlue : 'เสมอกัน');
+        }
+
+        function calculateCombinedScore(sportType) {
+            let scoreY = 0, scoreB = 0;
+            allMatchesArray.filter(m => m.sport === sportType && m.status === 'done')
+                .forEach(m => { if(m.winner==='yellow') scoreY+=3; else if(m.winner==='blue') scoreB+=3; });
+            return scoreY > scoreB ? `${systemSettings.teamYellow} (${scoreY} คะแนน)` : (scoreB > scoreY ? `${systemSettings.teamBlue} (${scoreB} คะแนน)` : 'เสมอกัน');
+        }
+
+        window.generateClosingReport = () => {
+            const reporter = document.getElementById('closingReporter').value;
+            const chairman = document.getElementById('closingChairman').value || "...................................................";
+            const pro = getPronoun(reporter);
+            const end = getEnding(reporter);
+            const logoHtml = getHeader();
+
+            let awardList = [];
+            let awardNum = 1;
+            const sportsInEvent = [...new Set(allMatchesArray.map(m => m.sport))];
+
+            sportsInEvent.forEach(sportKey => {
+                const awardType = document.querySelector(`input[name="award_${sportKey}"]:checked`)?.value || 'separate';
+                const sportName = getSportName(sportKey);
+                if (awardType === 'combined') {
+                    awardList.push({ t: `ถ้วยชนะเลิศ ${sportName} (คะแนนรวม)`, w: calculateCombinedScore(sportKey) });
+                } else {
+                    const categories = [...new Set(allMatchesArray.filter(m=>m.sport===sportKey).map(m=>m.category))];
+                    categories.forEach(cat => {
+                         awardList.push({ t: `ถ้วยชนะเลิศ ${sportName} ${cat}`, w: calculateGoldWinner(sportKey, cat) });
+                    });
+                }
+            });
+
+            // Overall
+            let tY=0, tB=0;
+            allMatchesArray.filter(m=>m.status==='done').forEach(m=>{ if(m.winner==='yellow') tY++; else if(m.winner==='blue') tB++; });
+            const wOverall = tY > tB ? systemSettings.teamYellow : (tB > tY ? systemSettings.teamBlue : 'เสมอกัน');
+            const wRunner = tY > tB ? systemSettings.teamBlue : (tB > tY ? systemSettings.teamYellow : '-');
+
+            const html = `
+                ${logoHtml}
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h3 style="margin:0; font-weight:bold;">คำกล่าวรายงาน (พิธีปิด)</h3>
+                    <h4 style="margin:5px 0;">กิจกรรมกีฬาภายใน "${systemSettings.eventName}" ประจำปีการศึกษา ${systemSettings.academicYear}</h4>
+                    <div>โดยประธานผู้จัดการแข่งขัน (${reporter})</div>
+                </div>
+                <div style="margin-bottom:15px;"><strong>เรียน ${chairman} ประธานในพิธีที่เคารพอย่างสูง</strong></div>
+                <div class="speech-indent">${pro} ${reporter} ในนามคณะกรรมการจัดการแข่งขัน ขอกราบขอบพระคุณที่ท่านให้เกียรติมาเป็นประธานในพิธีปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}" ซึ่งกำลังจะเสร็จสิ้นในวันนี้</div>
+                <div class="speech-indent">การแข่งขันกีฬาประกอบด้วย ${systemSettings.teamYellow}และ${systemSettings.teamBlue} ได้ดำเนินการแข่งขันหลายประเภท ได้แก่ ${getSportList()} บรรลุตามวัตถุประสงค์ทุกประการ</div>
+                <div class="speech-indent">บัดนี้ การแข่งขันได้ถึงบทสรุปลงแล้ว ${pro}ขอกราบเรียนเชิญท่านประธานมอบถ้วยรางวัลและโล่รางวัล ดังต่อไปนี้</div>
+                <div style="margin:15px 0;">
+                    <strong>รางวัลการแข่งขันแต่ละประเภท</strong>
+                    <ol style="line-height:1.8; margin-top:5px;">${awardList.map(a => `<li>${a.t} ได้แก่ <strong>${a.w}</strong></li>`).join('')}</ol>
+                    <strong style="display:block; margin-top:10px;">รางวัลชนะเลิศรวมกีฬา</strong>
+                    <ol start="${awardList.length+1}" style="line-height:1.8; margin-top:5px;">
+                        <li>ถ้วยชนะเลิศคะแนนรวม ได้แก่ <strong>${wOverall}</strong> (รวม ${Math.max(tY,tB)} เหรียญ)</li>
+                        <li>ถ้วยรองชนะเลิศอันดับ ๑ ได้แก่ <strong>${wRunner}</strong></li>
+                    </ol>
+                </div>
+                <div class="speech-indent">ลำดับต่อไป ${pro}ขอกราบเรียนเชิญท่านประธานกล่าวให้โอวาท และกล่าวปิดการแข่งขันกีฬาภายใน "${systemSettings.eventName}"</div>
+                <div style="text-align:right; margin-top:30px; margin-right:50px;"><strong>ขอกราบเรียนเชิญ${end}</strong></div>
+                <div style="text-align:center; font-size:9pt; margin-top:50px; color:#999; border-top:1px solid #eee; padding-top:10px;">เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</div>
+            `;
+
+            document.getElementById('previewContent').innerHTML = html;
+            bootstrap.Modal.getInstance(document.getElementById('closingSetupModal')).hide();
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        };
+
+    </script>
+</body>
+</html>
