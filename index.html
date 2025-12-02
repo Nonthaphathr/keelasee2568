@@ -309,6 +309,11 @@
                             <i class="fas fa-user-edit me-1"></i> ระบบลงทะเบียน
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="ceremony-docs.html" target="_blank" class="btn btn-sm btn-outline-primary border-0 w-100 text-start text-lg-center">
+                            <i class="fas fa-file-invoice me-1"></i> สร้างเอกสารพิธีการ
+                        </a>
+                    </li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-info border-0 w-100" onclick="showManual()"><i class="fas fa-book-reader me-1"></i> คู่มือ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-outline-success border-0 w-100" onclick="showSettings()"><i class="fas fa-cog me-1"></i> ตั้งค่าระบบ</button></li>
                     <li class="nav-item"><button class="btn btn-sm btn-light w-100" onclick="showPage('dashboard')"><i class="fas fa-home me-1"></i> หน้าหลัก</button></li>
@@ -654,7 +659,6 @@
         </div>
     </div>
 
-    <!-- Player List Preview Modal -->
     <div class="modal fade" id="playerListModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
@@ -673,7 +677,6 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
@@ -682,7 +685,6 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- ข้อมูลพื้นฐาน -->
                     <div class="setting-section">
                         <h6><i class="fas fa-school me-2"></i>ข้อมูลพื้นฐาน</h6>
                         <div class="row g-3">
@@ -701,7 +703,6 @@
                         </div>
                     </div>
 
-                    <!-- ชื่อสี/ทีม -->
                     <div class="setting-section">
                         <h6><i class="fas fa-palette me-2"></i>ชื่อสี/ทีมที่แข่งขัน</h6>
                         <div class="row g-3">
@@ -716,7 +717,6 @@
                         </div>
                     </div>
 
-                    <!-- รูปภาพ -->
                     <div class="setting-section">
                         <h6><i class="fas fa-image me-2"></i>รูปภาพ/โลโก้</h6>
                         <div class="row g-3">
@@ -741,7 +741,6 @@
                         </div>
                     </div>
 
-                    <!-- รายการกีฬา -->
                     <div class="setting-section">
                         <h6><i class="fas fa-running me-2"></i>รายการกีฬาที่จะจัด</h6>
                         <div class="mb-3">
@@ -757,7 +756,6 @@
                         </div>
                     </div>
 
-                    <!-- รหัสผ่าน -->
                     <div class="setting-section">
                         <h6><i class="fas fa-lock me-2"></i>รหัสผ่านระบบ</h6>
                         <div class="row g-3">
@@ -1656,99 +1654,6 @@
             if (!Array.isArray(matchDataLocal[key])) return;
             matchDataLocal[key].splice(idx, 1);
             set(ref(db, `matches/${currentMatchId}/${key}`), matchDataLocal[key]).then(() => { renderPlayers(matchDataLocal[key], team); });
-        };
-
-        // ===== ฟังก์ชันพิมพ์รายชื่อนักกีฬา (แก้ไขใหม่ - มีโลโก้คู่และ QR Code) =====
-        window.previewPlayerList = () => {
-            const listY = matchDataLocal.playersY || [];
-            const listB = matchDataLocal.playersB || [];
-            const max = Math.max(listY.length, listB.length, 12);
-            let tableRows = '';
-            for(let i = 0; i < max; i++) {
-                tableRows += `<tr>
-                    <td style="width:5%; text-align:center; font-weight:600; background:#fffde7; border:1px solid #333;">${i+1}</td>
-                    <td style="width:42.5%; padding-left:10px; background:#fffde7; height:28px; border:1px solid #333;">${listY[i] || ''}</td>
-                    <td style="width:5%; text-align:center; font-weight:600; background:#e3f2fd; border:1px solid #333;">${i+1}</td>
-                    <td style="width:42.5%; padding-left:10px; background:#e3f2fd; height:28px; border:1px solid #333;">${listB[i] || ''}</td>
-                </tr>`;
-            }
-            
-            // สร้างหัวเอกสารพร้อมโลโก้คู่
-            const hasEventLogo = systemSettings.eventLogo && systemSettings.eventLogo.trim() !== '';
-            let logoHtml = '';
-            if (hasEventLogo) {
-                logoHtml = `
-                    <div style="display:flex; justify-content:center; align-items:center; gap:30px; margin-bottom:10px;">
-                        <img src="${systemSettings.schoolLogo}" style="height:65px; object-fit:contain;">
-                        <img src="${systemSettings.eventLogo}" style="height:65px; object-fit:contain;">
-                    </div>
-                `;
-            } else {
-                logoHtml = `<img src="${systemSettings.schoolLogo}" style="height:65px; margin-bottom:8px;">`;
-            }
-            
-            const html = `
-                <div style="text-align:center; margin-bottom:15px; padding-bottom:15px; border-bottom:3px double #1a237e;">
-                    ${logoHtml}
-                    <h2 style="margin:0; font-family:'Kanit',sans-serif; font-size:20pt; color:#1a237e;">ใบรายชื่อนักกีฬา</h2>
-                    <h3 style="margin:3px 0 0; font-family:'Kanit',sans-serif; font-size:15pt; color:#ff9800;">"${systemSettings.eventName} ${systemSettings.academicYear}"</h3>
-                </div>
-                <div style="background:#f8f9fa; border-radius:6px; padding:10px 15px; margin-bottom:15px; border-left:4px solid #1a237e;">
-                    <table style="width:100%; font-size:11pt;">
-                        <tr>
-                            <td style="width:50%;"><strong>กีฬา:</strong> ${getSportName(matchDataLocal.sport)}</td>
-                            <td style="text-align:right;"><strong>วันที่:</strong> ${formatDateThai(matchDataLocal.date) || '-'}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>รุ่น:</strong> ${matchDataLocal.category}</td>
-                            <td style="text-align:right;"><strong>สถานที่:</strong> ${matchDataLocal.location || '-'}</td>
-                        </tr>
-                    </table>
-                </div>
-                <table style="width:100%; border-collapse:collapse; font-size:10pt;">
-                    <thead>
-                        <tr>
-                            <th colspan="2" style="background:linear-gradient(135deg,#f7971e,#ffd200); color:#000; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีม${systemSettings.teamYellow}</th>
-                            <th colspan="2" style="background:linear-gradient(135deg,#2196f3,#21cbf3); color:#fff; padding:8px; text-align:center; font-family:'Kanit',sans-serif; font-size:12pt; border:2px solid #333;">ทีม${systemSettings.teamBlue}</th>
-                        </tr>
-                        <tr style="background:#eee;">
-                            <th style="border:1px solid #333; padding:5px; width:5%;">ที่</th>
-                            <th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th>
-                            <th style="border:1px solid #333; padding:5px; width:5%;">ที่</th>
-                            <th style="border:1px solid #333; padding:5px;">ชื่อ - สกุล</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <div style="margin-top:30px;">
-                    <table style="width:100%;">
-                        <tr>
-                            <td style="width:50%; text-align:center; padding-top:25px;">
-                                <div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div>
-                                <p style="margin:0; font-size:9pt;">(................................................)</p>
-                                <p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีม${systemSettings.teamYellow}</p>
-                            </td>
-                            <td style="width:50%; text-align:center; padding-top:25px;">
-                                <div style="border-bottom:1px dotted #000; width:160px; margin:0 auto 5px;"></div>
-                                <p style="margin:0; font-size:9pt;">(................................................)</p>
-                                <p style="margin:2px 0 0; font-size:10pt; font-weight:600;">ผู้ควบคุมทีม${systemSettings.teamBlue}</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:flex-end;">
-                    <div style="text-align:left;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(window.location.href)}" style="width:70px; height:70px; border:1px solid #ddd; border-radius:5px;">
-                        <p style="margin:3px 0 0; font-size:7pt; color:#666; max-width:80px;">ดูผลตัดสิน/<br>ตัดสินการแข่งขัน</p>
-                    </div>
-                    <div style="text-align:right; flex:1;">
-                        <p style="margin:0; font-size:7pt; color:#999;">เอกสารนี้พิมพ์จากระบบจัดการกีฬาภายใน พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('playerListContent').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('playerListModal')).show();
         };
 
         window.saveMatchInfo = () => {
